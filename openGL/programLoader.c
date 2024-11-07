@@ -87,7 +87,7 @@ static char	*read_whole_file(const char *name, int *len)
 
 
 
-static int	load_shader(const char *name, GLenum type)
+static int	load_shader_file(const char *name, GLenum type)
 {
 	int sh_ID;
 	sh_ID = glCreateShader(type);
@@ -124,11 +124,11 @@ static int	load_shader(const char *name, GLenum type)
 	return (sh_ID);
 }
 
-int	load_programVF(const char *vert, const char *frag)
+int	load_shader_program_VF(const char *vert, const char *frag)
 {
 	int vert_ID, frag_ID;
-	vert_ID = load_shader(vert, GL_VERTEX_SHADER);
-	frag_ID = load_shader(frag, GL_FRAGMENT_SHADER);
+	vert_ID = load_shader_file(vert, GL_VERTEX_SHADER);
+	frag_ID = load_shader_file(frag, GL_FRAGMENT_SHADER);
 
 	if (vert_ID == -1 || frag_ID == -1)
 	{
@@ -164,12 +164,12 @@ int	load_programVF(const char *vert, const char *frag)
 	return (Prog_ID);
 }
 
-int	load_programVGF(const char *vert, const char *geom, const char *frag)
+int	load_shader_programVGF(const char *vert, const char *geom, const char *frag)
 {
 	int vert_ID, geom_ID, frag_ID;
-	vert_ID = load_shader(vert, GL_VERTEX_SHADER);
-	geom_ID = load_shader(geom, GL_GEOMETRY_SHADER);
-	frag_ID = load_shader(frag, GL_FRAGMENT_SHADER);
+	vert_ID = load_shader_file(vert, GL_VERTEX_SHADER);
+	geom_ID = load_shader_file(geom, GL_GEOMETRY_SHADER);
+	frag_ID = load_shader_file(frag, GL_FRAGMENT_SHADER);
 
 	if (vert_ID == -1 || geom_ID == -1 || frag_ID == -1)
 	{

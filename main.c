@@ -33,7 +33,7 @@ int main(void)
 	}
 
 	int Prog_ID;
-	Prog_ID = load_programVF("shaders/simple.vert", "shaders/simple.frag");
+	Prog_ID = load_shader_program_VF("shaders/simple.vert", "shaders/simple.frag");
 	if (Prog_ID == -1)
 	{
 		glfwDestroyWindow(win);

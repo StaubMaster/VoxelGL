@@ -14,8 +14,8 @@
 GLFWwindow *load_window(int w, int h, const char *name);
 GLFWwindow *load_window_ReSize(int w, int h, const char *name);
 
-int	load_programVF(const char *vert, const char *frag);
-int	load_programVGF(const char *vert, const char *geom, const char *frag);
+int	load_shader_program_VF(const char *vert, const char *frag);
+int	load_shader_programVGF(const char *vert, const char *geom, const char *frag);
 
 void texture_save(const char *name, unsigned int *data, int w, int h);
 void texture_load(const char *name, unsigned int **data, int *w, int *h);

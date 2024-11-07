@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "openGL.h"
+#include "openGL/openGL.h"
 
 
 void	f_rot(float *pls, float *mns, float cos, float sin)

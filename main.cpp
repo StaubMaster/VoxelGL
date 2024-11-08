@@ -6,7 +6,7 @@
 
 #include "openGL/openGL.h"
 #include "openGL/math3D.h"
-#include "openGL/programLoader.h"
+#include "openGL/programLoader.hpp"
 #include "openGL/textureLoadSave.h"
 #include "openGL/view.h"
 
@@ -26,9 +26,12 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	int Prog_ID;
-	Prog_ID = load_shader_program_VF("shaders/simple.vert", "shaders/simple.frag");
-	if (Prog_ID == -1)
+	Shader * prog;
+	try
+	{
+		prog = new Shader("shaders/simple.vert", "shaders/simple.frag");
+	}
+	catch (std::exception & e)
 	{
 		glfwDestroyWindow(win);
 		exit(EXIT_FAILURE);
@@ -39,9 +42,7 @@ int main(void)
 	glGenVertexArrays(1, &Buffer_Array);
 	glGenBuffers(1, &Buffer_PosCol);
 
-
-
-	glUseProgram(Prog_ID);
+	prog -> Use();
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_PosCol);
 
@@ -81,7 +82,7 @@ int main(void)
 	}
 	glfwDestroyWindow(win);
 
-	glDeleteProgram(Prog_ID);
+	delete prog;
 
 	glDeleteBuffers(1, &Buffer_PosCol);
 	glDeleteVertexArrays(1, &Buffer_Array);

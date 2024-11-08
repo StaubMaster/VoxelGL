@@ -20,15 +20,15 @@ class Point
 class Angle
 {
 	public:
-		float	x;
-		float	y;
-		float	z;
 		float	sin_x;
 		float	sin_y;
 		float	sin_z;
 		float	cos_x;
 		float	cos_y;
 		float	cos_z;
+		float	x;
+		float	y;
+		float	z;
 
 	public:
 		Angle();
@@ -39,7 +39,7 @@ class Angle
 
 	public:
 		void UpdateSinCos();
-}
+};
 
 void	rotate_fore(float *pls, float *mns, float cos, float sin);
 void	rotate_back(float *pls, float *mns, float cos, float sin);

@@ -2,7 +2,7 @@
 #ifndef VIEW_H
 # define VIEW_H
 # include "openGL.h"
-# include "math3D.h"
+# include "math3D.hpp"
 
 class View
 {
@@ -15,8 +15,8 @@ class View
 		~View();
 
 	public:
-		void	move(GLFWwindow *win);
-		void	turn(GLFWwindow *win);
+		void	move(GLFWwindow *win, float speed);
+		void	turn(GLFWwindow *win, float speed);
 };
 
 typedef struct s_view

@@ -20,6 +20,7 @@ class Shader
 
 	public:
 		void	Use() const;
+		int		FindUniform(const char * uniformName) const;
 
 	private:
 		class CompileErrorException : public std::exception { public: const char * what() const throw(); };

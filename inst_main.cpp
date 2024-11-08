@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
+#include "openGL/View.hpp"
 #include "inst.cpp"
 
 static void free_exit(GLFWwindow *win)
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 
 	inst_buffer_gen();
 	{
-		float Pos[] = (float[])
+		float Pos[] =
 		{
 			-1.0f, -1.0f, -1.0f, 0.75f, 0.99f,
 			-1.0f, -1.0f, +1.0f, 1.00f, 0.99f,
@@ -76,7 +77,7 @@ int main(int argc, char **argv)
 		};
 		inst_buffer_data_corn(Pos, 24);
 
-		unsigned int Indexe[] = (unsigned int[])
+		unsigned int Indexe[] =
 		{
 			0, 1, 2,    2, 1, 3,
 			4, 6, 5,    5, 6, 7,
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
 		inst_sin_cos(instances);
 
 		float w;
-		int i = 0;
+		unsigned int i = 0;
 		while (++i < instances_count)
 		{
 			instances[i].pos_x = ((rand() & 0xFF) + 15);
@@ -126,8 +127,7 @@ int main(int argc, char **argv)
 		inst_buffer_data_inst(instances, instances_count);
 	}
 
-	t_view view;
-	view_init(&view, 0.5f, 0.03f);
+	View view;
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -150,10 +150,11 @@ int main(int argc, char **argv)
 		last_frame = glfwGetTime();
 
 
+		view.move(win, 0.5f);
+		view.turn(win, 0.03f);
 
-		view_move_turn(&view, win);
 
-		for (int i = 1; i < instances_count; i++)
+		for (unsigned int i = 1; i < instances_count; i++)
 		{
 			dist = sqrt(
 				(instances[i].pos_x * instances[i].pos_x) +
@@ -171,7 +172,7 @@ int main(int argc, char **argv)
 		glClearColor(0.0f, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		inst_view(&view);
+		inst_view((float *)&(view));
 		inst_draw();
 
 		glfwSwapBuffers(win);

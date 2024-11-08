@@ -1,5 +1,5 @@
 
-#include "programLoader.hpp"
+#include "Shader.hpp"
 
 Shader::Shader()
 {
@@ -52,9 +52,48 @@ Shader::Shader(const std::string vert, const std::string frag)
 Shader::Shader(const std::string vert, const std::string geom, const std::string frag)
 {
 //	std::cout << "++++ Shader VGF\n";
-	(void) vert;
-	(void) geom;
-	(void) frag;
+
+	int vert_ID, geom_ID, frag_ID;
+	vert_ID = Load_Shader_File(vert, GL_VERTEX_SHADER);
+	geom_ID = Load_Shader_File(geom, GL_GEOMETRY_SHADER);
+	frag_ID = Load_Shader_File(frag, GL_FRAGMENT_SHADER);
+
+	if (vert_ID == -1 || geom_ID == -1 || frag_ID == -1)
+	{
+		glDeleteShader(vert_ID);
+		glDeleteShader(geom_ID);
+		glDeleteShader(frag_ID);
+		Program_ID = -1;
+		throw CompileErrorException();
+	}
+
+	Program_ID = glCreateProgram();
+
+	glAttachShader(Program_ID, vert_ID);
+	glAttachShader(Program_ID, geom_ID);
+	glAttachShader(Program_ID, frag_ID);
+	glLinkProgram(Program_ID);
+	glDetachShader(Program_ID, vert_ID);
+	glDetachShader(Program_ID, geom_ID);
+	glDetachShader(Program_ID, frag_ID);
+
+	glDeleteShader(vert_ID);
+	glDeleteShader(geom_ID);
+	glDeleteShader(frag_ID);
+
+	char log_txt[1024];
+	int log_len;
+	glGetProgramInfoLog(Program_ID, 1024, &log_len, log_txt);
+	if (log_len != 0)
+	{
+		glDeleteProgram(Program_ID);
+		write(2, "\nprog:\n", 7);
+		write(2, log_txt, log_len);
+		write(2, "\n", 1);
+		Program_ID = -1;
+		throw CompileErrorException();
+	}
+
 //	std::cout << Program_ID << "\n";
 }
 Shader::~Shader()
@@ -76,6 +115,11 @@ void	Shader::Use() const
 	glUseProgram(Program_ID);
 //	std::cout << Program_ID << "\n";
 }
+int		Shader::FindUniform(const char * uniformName) const
+{
+	return glGetUniformLocation(Program_ID, uniformName);
+}
+
 
 const char * Shader::CompileErrorException::what() const throw() { return " Error while compiling Shader Program"; }
 

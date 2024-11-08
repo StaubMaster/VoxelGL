@@ -17,7 +17,7 @@ void main()
 {
 	float f;
 	f = dot(fs_in.Normal, light);
-	f = max(f, 0.03);
+	f = max(f, 0.3);
 
 	vec4 col;
 	col = texture(texture0, fs_in.Tex);

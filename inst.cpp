@@ -5,6 +5,9 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
+#include "openGL/Shader.hpp"
+#include "openGL/View.hpp"
+#include "openGL/textureLoadSave.h"
 
 typedef struct s_inst_trans
 {
@@ -23,7 +26,7 @@ void inst_sin_cos(t_inst_trans *inst)
 	inst -> cos_z = cos(inst -> ang_z);
 }
 
-static int	Prog_ID;
+static Shader * Prog;
 static int	Uni_View;
 
 static unsigned int	Buffer_Array;
@@ -60,11 +63,11 @@ void	inst_delete()
 		Buffer_Array = 0xFFFFFFFF;
 	}
 
-	if (Prog_ID != -1)
+	if (Prog != NULL)
 	{
 		Uni_View = -1;
-		glDeleteProgram(Prog_ID);
-		Prog_ID = -1;
+		delete Prog;
+		Prog = NULL;
 	}
 
 	if (Texture1 != 0xFFFFFFFF)
@@ -76,7 +79,7 @@ void	inst_delete()
 
 void	inst_init()
 {
-	Prog_ID = -1;
+	Prog = NULL;
 	Uni_View = -1;
 	Buffer_Array = 0xFFFFFFFF;
 	Buffer_Corn = 0xFFFFFFFF;
@@ -87,13 +90,11 @@ void	inst_init()
 
 int		inst_load_program()
 {
-	Prog_ID = load_programVGF(
+	Prog = new Shader(
 		"shaders/inst_project.vert",
 		"shaders/faceNormal.geom",
 		"shaders/dirLight.frag");
-	if (Prog_ID == -1)
-		return (0);
-	Uni_View = glGetUniformLocation(Prog_ID, "view");
+	Uni_View = Prog -> FindUniform("view");
 	return (1);
 }
 
@@ -110,7 +111,7 @@ void	inst_buffer_gen()
 
 void	inst_buffer_data_corn(float *data, int count)
 {
-	glUseProgram(Prog_ID);
+	Prog -> Use();
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corn);
 
@@ -123,7 +124,7 @@ void	inst_buffer_data_corn(float *data, int count)
 
 void	inst_buffer_data_index(unsigned int *data, int count)
 {
-	glUseProgram(Prog_ID);
+	Prog -> Use();
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer_Index);
 
@@ -133,7 +134,7 @@ void	inst_buffer_data_index(unsigned int *data, int count)
 
 void	inst_buffer_data_inst(t_inst_trans *data, int count)
 {
-	glUseProgram(Prog_ID);
+	Prog -> Use();
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Inst);
 
@@ -181,10 +182,10 @@ int	inst_texture_load(const char *name)
 
 
 
-void	inst_view(t_view *view)
+void	inst_view(float *view)
 {
-	glUseProgram(Prog_ID);
-	glUniform3fv(Uni_View, 3, (view -> data));
+	Prog -> Use();
+	glUniform3fv(Uni_View, 3, view);
 }
 
 void	inst_draw()
@@ -192,7 +193,7 @@ void	inst_draw()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture1);
 
-	glUseProgram(Prog_ID);
+	Prog -> Use();
 	glBindVertexArray(Buffer_Array);
 	glDrawElementsInstanced(GL_TRIANGLES, IndexCount, GL_UNSIGNED_INT, (void*)0, InstCount);
 }

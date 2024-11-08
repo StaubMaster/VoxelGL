@@ -5,13 +5,14 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
+#include "openGL/Window.hpp"
 #include "openGL/View.hpp"
 #include "inst.cpp"
 
 static void free_exit(GLFWwindow *win)
 {
 	inst_delete();
-	glfwDestroyWindow(win);
+	(void)win;
 	exit(EXIT_FAILURE);
 }
 
@@ -31,18 +32,17 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	GLFWwindow	*win;
-	win = load_window(1000, 1000, "cube");
-	if (win == NULL)
-		exit(EXIT_FAILURE);
+	Window * win = new Window(1000, 1000, "instance test");
 
 	inst_init();
 	if (inst_load_program() == 0)
-		free_exit(win);
+		free_exit(NULL);
+	std::cout << "inst prog done\n";
 
 	inst_texture_gen();
 	if (inst_texture_load(argv[1]) == 0)
-		free_exit(win);
+		free_exit(NULL);
+	std::cout << "inst tex done\n";
 
 	inst_buffer_gen();
 	{
@@ -126,6 +126,7 @@ int main(int argc, char **argv)
 		}
 		inst_buffer_data_inst(instances, instances_count);
 	}
+	std::cout << "inst buff done\n";
 
 	View view;
 
@@ -141,18 +142,20 @@ int main(int argc, char **argv)
 	float dist, ang;
 	double last_frame = glfwGetTime();
 	double time_diff;
-	while (!glfwWindowShouldClose(win))
+
+	std::cout << "loop\n";
+	while (!glfwWindowShouldClose(win -> win))
 	{
-		if (glfwGetKey(win, GLFW_KEY_ESCAPE)) { glfwSetWindowShouldClose(win, 1); }
+		win -> Update();
 
 		time_diff = glfwGetTime() - last_frame;
 		time_diff *= 60;
 		last_frame = glfwGetTime();
 
 
-		view.move(win, 0.5f);
-		view.turn(win, 0.03f);
-
+		view.move(win -> GetKeyMovement(0.5f));
+		//view.turn(win -> GetKeyTurning(0.03f));
+		view.turn(win -> GetMouseTurning());
 
 		for (unsigned int i = 1; i < instances_count; i++)
 		{
@@ -167,18 +170,16 @@ int main(int argc, char **argv)
 		}
 		inst_buffer_data_inst(instances, instances_count);
 
-
-
 		glClearColor(0.0f, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		inst_view((float *)&(view));
 		inst_draw();
 
-		glfwSwapBuffers(win);
+		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
-	glfwDestroyWindow(win);
+	delete win;
 	inst_delete();
 
 	return (0);

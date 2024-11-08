@@ -9,39 +9,18 @@ View::~View()
 {
 
 }
-void	View::move(GLFWwindow *win, float speed)
+void	View::move(Point rel)
 {
-	Point rel;
-	if (glfwGetKey(win, GLFW_KEY_D))			{ rel.x -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_A))			{ rel.x += speed; }
-	if (glfwGetKey(win, GLFW_KEY_SPACE))		{ rel.y -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT))	{ rel.y += speed; }
-	if (glfwGetKey(win, GLFW_KEY_S))			{ rel.z -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_W))			{ rel.z += speed; }
 	rotate_fore(&rel.z, &rel.x, ang.cos_y, ang.sin_y);
-	//view -> pos_x += rel[0];
-	//view -> pos_y += rel[1];
-	//view -> pos_z += rel[2];
 	pos.x += rel.x;
 	pos.y += rel.y;
 	pos.z += rel.z;
 }
-void	View::turn(GLFWwindow *win, float speed)
+void	View::turn(Angle rel)
 {
-	Point rel;
-	if (glfwGetKey(win, GLFW_KEY_DOWN))		{ rel.x += speed; }
-	if (glfwGetKey(win, GLFW_KEY_UP))		{ rel.x -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_LEFT))		{ rel.y += speed; }
-	if (glfwGetKey(win, GLFW_KEY_RIGHT))	{ rel.y -= speed; }
 	ang.x += rel.x;
 	ang.y += rel.y;
 	ang.z += rel.z;
-	//view -> sin_x = sin(view -> ang_x);
-	//view -> cos_x = cos(view -> ang_x);
-	//view -> sin_y = sin(view -> ang_y);
-	//view -> cos_y = cos(view -> ang_y);
-	//view -> sin_z = sin(view -> ang_z);
-	//view -> cos_z = cos(view -> ang_z);
 	ang.UpdateSinCos();
 }
 

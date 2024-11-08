@@ -15,8 +15,8 @@ class View
 		~View();
 
 	public:
-		void	move(GLFWwindow *win, float speed);
-		void	turn(GLFWwindow *win, float speed);
+		void	move(Point rel);
+		void	turn(Angle rel);
 };
 
 typedef struct s_view

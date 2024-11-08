@@ -7,6 +7,7 @@
 #include "openGL/openGL.h"
 #include "openGL/Window.hpp"
 #include "openGL/View.hpp"
+#include "VoxelChunk.hpp"
 #include "inst.cpp"
 
 static void free_exit(GLFWwindow *win)
@@ -128,6 +129,17 @@ int main(int argc, char **argv)
 	}
 	std::cout << "inst buff done\n";
 
+	VoxelChunk chunk;
+	chunk.UpdateBufferCorner();
+	chunk.UpdateBufferIndex();
+	Shader voxelShader(
+		"shaders/tri_project.vert",
+		"shaders/faceNormalNoTex.geom",
+		"shaders/dirLightNoCol.frag"
+	);
+	unsigned int Uni_View = voxelShader.FindUniform("view");
+	std::cout << "view Uni " << Uni_View << "\n";
+
 	View view;
 
 	glEnable(GL_DEPTH_TEST);
@@ -174,7 +186,11 @@ int main(int argc, char **argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		inst_view((float *)&(view));
-		inst_draw();
+		//inst_draw();
+
+		voxelShader.Use();
+		glUniform3fv(Uni_View, 3, (float *)&view);
+		chunk.Draw();
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();

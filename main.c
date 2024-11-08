@@ -5,16 +5,10 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
-
-
-void	f_rot(float *pls, float *mns, float cos, float sin)
-{
-	float	temppp;
-
-	temppp = pls[0] * cos - mns[0] * sin;
-	mns[0] = mns[0] * cos + pls[0] * sin;
-	pls[0] = temppp;
-}
+#include "openGL/math3D.h"
+#include "openGL/programLoader.h"
+#include "openGL/textureLoadSave.h"
+#include "openGL/view.h"
 
 void leaks(void)
 {
@@ -81,9 +75,9 @@ int main(void)
 		glfwSwapBuffers(win);
 		glfwPollEvents();
 
-		f_rot(&PosCol[0x0], &PosCol[0x1], wnk_cos, wnk_sin);
-		f_rot(&PosCol[0x5], &PosCol[0x6], wnk_cos, wnk_sin);
-		f_rot(&PosCol[0xA], &PosCol[0xB], wnk_cos, wnk_sin);
+		rotate_fore(&PosCol[0x0], &PosCol[0x1], wnk_cos, wnk_sin);
+		rotate_back(&PosCol[0x5], &PosCol[0x6], wnk_cos, wnk_sin);
+		rotate_fore(&PosCol[0xA], &PosCol[0xB], wnk_cos, wnk_sin);
 	}
 	glfwDestroyWindow(win);
 

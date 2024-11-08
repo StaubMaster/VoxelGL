@@ -4,7 +4,7 @@ NAME = openGL.a
 FLAGS = -Wall -Wextra -Werror
 FLAGS += -lglfw
 
-FILE_C = glad.c programLoader.c windowLoader.c textureLoadSave.c view.c
+FILE_C = glad.c stringHelp.c programLoader.c windowLoader.c textureLoadSave.c view.c math3D.c
 FILE_O = $(FILE_C:.c=.o)
 
 

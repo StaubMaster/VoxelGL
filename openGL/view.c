@@ -1,14 +1,5 @@
 
-#include "openGL.h"
-
-
-static void	f_rot(float *pls, float *mns, float cos, float sin)
-{
-	float	temppp;
-	temppp = pls[0] * cos - mns[0] * sin;
-	mns[0] = mns[0] * cos + pls[0] * sin;
-	pls[0] = temppp;
-}
+#include "view.h"
 
 void	view_init(t_view *view, float move, float turn)
 {
@@ -38,7 +29,7 @@ static void view_move(t_view *view, GLFWwindow *win)
 	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT))	{ rel[1] += view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_S))			{ rel[2] -= view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_W))			{ rel[2] += view -> move_speed; }
-	f_rot(&rel[2], &rel[0], view -> cos_y, view -> sin_y);
+	rotate_fore(&rel[2], &rel[0], view -> cos_y, view -> sin_y);
 	view -> pos_x += rel[0];
 	view -> pos_y += rel[1];
 	view -> pos_z += rel[2];

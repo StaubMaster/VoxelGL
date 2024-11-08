@@ -1,6 +1,5 @@
 
 FLAGS = -Wall -Wextra -Werror
-FLAGS += -lglfw
 
 NAME = test
 
@@ -12,7 +11,7 @@ ARC = $(ARC_PATH)/openGL.a
 
 
 $(NAME) : $(FILE_O) $(ARC)
-	cc $(FILE_O) $(ARC) $(FLAGS) -o $(NAME)
+	cc $(FLAGS) -lglfw $(FILE_O) $(ARC) -o $(NAME)
 
 all:
 	$(MAKE) $(FILE_O)
@@ -34,7 +33,7 @@ re:
 
 
 %.o : %.c
-	cc -c $^ -o $@
+	cc $(FLAGS) -c $^ -o $@
 
 
 $(ARC) :

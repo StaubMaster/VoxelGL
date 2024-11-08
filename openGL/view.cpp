@@ -1,5 +1,15 @@
 
-#include "view.h"
+#include "view.hpp"
+
+View::View()
+{
+
+}
+View::~View()
+{
+
+}
+
 
 void	view_init(t_view *view, float move, float turn)
 {

@@ -4,6 +4,21 @@
 # include "openGL.h"
 # include "math3D.h"
 
+class View
+{
+	public:
+		Point	pos;
+		Angle	ang;
+
+	public:
+		View();
+		~View();
+
+	public:
+		void	move(GLFWwindow *win);
+		void	turn(GLFWwindow *win);
+};
+
 typedef struct s_view
 {
 	float	pos_x, pos_y, pos_z;

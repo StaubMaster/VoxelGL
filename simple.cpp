@@ -8,7 +8,7 @@
 #include "openGL/math3D.h"
 #include "openGL/programLoader.hpp"
 #include "openGL/textureLoadSave.h"
-#include "openGL/view.h"
+#include "openGL/view.hpp"
 
 void leaks(void)
 {

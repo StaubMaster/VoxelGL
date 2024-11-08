@@ -3,7 +3,7 @@ FLAGS = -Wall -Wextra -Werror
 
 NAME = test
 
-FILE_C = main.cpp
+FILE_C = inst_main.cpp
 FILE_O = $(FILE_C:.cpp=.o)
 
 ARC_PATH = ./openGL

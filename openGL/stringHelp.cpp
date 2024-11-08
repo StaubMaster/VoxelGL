@@ -15,7 +15,7 @@ int	copy_add_free(char **arr_data, int *arr_len, char *buf, int siz)
 	char	*arr_new;
 	int		i;
 
-	arr_new = calloc((*arr_len) + siz, sizeof(char));
+	arr_new = (char *)calloc((*arr_len) + siz, sizeof(char));
 	if (arr_new == NULL)
 		return (0);
 	i = 0;
@@ -47,7 +47,7 @@ char	*read_whole_file(const char *name, int *len)
 		return (NULL);
 	}
 
-	char	*arr_data = calloc(1, sizeof(char));
+	char	*arr_data = (char *)calloc(1, sizeof(char));
 	if (arr_data == NULL)
 	{
 		close(fd);

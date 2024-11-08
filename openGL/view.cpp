@@ -22,7 +22,7 @@ void	view_init(t_view *view, float move, float turn)
 
 static void view_move(t_view *view, GLFWwindow *win)
 {
-	float rel[] = (float[]) { 0.0f, 0.0f, 0.0f };
+	float rel[] = { 0.0f, 0.0f, 0.0f };
 	if (glfwGetKey(win, GLFW_KEY_D))			{ rel[0] -= view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_A))			{ rel[0] += view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_SPACE))		{ rel[1] -= view -> move_speed; }
@@ -37,7 +37,7 @@ static void view_move(t_view *view, GLFWwindow *win)
 
 static void view_turn(t_view *view, GLFWwindow *win)
 {
-	float rel[] = (float[]) { 0.0f, 0.0f, 0.0f };
+	float rel[] = { 0.0f, 0.0f, 0.0f };
 	if (glfwGetKey(win, GLFW_KEY_DOWN))		{ rel[0] += view -> turn_speed; }
 	if (glfwGetKey(win, GLFW_KEY_UP))		{ rel[0] -= view -> turn_speed; }
 	if (glfwGetKey(win, GLFW_KEY_LEFT))		{ rel[1] += view -> turn_speed; }

@@ -46,7 +46,7 @@ int main(void)
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_PosCol);
 
 
-	float PosCol[] = (float[])
+	float PosCol[] =
 	{
 		-0.6f, -0.6f, 1.0f, 0.0f, 0.0f,
 		+0.6f, -0.6f, 0.0f, 1.0f, 0.0f,

@@ -3,15 +3,15 @@ FLAGS = -Wall -Wextra -Werror
 
 NAME = test
 
-FILE_C = main.c
-FILE_O = $(FILE_C:.c=.o)
+FILE_C = main.cpp
+FILE_O = $(FILE_C:.cpp=.o)
 
 ARC_PATH = ./openGL
 ARC = $(ARC_PATH)/openGL.a
 
 
 $(NAME) : $(FILE_O) $(ARC)
-	cc $(FLAGS) -lglfw $(FILE_O) $(ARC) -o $(NAME)
+	c++ $(FLAGS) -lglfw $(FILE_O) $(ARC) -o $(NAME)
 
 all:
 	$(MAKE) $(FILE_O)
@@ -32,8 +32,8 @@ re:
 .PHONY: all clean fclean re
 
 
-%.o : %.c
-	cc $(FLAGS) -c $^ -o $@
+%.o : %.cpp
+	c++ $(FLAGS) -c $^ -o $@
 
 
 $(ARC) :

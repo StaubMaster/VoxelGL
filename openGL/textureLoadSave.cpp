@@ -14,7 +14,7 @@ static void write_uint(int fd, unsigned int i)
 static void read_uint(int fd, unsigned int *i)
 {
 	unsigned char bytes[4];
-	int r = read(fd, bytes, 4);
+	read(fd, bytes, 4);
 	(*i) = 0;
 	(*i) |= ((unsigned int)bytes[0]) << 24;
 	(*i) |= ((unsigned int)bytes[1]) << 16;
@@ -77,7 +77,7 @@ void texture_load(const char *name, unsigned int **data, int *w, int *h)
 		if (!(s1 == 0x54455854 && s2 == 0x2D555245))
 		{
 			//printf("\twrong signature: %08X%08X != 544558542D555245\n", s1, s2);
-			(*data) = NULL + 1;
+			(*data) = NULL;
 			printf("\twrong signature\n");
 			close(fd);
 			return;
@@ -87,7 +87,7 @@ void texture_load(const char *name, unsigned int **data, int *w, int *h)
 	}
 
 	int size = _w * _h;
-	_data = calloc(size, sizeof(unsigned int));
+	_data = (unsigned int *)calloc(size, sizeof(unsigned int));
 	if (_data == NULL)
 	{
 		printf("\tcouldn't malloc\n");

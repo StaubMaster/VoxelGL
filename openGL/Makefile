@@ -2,10 +2,9 @@
 NAME = openGL.a
 
 FLAGS = -Wall -Wextra -Werror
-FLAGS += -lglfw
 
-FILE_C = glad.c stringHelp.c programLoader.c windowLoader.c textureLoadSave.c view.c math3D.c
-FILE_O = $(FILE_C:.c=.o)
+FILE_C = stringHelp.cpp programLoader.cpp windowLoader.cpp textureLoadSave.cpp view.cpp math3D.cpp
+FILE_O = glad.o $(FILE_C:.cpp=.o)
 
 
 all: $(FILE_O)
@@ -22,7 +21,7 @@ re:
 	$(MAKE) fclean
 	$(MAKE) all
 
-%.o : %.c
-	cc -c $^ -o $@
+%.o : %.cpp
+	c++ $(FLAGS) -c $^ -o $@
 
 .PHONY: all clean fclean re

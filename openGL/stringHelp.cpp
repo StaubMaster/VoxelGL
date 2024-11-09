@@ -1,5 +1,5 @@
 
-#include "stringHelp.h"
+#include "stringHelp.hpp"
 
 int str_len(const char *name)
 {
@@ -83,4 +83,21 @@ char	*read_whole_file(const char *name, int *len)
 
 	(*len) = arr_len;
 	return (arr_data);
+}
+
+std::string read_whole_file(std::string path)
+{
+	std::ifstream file;
+	file.open(path.c_str());
+	std::string text = "";
+
+	std::string line;
+	while (!file.eof())
+	{
+		std::getline(file, line);
+		text += line + "\n";
+	}
+
+	file.close();
+	return (text);
 }

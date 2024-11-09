@@ -2,7 +2,7 @@
 #ifndef PROGRAMLOADER_HPP
 # define PROGRAMLOADER_HPP
 # include "openGL.h"
-# include "stringHelp.h"
+# include "stringHelp.hpp"
 # include <iostream>
 
 class Shader

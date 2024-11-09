@@ -126,21 +126,13 @@ int	Shader::Load_Shader_File(std::string file, GLenum type)
 	int sh_ID;
 	sh_ID = glCreateShader(type);
 
-	char *shader_str;
-	const char *shader_const;
-	int shader_len;
+	std::string shader_str;
+	shader_str = read_whole_file(file);
 
-	shader_str = read_whole_file(file.c_str(), &shader_len);
-	std::cout << "========\n";
-	std::cout << std::string(shader_str, shader_len) << "\n";
-	std::cout << "========\n";
-	if (shader_str == NULL)
-	{
-		return (-1);
-	}
-	shader_const = shader_str;
-	glShaderSource(sh_ID, 1, &shader_const, &shader_len);
-	free(shader_str);
+	const char * shader_txt = shader_str.c_str();
+	int	shader_len = shader_str.size();
+
+	glShaderSource(sh_ID, 1, &shader_txt, &shader_len);
 	glCompileShader(sh_ID);
 
 	char log_txt[1024];

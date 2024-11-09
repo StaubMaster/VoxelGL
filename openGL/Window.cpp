@@ -39,8 +39,9 @@ Window::Window(int w, int h, const char * name)
 		throw GenericWindowException();
 	}
 	std::cout << "gl done\n";
-	
-	glViewport(0, 0, w * 2, h * 2);
+
+	//glViewport(0, 0, w * 2, h * 2);	//	Mac
+	glViewport(0, 0, w, h);				//Windows
 	std::cout << "viewport done\n";
 
 	tabbed = false;

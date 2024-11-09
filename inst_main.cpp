@@ -49,12 +49,12 @@ int main(int argc, char **argv)
 	inst_init();
 	if (inst_load_program() == 0)
 		free_exit(NULL);
-	std::cout << "inst prog done\n";
+	std::cout << "instance program done\n";
 
 	inst_texture_gen();
 	if (inst_texture_load(argv[1]) == 0)
 		free_exit(NULL);
-	std::cout << "inst tex done\n";
+	std::cout << "individual textures done\n";
 
 	inst_buffer_gen();
 	{
@@ -88,6 +88,7 @@ int main(int argc, char **argv)
 			+1.0f, +1.0f, +1.0f, 0.50f, 0.00f,
 		};
 		inst_buffer_data_corn(Pos, 24);
+		std::cout << "  individual buffer vertex done\n";
 
 		unsigned int Indexe[] =
 		{
@@ -107,10 +108,15 @@ int main(int argc, char **argv)
 		while (++i < 36)
 			Indexe[i] += 16;
 		inst_buffer_data_index(Indexe, 36);
+		std::cout << "  individual buffer index done\n";
 	}
+	std::cout << "individual buffer done\n";
 
-	unsigned int instances_count = 0xFFFF;
+	unsigned int instances_count = 0xFFF;
+	std::cout << "instance size: " << sizeof(t_inst_trans) << "\n";
+	std::cout << "instance array size: " << sizeof(t_inst_trans) * instances_count << "\n";
 	t_inst_trans instances[instances_count];
+	std::cout << "instance alloc done\n";
 	{
 		instances -> pos_x = 0;
 		instances -> pos_y = 0;
@@ -119,6 +125,7 @@ int main(int argc, char **argv)
 		instances -> ang_y = 0;
 		instances -> ang_z = 0;
 		inst_sin_cos(instances);
+		std::cout << "instance sin cos done\n";
 
 		float w;
 		unsigned int i = 0;
@@ -138,7 +145,7 @@ int main(int argc, char **argv)
 		}
 		inst_buffer_data_inst(instances, instances_count);
 	}
-	std::cout << "inst buff done\n";
+	std::cout << "instance buffer done\n";
 
 	VoxelChunk chunk;
 	chunk.UpdateBufferCorner();
@@ -197,7 +204,7 @@ int main(int argc, char **argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		inst_view((float *)&(view));
-		//inst_draw();
+		inst_draw();
 
 		voxelShader.Use();
 		glUniform3fv(Uni_View, 3, (float *)&view);

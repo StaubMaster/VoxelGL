@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,11 +26,21 @@ static void	f_rot(float *pls, float *mns, float cos, float sin)
 	pls[0] = temppp;
 }
 
+static void use_info()
+{
+	std::cout
+		<< "./a.out "
+		<< "[texture.uints]"
+		<< "\n";
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 2)
 	{
-		printf("needs texture name\n");
+		(void)argc;
+		(void)argv;
+		use_info();
 		return 0;
 	}
 

@@ -11,7 +11,7 @@ ARC = $(ARC_PATH)/openGL.a
 
 
 $(NAME) : $(FILE_O) $(ARC)
-	c++ $(FLAGS) -lglfw $(FILE_O) $(ARC) -o $(NAME)
+	c++ $(FLAGS) $(FILE_O) $(ARC) -o $(NAME) E:/Programmieren/code/glfw-3.4.bin.WIN64/lib-mingw-w64/libglfw3.a -lgdi32
 
 all:
 	$(MAKE) $(FILE_O)

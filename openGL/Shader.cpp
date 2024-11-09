@@ -40,9 +40,7 @@ Shader::Shader(const std::string vert, const std::string frag)
 	if (log_len != 0)
 	{
 		glDeleteProgram(Program_ID);
-		write(2, "\nprog:\n", 7);
-		write(2, log_txt, log_len);
-		write(2, "\n", 1);
+		std::cout << "Shader:\n" << std::string(log_txt, log_len) << "\n";
 		Program_ID = -1;
 		throw CompileErrorException();
 	}
@@ -87,9 +85,7 @@ Shader::Shader(const std::string vert, const std::string geom, const std::string
 	if (log_len != 0)
 	{
 		glDeleteProgram(Program_ID);
-		write(2, "\nprog:\n", 7);
-		write(2, log_txt, log_len);
-		write(2, "\n", 1);
+		std::cout << "Shader:\n" << std::string(log_txt, log_len) << "\n";
 		Program_ID = -1;
 		throw CompileErrorException();
 	}
@@ -135,6 +131,9 @@ int	Shader::Load_Shader_File(std::string file, GLenum type)
 	int shader_len;
 
 	shader_str = read_whole_file(file.c_str(), &shader_len);
+	std::cout << "========\n";
+	std::cout << std::string(shader_str, shader_len) << "\n";
+	std::cout << "========\n";
 	if (shader_str == NULL)
 	{
 		return (-1);
@@ -149,14 +148,7 @@ int	Shader::Load_Shader_File(std::string file, GLenum type)
 	glGetShaderInfoLog(sh_ID, 1024, &log_len, log_txt);
 	if (log_len != 0)
 	{
-		//int len = 0;
-		/*while (name[len] != '\0')
-			len++;*/
-		write(2, "\n", 1);
-		/*write(2, name, len);
-		write(2, ":\n", 2);*/
-		write(2, log_txt, log_len);
-		write(2, "\n", 1);
+		std::cout << file << ":\n" << std::string(log_txt, log_len) << "\n";
 	}
 
 	return (sh_ID);
@@ -189,14 +181,7 @@ int	load_shader_file(const char *name, GLenum type)
 	glGetShaderInfoLog(sh_ID, 1024, &log_len, log_txt);
 	if (log_len != 0)
 	{
-		int len = 0;
-		while (name[len] != '\0')
-			len++;
-		write(2, "\n", 1);
-		write(2, name, len);
-		write(2, ":\n", 2);
-		write(2, log_txt, log_len);
-		write(2, "\n", 1);
+		std::cout << name << ":\n" << std::string(log_txt, log_len) << "\n";
 	}
 
 	return (sh_ID);
@@ -233,9 +218,7 @@ int	load_shader_program_VF(const char *vert, const char *frag)
 	if (log_len != 0)
 	{
 		glDeleteProgram(Prog_ID);
-		write(2, "\nprog:\n", 7);
-		write(2, log_txt, log_len);
-		write(2, "\n", 1);
+		std::cout << "Shader:\n" << std::string(log_txt, log_len) << "\n";
 		return (-1);
 	}
 

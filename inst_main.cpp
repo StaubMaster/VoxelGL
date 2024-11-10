@@ -148,7 +148,8 @@ int main(int argc, char **argv)
 	std::cout << "instance buffer done\n";
 
 	VoxelChunk chunk;
-	chunk.UpdateBufferCorner();
+	chunk.FillRandom();
+	chunk.UpdateBufferVertex();
 	chunk.UpdateBufferIndex();
 	Shader voxelShader(
 		"shaders/tri_project.vert",
@@ -183,7 +184,7 @@ int main(int argc, char **argv)
 		last_frame = glfwGetTime();
 
 
-		view.move(win -> GetKeyMovement(0.5f));
+		view.move(win -> GetKeyMovement(0.05f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 

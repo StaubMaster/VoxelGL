@@ -20,6 +20,7 @@ void main()
 
 	vec4 col;
 	col = vec4(1, 1, 1, 1);
+	col = col * f;
 
 	Pixel = vec4(col);
 }

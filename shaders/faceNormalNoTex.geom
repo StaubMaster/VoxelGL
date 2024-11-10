@@ -36,12 +36,6 @@ void calcCorner(int i)
 void main()
 {
 	gs_out.Normal = calcNormal(gs_in[0].NonProj, gs_in[1].NonProj, gs_in[2].NonProj);
-	//gl_Position = vec4(+0.5, +0.5, 0.5, 1);
-	//EmitVertex();
-	//gl_Position = vec4(+0.5, -0.5, 0.5, 1);
-	//EmitVertex();
-	//gl_Position = vec4(-0.5, -0.5, 0.5, 1);
-	//EmitVertex();
 	calcCorner(0);
 	calcCorner(1);
 	calcCorner(2);

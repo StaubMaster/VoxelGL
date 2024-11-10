@@ -99,10 +99,10 @@ VoxelChunk::~VoxelChunk()
 VoxelChunk::VoxelChunk(const VoxelChunk & other) :
 	Chunk_X(other.Chunk_X), Chunk_Y(other.Chunk_Y), Chunk_Z(other.Chunk_Z)
 {
-	std::cout
+	/*std::cout
 		<< "==== VoxelChunk "
 		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
-		<< "\n";
+		<< "\n";*/
 
 	Data = new char[Voxel_per_Chunk];
 
@@ -174,7 +174,8 @@ void	VoxelChunk::UpdateBufferVertex()
 			}
 		}
 	}
-	std::cout << "Vertex Count:" << vertex_count << " (" << (vertex_count * sizeof(unsigned int)) << "B)\n";
+	//std::cout << "Vertex Count:" << vertex_count << " (" << (vertex_count * sizeof(unsigned int)) << "B)\n";
+	//std::cout << "Vertex Count:" << vertex_count << " (" << mem_size_1024(vertex_count * sizeof(unsigned int)) << ")\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
@@ -311,7 +312,7 @@ void	VoxelChunk::UpdateBufferIndex(
 			}
 		}
 	}
-	std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << " (" << (index_count * sizeof(unsigned int)) << "B)\n";
+	//std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << " (" << (index_count * sizeof(unsigned int)) << "B)\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer_Index);

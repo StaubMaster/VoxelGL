@@ -4,6 +4,7 @@
 # include "openGL/openGL.h"
 # include "openGL/math3D.hpp"
 # include "Box.hpp"
+# include "MemorySize.hpp"
 # include <iostream>
 
 class VoxelChunk

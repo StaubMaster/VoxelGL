@@ -21,6 +21,7 @@ class VoxelSpace
 		VoxelChunk *	FindChunkPtr(int x, int y, int z);
 
 		void	Draw(int Uni_Chunk_Pos) const;
+		void	DrawBound() const;
 };
 
 #endif

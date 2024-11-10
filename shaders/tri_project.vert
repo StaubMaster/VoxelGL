@@ -1,9 +1,9 @@
 #version 330
 
-layout(location = 0) in vec3 VPos;
-
 uniform vec3[3] view;
 const float projF = 2.0;
+
+layout(location = 0) in vec3 VPos;
 
 out Vert_Out
 {

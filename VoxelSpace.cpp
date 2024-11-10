@@ -6,11 +6,11 @@ VoxelSpace::VoxelSpace()
 	std::cout << "++++ VoxelSpace\n";
 
 	Chunks.clear();
-	for (int z = -0; z <= +1; z++)
+	for (int z = -2; z < +2; z++)
 	{
-		for (int y = -0; y <= +1; y++)
+		for (int y = -2; y < +2; y++)
 		{
-			for (int x = -0; x <= +1; x++)
+			for (int x = -2; x < +2; x++)
 			{
 				Chunks.push_back(VoxelChunk(x, y, z));
 			}
@@ -57,3 +57,25 @@ void	VoxelSpace::Draw(int Uni_Chunk_Pos) const
 	for (size_t i = 0; i < Chunks.size(); i++)
 		Chunks[i].Draw(Uni_Chunk_Pos);
 }
+void	VoxelSpace::DrawBound() const
+{
+	int x, y, z;
+	Point min, max;
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		Chunks[i].getChunkIndex(x, y, z);
+		min.x = x * 4 * (int)(VoxelChunk::Voxel_per_Side);
+		min.y = y * 4 * (int)(VoxelChunk::Voxel_per_Side);
+		min.z = z * 4 * (int)(VoxelChunk::Voxel_per_Side);
+		max.x = min.x + 4 * (int)(VoxelChunk::Voxel_per_Side);
+		max.y = min.y + 4 * (int)(VoxelChunk::Voxel_per_Side);
+		max.z = min.z + 4 * (int)(VoxelChunk::Voxel_per_Side);
+
+		Box box(min, max);
+		box.CreateBuffer();
+		box.UpdateBuffer();
+		box.Draw();
+	}
+}
+
+

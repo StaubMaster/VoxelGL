@@ -71,10 +71,10 @@ void VoxelChunk::IndexFaceZp(unsigned int * index, unsigned int idx, unsigned in
 VoxelChunk::VoxelChunk(int x, int y, int z) :
 	Chunk_X(x), Chunk_Y(y), Chunk_Z(z)
 {
-	std::cout
+	/*std::cout
 		<< "++++ VoxelChunk "
 		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
-		<< "\n";
+		<< "\n";*/
 
 	Data = new char[Voxel_per_Chunk];
 
@@ -84,10 +84,10 @@ VoxelChunk::VoxelChunk(int x, int y, int z) :
 }
 VoxelChunk::~VoxelChunk()
 {
-	std::cout
+	/*std::cout
 		<< "---- VoxelChunk "
 		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
-		<< "\n";
+		<< "\n";*/
 
 	delete [] Data;
 
@@ -174,7 +174,7 @@ void	VoxelChunk::UpdateBufferVertex()
 			}
 		}
 	}
-	std::cout << "Vertex Count:" << vertex_count << "(" << (vertex_count * sizeof(unsigned int)) << "B)\n";
+	std::cout << "Vertex Count:" << vertex_count << " (" << (vertex_count * sizeof(unsigned int)) << "B)\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
@@ -311,7 +311,7 @@ void	VoxelChunk::UpdateBufferIndex(
 			}
 		}
 	}
-	std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << "(" << (index_count * sizeof(unsigned int)) << "B)\n";
+	std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << " (" << (index_count * sizeof(unsigned int)) << "B)\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer_Index);
@@ -328,6 +328,35 @@ void	VoxelChunk::UpdateBufferIndex(
 	(void)Yp;
 	(void)Zp;
 }
+/*		Better Buffers
+	IndexUnCompressed[MaxIndexCount] = 0xFFFFFFFF
+	FaceIndexUnCompressed[MaxFaceCount]
+
+	fill FaceIndexUnCompressed as in UpdateBufferIndex()
+		each index used, set IndexUnCompressed[index] = 0
+	count IndexFaceCount
+
+	IndexCount = 0
+	IndexCompressionMap[MaxIndexCount]
+	for each IndexUnCompressed
+		if (IndexUnCompressed[i] == 0)
+		{
+			IndexCompressionMap[i] = IndexCount
+			IndexCount++
+		}
+
+	VertexCompressed[IndexCount]
+	for each IndexUnCompressed
+		if IndexUnCompressed[index] == 0
+			VertexCompressed[index] = setForVertex(IndexCompressionMap[index])
+
+	FaceIndexCompressed[FaceIndexCount]
+	for each FaceIndexUnCompressed
+		FaceIndexCompressed[index] = IndexCompressionMap[FaceIndexUnCompressed[index]]
+
+	put VertexCompressed into Buffer
+	put FaceIndexCompressed into Buffer
+*/
 void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 {
 	glUniform3i(Uni_Chunk_Pos, Chunk_X, Chunk_Y, Chunk_Z);

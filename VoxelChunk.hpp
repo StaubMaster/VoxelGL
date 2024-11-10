@@ -3,6 +3,7 @@
 # define VOXELCHUNK_HPP
 # include "openGL/openGL.h"
 # include "openGL/math3D.hpp"
+# include "Box.hpp"
 # include <iostream>
 
 class VoxelChunk

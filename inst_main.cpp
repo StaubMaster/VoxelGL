@@ -10,6 +10,7 @@
 #include "openGL/View.hpp"
 #include "VoxelChunk.hpp"
 #include "VoxelSpace.hpp"
+#include "Box.hpp"
 #include "inst.cpp"
 
 static void free_exit(GLFWwindow *win)
@@ -158,14 +159,25 @@ int main(int argc, char **argv)
 	//chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
 	VoxelSpace space;
 	Shader voxelShader(
-		//"shaders/tri_project.vert",
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
 		"shaders/dirLightNoCol.frag"
 	);
-	int Uni_View = voxelShader.FindUniform("view");
+	int Uni_Chunk_View = voxelShader.FindUniform("view");
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
-	std::cout << "view Uni " << Uni_View << "\n";
+	std::cout << "Uni Chunk View " << Uni_Chunk_View << "\n";
+
+	Shader boxShader(
+		"shaders/Box.vert",
+		"shaders/Box.geom",
+		"shaders/simple.frag"
+	);
+	int Uni_Box_View = boxShader.FindUniform("view");
+	std::cout << "Uni Box View " << Uni_Box_View << "\n";
+
+	Box box(Point(1, 2, 3), Point(4, 5, 6));
+	box.CreateBuffer();
+	box.UpdateBuffer();
 
 	View view;
 
@@ -216,10 +228,15 @@ int main(int argc, char **argv)
 		inst_draw();
 
 		voxelShader.Use();
-		glUniform3fv(Uni_View, 3, (float *)&view);
+		glUniform3fv(Uni_Chunk_View, 3, (float *)&view);
 		//chunk1.Draw(Uni_Chunk_Pos);
 		//chunk2.Draw(Uni_Chunk_Pos);
 		space.Draw(Uni_Chunk_Pos);
+
+		boxShader.Use();
+		glUniform3fv(Uni_Box_View, 3, (float *)&view);
+		box.Draw();
+		space.DrawBound();
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();

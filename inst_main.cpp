@@ -9,6 +9,7 @@
 #include "openGL/Window.hpp"
 #include "openGL/View.hpp"
 #include "VoxelChunk.hpp"
+#include "VoxelSpace.hpp"
 #include "inst.cpp"
 
 static void free_exit(GLFWwindow *win)
@@ -112,7 +113,7 @@ int main(int argc, char **argv)
 	}
 	std::cout << "individual buffer done\n";
 
-	unsigned int instances_count = 0xFFF;
+	unsigned int instances_count = 0xFF;
 	std::cout << "instance size: " << sizeof(t_inst_trans) << "\n";
 	std::cout << "instance array size: " << sizeof(t_inst_trans) * instances_count << "\n";
 	t_inst_trans instances[instances_count];
@@ -147,14 +148,15 @@ int main(int argc, char **argv)
 	}
 	std::cout << "instance buffer done\n";
 
-	VoxelChunk chunk1(0, 0, 0);
-	VoxelChunk chunk2(1, 0, 0);
-	chunk1.FillRandom();
-	chunk2.FillRandom();
-	chunk1.UpdateBufferVertex();
-	chunk2.UpdateBufferVertex();
-	chunk1.UpdateBufferIndex(NULL, &chunk2, NULL, NULL, NULL, NULL);
-	chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
+	//VoxelChunk chunk1(0, 0, 0);
+	//VoxelChunk chunk2(1, 0, 0);
+	//chunk1.FillRandom();
+	//chunk2.FillRandom();
+	//chunk1.UpdateBufferVertex();
+	//chunk2.UpdateBufferVertex();
+	//chunk1.UpdateBufferIndex(NULL, &chunk2, NULL, NULL, NULL, NULL);
+	//chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
+	VoxelSpace space;
 	Shader voxelShader(
 		//"shaders/tri_project.vert",
 		"shaders/chunk_vertex_project.vert",
@@ -215,8 +217,9 @@ int main(int argc, char **argv)
 
 		voxelShader.Use();
 		glUniform3fv(Uni_View, 3, (float *)&view);
-		chunk1.Draw(Uni_Chunk_Pos);
-		chunk2.Draw(Uni_Chunk_Pos);
+		//chunk1.Draw(Uni_Chunk_Pos);
+		//chunk2.Draw(Uni_Chunk_Pos);
+		space.Draw(Uni_Chunk_Pos);
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();

@@ -71,6 +71,11 @@ void VoxelChunk::IndexFaceZp(unsigned int * index, unsigned int idx, unsigned in
 VoxelChunk::VoxelChunk(int x, int y, int z) :
 	Chunk_X(x), Chunk_Y(y), Chunk_Z(z)
 {
+	std::cout
+		<< "++++ VoxelChunk "
+		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
+		<< "\n";
+
 	Data = new char[Voxel_per_Chunk];
 
 	glGenVertexArrays(1, &Buffer_Array);
@@ -79,6 +84,11 @@ VoxelChunk::VoxelChunk(int x, int y, int z) :
 }
 VoxelChunk::~VoxelChunk()
 {
+	std::cout
+		<< "---- VoxelChunk "
+		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
+		<< "\n";
+
 	delete [] Data;
 
 	glBindVertexArray(Buffer_Array);
@@ -86,15 +96,47 @@ VoxelChunk::~VoxelChunk()
 	glDeleteBuffers(1, &Buffer_Index);
 	glDeleteVertexArrays(1, &Buffer_Array);
 }
+VoxelChunk::VoxelChunk(const VoxelChunk & other) :
+	Chunk_X(other.Chunk_X), Chunk_Y(other.Chunk_Y), Chunk_Z(other.Chunk_Z)
+{
+	std::cout
+		<< "==== VoxelChunk "
+		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
+		<< "\n";
+
+	Data = new char[Voxel_per_Chunk];
+
+	glGenVertexArrays(1, &Buffer_Array);
+	glGenBuffers(1, &Buffer_Corner);
+	glGenBuffers(1, &Buffer_Index);
+}
+const VoxelChunk & VoxelChunk::operator =(const VoxelChunk & other)
+{
+	std::cout << "= VoxelChunk\n";
+	(void)other;
+	return (*this);
+}
 
 
 
+
+bool	VoxelChunk::isChunkIndex(int x, int y, int z) const
+{
+	return ((Chunk_X == x) && (Chunk_Y == y) && (Chunk_Z == z));
+}
+void	VoxelChunk::getChunkIndex(int & x, int & y, int & z) const
+{
+	x = Chunk_X;
+	y = Chunk_Y;
+	z = Chunk_Z;
+}
 void	VoxelChunk::FillRandom()
 {
 	/*for (unsigned i = 0; i < Voxel_per_Chunk; i++)
 	{
 		Data[i] = std::rand() & 1;
 	}*/
+	unsigned int half = Voxel_per_Side / 2;
 	for (unsigned int z = 0; z < Voxel_per_Side; z++)
 	{
 		for (unsigned int y = 0; y < Voxel_per_Side; y++)
@@ -102,9 +144,9 @@ void	VoxelChunk::FillRandom()
 			for (unsigned int x = 0; x < Voxel_per_Side; x++)
 			{
 				unsigned int i = XYZ_to_VoxelIndex(x, y, z);
-				if (y < 1)
+				if (y < half)
 					Data[i] = 0;
-				else if (y > 1)
+				else if (y > half)
 					Data[i] = 1;
 				else
 					Data[i] = std::rand() & 1;
@@ -132,7 +174,7 @@ void	VoxelChunk::UpdateBufferVertex()
 			}
 		}
 	}
-	std::cout << "Vertex:" << vertex_count << "\n";
+	std::cout << "Vertex Count:" << vertex_count << "(" << (vertex_count * sizeof(unsigned int)) << "B)\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
@@ -269,7 +311,7 @@ void	VoxelChunk::UpdateBufferIndex(
 			}
 		}
 	}
-	std::cout << "index_count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << "\n";
+	std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << "(" << (index_count * sizeof(unsigned int)) << "B)\n";
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer_Index);
@@ -286,7 +328,7 @@ void	VoxelChunk::UpdateBufferIndex(
 	(void)Yp;
 	(void)Zp;
 }
-void	VoxelChunk::Draw(int Uni_Chunk_Pos)
+void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 {
 	glUniform3i(Uni_Chunk_Pos, Chunk_X, Chunk_Y, Chunk_Z);
 

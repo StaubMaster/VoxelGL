@@ -11,7 +11,8 @@ unsigned int VoxelChunk::XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsi
 }
 
 
-VoxelChunk::VoxelChunk()
+VoxelChunk::VoxelChunk(int x, int y, int z) :
+	Chunk_X(x), Chunk_Y(y), Chunk_Z(z)
 {
 	Data = new char[Voxel_per_Chunk];
 
@@ -62,20 +63,15 @@ void	VoxelChunk::FillRandom()
 void	VoxelChunk::UpdateBufferVertex()
 {
 	unsigned int vertex_count = Vertex_per_Chunk;
-	Point * vertex = new Point[vertex_count];
-	Point c;
+	unsigned int * vertex = new unsigned int[vertex_count];
 
 	for (unsigned int z = 0; z < Vertex_per_Side; z++)
 	{
-		c.z = z * 4;
 		for (unsigned int y = 0; y < Vertex_per_Side; y++)
 		{
-			c.y = y * 4;
 			for (unsigned int x = 0; x < Vertex_per_Side; x++)
 			{
-				c.x = x * 4;
-				vertex[XYZ_to_VertexIndex(x, y, z)] = c;
-				//std::cout << x << ":" << y << ":" << z << " [" << XYZ_to_VertexIndex(x, y, z) << "] " << c.x << ":" << c.y << ":" << c.z << "\n";
+				vertex[XYZ_to_VertexIndex(x, y, z)] = x | (y << 8) | (z << 16);
 			}
 		}
 	}
@@ -84,9 +80,9 @@ void	VoxelChunk::UpdateBufferVertex()
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
 
-	glBufferData(GL_ARRAY_BUFFER, vertex_count * 3 * sizeof(float), vertex, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(unsigned int), vertex, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)(0 * sizeof(float)));
+	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 1 * sizeof(unsigned int), (void *)0);
 
 	delete [] vertex;
 }
@@ -198,8 +194,10 @@ void	VoxelChunk::UpdateBufferIndex()
 
 	delete [] index;
 }
-void	VoxelChunk::Draw()
+void	VoxelChunk::Draw(int Uni_Chunk_Pos)
 {
+	glUniform3i(Uni_Chunk_Pos, Chunk_X, Chunk_Y, Chunk_Z);
+
 	glBindVertexArray(Buffer_Array);
 	glDrawElements(GL_TRIANGLES, Index_Count, GL_UNSIGNED_INT, (void*)0);
 }

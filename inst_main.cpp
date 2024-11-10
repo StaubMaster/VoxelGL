@@ -147,16 +147,22 @@ int main(int argc, char **argv)
 	}
 	std::cout << "instance buffer done\n";
 
-	VoxelChunk chunk;
-	chunk.FillRandom();
-	chunk.UpdateBufferVertex();
-	chunk.UpdateBufferIndex();
+	VoxelChunk chunk1(0, 0, 0);
+	VoxelChunk chunk2(1, 0, 0);
+	chunk1.FillRandom();
+	chunk1.UpdateBufferVertex();
+	chunk1.UpdateBufferIndex();
+	chunk2.FillRandom();
+	chunk2.UpdateBufferVertex();
+	chunk2.UpdateBufferIndex();
 	Shader voxelShader(
-		"shaders/tri_project.vert",
+		//"shaders/tri_project.vert",
+		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
 		"shaders/dirLightNoCol.frag"
 	);
-	unsigned int Uni_View = voxelShader.FindUniform("view");
+	int Uni_View = voxelShader.FindUniform("view");
+	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
 	std::cout << "view Uni " << Uni_View << "\n";
 
 	View view;
@@ -209,7 +215,8 @@ int main(int argc, char **argv)
 
 		voxelShader.Use();
 		glUniform3fv(Uni_View, 3, (float *)&view);
-		chunk.Draw();
+		chunk1.Draw(Uni_Chunk_Pos);
+		chunk2.Draw(Uni_Chunk_Pos);
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();

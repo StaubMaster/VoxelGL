@@ -7,16 +7,20 @@
 
 class VoxelChunk
 {
-	const static unsigned int	Voxel_per_Side = 8;
-	const static unsigned int	Voxel_per_Chunk = 8 * 8 * 8;
-	const static unsigned int	Vertex_per_Side = 9;
-	const static unsigned int	Vertex_per_Chunk = 9 * 9 * 9;
+	public:
+		const static unsigned int	Voxel_per_Side = 8;
+		const static unsigned int	Voxel_per_Chunk = 8 * 8 * 8;
+		const static unsigned int	Vertex_per_Side = 9;
+		const static unsigned int	Vertex_per_Chunk = 9 * 9 * 9;
 
-	static unsigned int XYZ_to_VoxelIndex(unsigned int x, unsigned int y, unsigned int z);
-	static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
+		static unsigned int XYZ_to_VoxelIndex(unsigned int x, unsigned int y, unsigned int z);
+		static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
 
 	private:
-		char *	Data;
+		char *		Data;
+		const int	Chunk_X;
+		const int	Chunk_Y;
+		const int	Chunk_Z;
 
 		unsigned int	Buffer_Array;
 		unsigned int	Buffer_Corner;
@@ -24,7 +28,7 @@ class VoxelChunk
 		unsigned int	Index_Count;
 
 	public:
-		VoxelChunk();
+		VoxelChunk(int x, int y, int z);
 		~VoxelChunk();
 
 	public:
@@ -33,7 +37,7 @@ class VoxelChunk
 	public:
 		void	UpdateBufferVertex();
 		void	UpdateBufferIndex();
-		void	Draw();
+		void	Draw(int Uni_Chunk_Pos);
 };
 
 #endif

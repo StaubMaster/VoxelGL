@@ -10,6 +10,63 @@ unsigned int VoxelChunk::XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsi
 	return (x + (y + (z) * Vertex_per_Side) * Vertex_per_Side);
 }
 
+void VoxelChunk::IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x, y + 0, z + 0);
+	index[idx + 1] = XYZ_to_VertexIndex(x, y + 1, z + 0);
+	index[idx + 2] = XYZ_to_VertexIndex(x, y + 0, z + 1);
+	index[idx + 3] = XYZ_to_VertexIndex(x, y + 0, z + 1);
+	index[idx + 4] = XYZ_to_VertexIndex(x, y + 1, z + 0);
+	index[idx + 5] = XYZ_to_VertexIndex(x, y + 1, z + 1);
+}
+void VoxelChunk::IndexFaceXp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x, y + 0, z + 0);
+	index[idx + 1] = XYZ_to_VertexIndex(x, y + 0, z + 1);
+	index[idx + 2] = XYZ_to_VertexIndex(x, y + 1, z + 0);
+	index[idx + 3] = XYZ_to_VertexIndex(x, y + 1, z + 0);
+	index[idx + 4] = XYZ_to_VertexIndex(x, y + 0, z + 1);
+	index[idx + 5] = XYZ_to_VertexIndex(x, y + 1, z + 1);
+}
+void VoxelChunk::IndexFaceYn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x + 0, y, z + 0);
+	index[idx + 1] = XYZ_to_VertexIndex(x + 0, y, z + 1);
+	index[idx + 2] = XYZ_to_VertexIndex(x + 1, y, z + 0);
+	index[idx + 3] = XYZ_to_VertexIndex(x + 1, y, z + 0);
+	index[idx + 4] = XYZ_to_VertexIndex(x + 0, y, z + 1);
+	index[idx + 5] = XYZ_to_VertexIndex(x + 1, y, z + 1);
+}
+void VoxelChunk::IndexFaceYp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x + 0, y, z + 0);
+	index[idx + 1] = XYZ_to_VertexIndex(x + 1, y, z + 0);
+	index[idx + 2] = XYZ_to_VertexIndex(x + 0, y, z + 1);
+	index[idx + 3] = XYZ_to_VertexIndex(x + 0, y, z + 1);
+	index[idx + 4] = XYZ_to_VertexIndex(x + 1, y, z + 0);
+	index[idx + 5] = XYZ_to_VertexIndex(x + 1, y, z + 1);
+}
+void VoxelChunk::IndexFaceZn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x + 0, y + 0, z);
+	index[idx + 1] = XYZ_to_VertexIndex(x + 1, y + 0, z);
+	index[idx + 2] = XYZ_to_VertexIndex(x + 0, y + 1, z);
+	index[idx + 3] = XYZ_to_VertexIndex(x + 0, y + 1, z);
+	index[idx + 4] = XYZ_to_VertexIndex(x + 1, y + 0, z);
+	index[idx + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z);
+}
+void VoxelChunk::IndexFaceZp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
+{
+	index[idx + 0] = XYZ_to_VertexIndex(x + 0, y + 0, z);
+	index[idx + 1] = XYZ_to_VertexIndex(x + 0, y + 1, z);
+	index[idx + 2] = XYZ_to_VertexIndex(x + 1, y + 0, z);
+	index[idx + 3] = XYZ_to_VertexIndex(x + 1, y + 0, z);
+	index[idx + 4] = XYZ_to_VertexIndex(x + 0, y + 1, z);
+	index[idx + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z);
+}
+
+
+
 
 VoxelChunk::VoxelChunk(int x, int y, int z) :
 	Chunk_X(x), Chunk_Y(y), Chunk_Z(z)
@@ -86,7 +143,10 @@ void	VoxelChunk::UpdateBufferVertex()
 
 	delete [] vertex;
 }
-void	VoxelChunk::UpdateBufferIndex()
+void	VoxelChunk::UpdateBufferIndex(
+	const VoxelChunk * Xn, const VoxelChunk * Xp,
+	const VoxelChunk * Yn, const VoxelChunk * Yp,
+	const VoxelChunk * Zn, const VoxelChunk * Zp)
 {
 	unsigned int * index = new unsigned int[Voxel_per_Chunk * 6 * 3];
 	unsigned int index_count = 0;
@@ -98,88 +158,113 @@ void	VoxelChunk::UpdateBufferIndex()
 		{
 			for (unsigned int x = 0; x < Voxel_per_Side; x++)
 			{
-				if (x != Voxel_per_Side - 1)
+				c1 = 0;
+				c2 = 0;
+				if (x == 0)
 				{
-					c1 = Data[XYZ_to_VoxelIndex(x + 0, y, z)];
-					c2 = Data[XYZ_to_VoxelIndex(x + 1, y, z)];
-					if (c1 == 1 && c2 == 0)
+					if (Xn != NULL)
 					{
-						//std::cout << "X+ " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 1, y + 0, z + 0);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
-					}
-					if (c1 == 0 && c2 == 1)
-					{
-						//std::cout << "X- " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 1, y + 0, z + 0);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
+						c1 = Xn -> Data[XYZ_to_VoxelIndex(Voxel_per_Side - 1, y, z)];
+						c2 = Data[XYZ_to_VoxelIndex(0, y, z)];
 					}
 				}
-
-				if (y != Voxel_per_Side - 1)
+				else if (x == Voxel_per_Side)
 				{
-					c1 = Data[XYZ_to_VoxelIndex(x, y + 0, z)];
-					c2 = Data[XYZ_to_VoxelIndex(x, y + 1, z)];
-					if (c1 == 0 && c2 == 1)
+					if (Xp != NULL)
 					{
-						//std::cout << "Y+ " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 0, y + 1, z + 0);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
-					}
-					if (c1 == 1 && c2 == 0)
-					{
-						//std::cout << "Y- " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 0, y + 1, z + 0);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 1, y + 1, z + 0);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
+						c1 = Data[XYZ_to_VoxelIndex(Voxel_per_Side, y, z)];
+						c2 = Xp -> Data[XYZ_to_VoxelIndex(0, y, z)];
 					}
 				}
-
-				if (z != Voxel_per_Side - 1)
+				else
 				{
-					c1 = Data[XYZ_to_VoxelIndex(x, y, z + 0)];
-					c2 = Data[XYZ_to_VoxelIndex(x, y, z + 1)];
-					if (c1 == 1 && c2 == 0)
+					c1 = Data[XYZ_to_VoxelIndex(x - 1, y, z)];
+					c2 = Data[XYZ_to_VoxelIndex(x - 0, y, z)];
+				}
+
+				if (c1 == 1 && c2 == 0)
+				{
+					IndexFaceXn(index, index_count, x, y, z);
+					index_count += 6;
+				}
+				if (c1 == 0 && c2 == 1)
+				{
+					IndexFaceXp(index, index_count, x, y, z);
+					index_count += 6;
+				}
+
+
+
+				c1 = 0;
+				c2 = 0;
+				if (y == 0)
+				{
+					if (Yn != NULL)
 					{
-						//std::cout << "Z+ " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 0, y + 0, z + 1);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
+						c1 = Yn -> Data[XYZ_to_VoxelIndex(x, Voxel_per_Side - 1, z)];
+						c2 = Data[XYZ_to_VoxelIndex(x, 0, z)];
 					}
-					if (c1 == 0 && c2 == 1)
+				}
+				else if (y == Voxel_per_Side)
+				{
+					if (Yp != NULL)
 					{
-						//std::cout << "Z- " << x << ":" << y << ":" << z << "\n";
-						index[index_count + 0] = XYZ_to_VertexIndex(x + 0, y + 0, z + 1);
-						index[index_count + 1] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 2] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 3] = XYZ_to_VertexIndex(x + 1, y + 0, z + 1);
-						index[index_count + 4] = XYZ_to_VertexIndex(x + 0, y + 1, z + 1);
-						index[index_count + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z + 1);
-						index_count += 6;
+						c1 = Data[XYZ_to_VoxelIndex(x, Voxel_per_Side, z)];
+						c2 = Yp -> Data[XYZ_to_VoxelIndex(x, 0, z)];
 					}
+				}
+				else
+				{
+					c1 = Data[XYZ_to_VoxelIndex(x, y - 1, z)];
+					c2 = Data[XYZ_to_VoxelIndex(x, y - 0, z)];
+				}
+
+				if (c1 == 1 && c2 == 0)
+				{
+					IndexFaceYn(index, index_count, x, y, z);
+					index_count += 6;
+				}
+				if (c1 == 0 && c2 == 1)
+				{
+					IndexFaceYp(index, index_count, x, y, z);
+					index_count += 6;
+				}
+
+
+
+				c1 = 0;
+				c2 = 0;
+				if (z == 0)
+				{
+					if (Zn != NULL)
+					{
+						c1 = Zn -> Data[XYZ_to_VoxelIndex(x, y, Voxel_per_Side - 1)];
+						c2 = Data[XYZ_to_VoxelIndex(x, y, 0)];
+					}
+				}
+				else if (z == Voxel_per_Side)
+				{
+					if (Zp != NULL)
+					{
+						c1 = Data[XYZ_to_VoxelIndex(x, y, Voxel_per_Side)];
+						c2 = Zp -> Data[XYZ_to_VoxelIndex(x, y, 0)];
+					}
+				}
+				else
+				{
+					c1 = Data[XYZ_to_VoxelIndex(x, y, z - 1)];
+					c2 = Data[XYZ_to_VoxelIndex(x, y, z - 0)];
+				}
+
+				if (c1 == 1 && c2 == 0)
+				{
+					IndexFaceZn(index, index_count, x, y, z);
+					index_count += 6;
+				}
+				if (c1 == 0 && c2 == 1)
+				{
+					IndexFaceZp(index, index_count, x, y, z);
+					index_count += 6;
 				}
 			}
 		}
@@ -193,6 +278,13 @@ void	VoxelChunk::UpdateBufferIndex()
 	Index_Count = index_count;
 
 	delete [] index;
+
+	(void)Xn;
+	(void)Yn;
+	(void)Zn;
+	(void)Xp;
+	(void)Yp;
+	(void)Zp;
 }
 void	VoxelChunk::Draw(int Uni_Chunk_Pos)
 {

@@ -150,11 +150,11 @@ int main(int argc, char **argv)
 	VoxelChunk chunk1(0, 0, 0);
 	VoxelChunk chunk2(1, 0, 0);
 	chunk1.FillRandom();
-	chunk1.UpdateBufferVertex();
-	chunk1.UpdateBufferIndex();
 	chunk2.FillRandom();
+	chunk1.UpdateBufferVertex();
 	chunk2.UpdateBufferVertex();
-	chunk2.UpdateBufferIndex();
+	chunk1.UpdateBufferIndex(NULL, &chunk2, NULL, NULL, NULL, NULL);
+	chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
 	Shader voxelShader(
 		//"shaders/tri_project.vert",
 		"shaders/chunk_vertex_project.vert",

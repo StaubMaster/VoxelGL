@@ -16,6 +16,13 @@ class VoxelChunk
 		static unsigned int XYZ_to_VoxelIndex(unsigned int x, unsigned int y, unsigned int z);
 		static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
 
+		static void IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceXp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceYn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceYp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceZn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceZp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+
 	private:
 		char *		Data;
 		const int	Chunk_X;
@@ -36,7 +43,10 @@ class VoxelChunk
 
 	public:
 		void	UpdateBufferVertex();
-		void	UpdateBufferIndex();
+		void	UpdateBufferIndex(
+					const VoxelChunk * Xn, const VoxelChunk * Xp,
+					const VoxelChunk * Yn, const VoxelChunk * Yp,
+					const VoxelChunk * Zn, const VoxelChunk * Zp);
 		void	Draw(int Uni_Chunk_Pos);
 };
 

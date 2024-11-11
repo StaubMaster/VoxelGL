@@ -82,8 +82,15 @@ void	VoxelSpace::DrawBound() const
 	}
 }
 
+
 void	VoxelSpace::Cross(Point pos, Point dir)
 {
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+
+	}
+
+
 	if (Chunks.size() > 0)
 	{
 		int x, y, z;
@@ -97,17 +104,23 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 		Point rel_pos = pos - chunk_off;
 
-		VoxelChunk::ChunkIndex idx = Chunks[0].Cross(rel_pos, dir);
+		VoxelHit hit = VoxelCross(rel_pos, dir, &Chunks[0], VoxelChunk::CheckVoxel);
 
-		if (idx.x != 0xFFFFFFFF)
+		if (hit.isHit)
 		{
 			Box box(
-				Point((idx.x + 0) - 0.1f, (idx.y + 0) - 0.1f, (idx.z + 0) - 0.1f) + chunk_off,
-				Point((idx.x + 1) + 0.1f, (idx.y + 1) + 0.1f, (idx.z + 1) + 0.1f) + chunk_off
+				Point((hit.x + 0) - 0.1f, (hit.y + 0) - 0.1f, (hit.z + 0) - 0.1f) + chunk_off,
+				Point((hit.x + 1) + 0.1f, (hit.y + 1) + 0.1f, (hit.z + 1) + 0.1f) + chunk_off
 			);
 			box.CreateBuffer();
 			box.UpdateBuffer();
 			box.Draw();
 		}
 	}
+}
+int	VoxelSpace::CheckChunk(const void * p, int x, int y, int z)
+{
+	
+
+	return (0);
 }

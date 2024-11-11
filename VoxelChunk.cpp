@@ -366,7 +366,6 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 	glDrawElements(GL_TRIANGLES, Index_Count, GL_UNSIGNED_INT, (void*)0);
 }
 
-
 VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 {
 	dir.x = -dir.x;
@@ -529,3 +528,20 @@ VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 	return (ChunkIndex){ 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 }
 
+int			VoxelChunk::CheckVoxel(const void * p, int x, int y, int z)
+{
+	if (x < 0 || x >= (int)Voxel_per_Side ||
+		y < 0 || y >= (int)Voxel_per_Side ||
+		z < 0 || z >= (int)Voxel_per_Side)
+	{
+		return (-1);
+	}
+
+	VoxelChunk * ch = (VoxelChunk *)p;
+	if (ch -> Data[XYZ_to_VoxelIndex(x, y, z)] != 0)
+	{
+		return (1);
+	}
+
+	return (0);
+}

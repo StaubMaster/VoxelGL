@@ -25,7 +25,8 @@ class VoxelSpace
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;
 
-		void	Cross(Point pos, Point dir);
+		void		Cross(Point pos, Point dir);
+		static int	CheckChunk(const void * p, int x, int y, int z);
 };
 
 #endif

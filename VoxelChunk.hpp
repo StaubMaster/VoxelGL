@@ -64,6 +64,7 @@ class VoxelChunk
 		};
 
 		ChunkIndex	Cross(Point pos, Point dir);
+		static int	CheckVoxel(const void * p, int x, int y, int z);
 };
 
 #endif

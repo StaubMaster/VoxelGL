@@ -104,7 +104,7 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 		Point rel_pos = pos - chunk_off;
 
-		VoxelHit hit = VoxelCross(rel_pos, dir, &Chunks[0], VoxelChunk::CheckVoxel);
+		RayCast3DHit hit = RayCast3D(rel_pos, dir, &Chunks[0], VoxelChunk::CheckVoxel);
 
 		if (hit.isHit)
 		{
@@ -118,9 +118,15 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 		}
 	}
 }
+
 int	VoxelSpace::CheckChunk(const void * p, int x, int y, int z)
 {
-	
+	VoxelSpace * sp = (VoxelSpace *)p;
+
+	if (sp -> FindChunkPtr(x, y, z) == NULL)
+	{
+		return (-1);
+	}
 
 	return (0);
 }

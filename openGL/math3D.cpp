@@ -1,13 +1,9 @@
 
 #include "math3D.hpp"
 
-
-/// @brief like ray-casting but in 3D
-/// @param checkfunc should return >0 if hit is found, <0 if search should stop, and =0 if search should continue
-/// @return hit
-VoxelHit	VoxelCross(Point pos, Point dir, const void * p, int(* checkfunc)(const void *, int, int, int), int max_dist)
+RayCast3DHit	RayCast3D(Point pos, Point dir, const void * obj, int(* hitfunc)(const void *, int, int, int), int max_dist)
 {
-	VoxelHit hit;
+	RayCast3DHit hit;
 	hit.isHit = false;
 
 	dir.x = -dir.x;
@@ -94,7 +90,10 @@ VoxelHit	VoxelCross(Point pos, Point dir, const void * p, int(* checkfunc)(const
 
 	while (ray_sum < max_dist)
 	{
-		int check = checkfunc(p, ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z);
+		/*if (hitfunc(obj, hit, x, y ,z))
+			return;*/
+
+		int check = hitfunc(obj, ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z);
 		if (check < 0)
 		{
 			return hit;

@@ -367,36 +367,49 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 }
 
 
-unsigned int	VoxelChunk::Cross(Point pos, Point dir)
+VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 {
-	//	ray init
+	dir.x = -dir.x;
+	dir.y = -dir.y;
+	//dir.y = 0;
+
+	Point ray_pos = pos;
+	Point ray_dir = dir;
+
 	int	ray_grid_idx_x = (int)pos.x;
 	int	ray_grid_idx_y = (int)pos.y;
+	int	ray_grid_idx_z = (int)pos.z;
 	dir = dir / (dir.length());
 
-	int	ray_side_len_x;
-	int	ray_side_len_y;
-	if (dir.x != 0)
-		ray_side_len_x = dir.y / dir.x;
-	else
-		ray_side_len_x = 0xFFFFFF;
-	if (dir.y != 0)
-		ray_side_len_y = dir.x / dir.y;
-	else
-		ray_side_len_y = 0xFFFFFF;
+	float	ray_side_len_x;
+	float	ray_side_len_y = 0;
+	float	ray_side_len_z;
+
+	//if (dir.x != 0) { ray_side_len_x = dir.z / dir.x; } else { ray_side_len_x = 0xFFFFFFFF; }
+	//if (dir.z != 0) { ray_side_len_z = dir.x / dir.z; } else { ray_side_len_z = 0xFFFFFFFF; }
+	if (dir.x != 0) { ray_side_len_x = sqrt(dir.y * dir.y + dir.z * dir.z) / dir.x; } else { ray_side_len_x = 0xFFFFFFFF; }
+	if (dir.y != 0) { ray_side_len_y = sqrt(dir.z * dir.z + dir.x * dir.x) / dir.y; } else { ray_side_len_y = 0xFFFFFFFF; }
+	if (dir.z != 0) { ray_side_len_z = sqrt(dir.x * dir.x + dir.y * dir.y) / dir.z; } else { ray_side_len_z = 0xFFFFFFFF; }
 
 	ray_side_len_x = sqrt(1 + ray_side_len_x * ray_side_len_x);
 	ray_side_len_y = sqrt(1 + ray_side_len_y * ray_side_len_y);
+	ray_side_len_z = sqrt(1 + ray_side_len_z * ray_side_len_z);
 
 	float ray_sum = 0;
 
+
+
 	int	ray_grid_dir_x;
 	int	ray_grid_dir_y;
-	int	ray_side_sum_x;
-	int	ray_side_sum_y;
+	int	ray_grid_dir_z;
+
+	float	ray_side_sum_x;
+	float	ray_side_sum_y;
+	float	ray_side_sum_z;
+
 	int	ray_cardinal_side_x;
 	int	ray_cardinal_side_y;
-	int	ray_cardinal_dir;
+	int	ray_cardinal_side_z;
 
 	if (dir.x > 0)
 	{
@@ -420,20 +433,36 @@ unsigned int	VoxelChunk::Cross(Point pos, Point dir)
 	else
 	{
 		ray_grid_dir_y = -1;
-		ray_side_sum_y = (pos.x - ray_grid_idx_y) * ray_side_len_y;
+		ray_side_sum_y = (pos.y - ray_grid_idx_y) * ray_side_len_y;
 		ray_cardinal_side_y = 4;
 	}
-	ray_cardinal_dir = 0;
 
-	Point chunk_off(
-		Chunk_X * Voxel_per_Side,
-		Chunk_Y * Voxel_per_Side,
-		Chunk_Z * Voxel_per_Side
-	);
+	if (dir.z > 0)
+	{
+		ray_grid_dir_z = +1;
+		ray_side_sum_z = ((ray_grid_idx_z + 1) - pos.z) * ray_side_len_z;
+		ray_cardinal_side_z = 5;
+	}
+	else
+	{
+		ray_grid_dir_z = -1;
+		ray_side_sum_z = (pos.z - ray_grid_idx_z) * ray_side_len_z;
+		ray_cardinal_side_z = 6;
+	}
+
+	int	ray_cardinal_dir = 0;
+
+
+
+	//Point chunk_off(
+	//	Chunk_X * Voxel_per_Side,
+	//	Chunk_Y * Voxel_per_Side,
+	//	Chunk_Z * Voxel_per_Side
+	//);
 
 	while (ray_sum < 100)
 	{
-		if ((ray_side_sum_x) < (ray_side_sum_y))
+		/*if (ray_side_sum_x < ray_side_sum_z)
 		{
 			ray_sum = ray_side_sum_x;
 			ray_side_sum_x += ray_side_len_x;
@@ -442,32 +471,61 @@ unsigned int	VoxelChunk::Cross(Point pos, Point dir)
 		}
 		else
 		{
+			ray_sum = ray_side_sum_z;
+			ray_side_sum_z += ray_side_len_z;
+			ray_grid_idx_z += ray_grid_dir_z;
+			ray_cardinal_dir = ray_cardinal_side_z;
+		}*/
+		if (ray_side_sum_x < ray_side_sum_y && ray_side_sum_x < ray_side_sum_z)
+		{
+			ray_sum = ray_side_sum_x;
+			ray_side_sum_x += ray_side_len_x;
+			ray_grid_idx_x += ray_grid_dir_x;
+			ray_cardinal_dir = ray_cardinal_side_x;
+		}
+		else if (ray_side_sum_y < ray_side_sum_z && ray_side_sum_y < ray_side_sum_z)
+		{
 			ray_sum = ray_side_sum_y;
 			ray_side_sum_y += ray_side_len_y;
 			ray_grid_idx_y += ray_grid_dir_y;
 			ray_cardinal_dir = ray_cardinal_side_y;
 		}
-
-		if (ray_grid_idx_x < 0 || (unsigned int)ray_grid_idx_x >= Voxel_per_Side ||
-			ray_grid_idx_y < 0 || (unsigned int)ray_grid_idx_y >= Voxel_per_Side)
+		else
 		{
-			return (0xFFFFFFFF);
+			ray_sum = ray_side_sum_z;
+			ray_side_sum_z += ray_side_len_z;
+			ray_grid_idx_z += ray_grid_dir_z;
+			ray_cardinal_dir = ray_cardinal_side_z;
 		}
 
-		//if (Data[XYZ_to_VoxelIndex(ray_grid_idx_x, 4, ray_grid_idx_y)] != 0)
-		//{
-		//	return XYZ_to_VoxelIndex(ray_grid_idx_x, 4, ray_grid_idx_y);
-		//}
+		if (ray_grid_idx_x < 0 || (unsigned int)ray_grid_idx_x >= Voxel_per_Side ||
+			ray_grid_idx_y < 0 || (unsigned int)ray_grid_idx_y >= Voxel_per_Side ||
+			ray_grid_idx_z < 0 || (unsigned int)ray_grid_idx_z >= Voxel_per_Side)
+		{
+			return (ChunkIndex){ 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+		}
 
-		//std::cout << "checked: " << ray_grid_idx_x << ":" << ray_grid_idx_y << ":4\n";
-		Box box(
-			Point((ray_grid_idx_x + 0), (ray_grid_idx_y + 0), (4 + 0)),
-			Point((ray_grid_idx_x + 1), (ray_grid_idx_y + 1), (4 + 1))
+		if (Data[XYZ_to_VoxelIndex(ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z)] != 0)
+		{
+			Point hit = ray_pos + (ray_dir * ray_sum);
+			Box box(
+				Point((hit.x - 0.01f), (hit.y - 0.01f), (hit.z - 0.01f)),
+				Point((hit.x + 0.01f), (hit.y + 0.01f), (hit.z + 0.01f))
+			);
+			box.CreateBuffer();
+			box.UpdateBuffer();
+			box.Draw();
+			return (ChunkIndex){ ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z };
+		}
+
+		/*Box box(
+			Point((ray_grid_idx_x + 0), (ray_grid_idx_y + 0), (ray_grid_idx_z + 0)),
+			Point((ray_grid_idx_x + 1), (ray_grid_idx_y + 1), (ray_grid_idx_z + 1))
 		);
 		box.CreateBuffer();
 		box.UpdateBuffer();
-		box.Draw();
+		box.Draw();*/
 	}
-	return (0xFFFFFFFF);
+	return (ChunkIndex){ 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
 }
 

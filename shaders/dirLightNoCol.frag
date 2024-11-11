@@ -19,7 +19,8 @@ void main()
 	f = max(f, 0.3);
 
 	vec4 col;
-	col = vec4(1, 1, 1, 1);
+	col = vec4(0.5, 0.5, 0.5, 1);
+	//col = vec4(1, 1, 1, 1);
 	col = col * f;
 
 	Pixel = vec4(col);

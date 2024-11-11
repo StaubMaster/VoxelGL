@@ -16,7 +16,17 @@ VoxelSpace::VoxelSpace()
 			}
 		}
 	}
+	//Chunks.push_back(VoxelChunk(0, 0, 0));
+}
+VoxelSpace::~VoxelSpace()
+{
+	std::cout << "---- VoxelSpace\n";
 
+	Chunks.clear();
+}
+
+void	VoxelSpace::FillRandom()
+{
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Chunks[i].FillRandom();
@@ -33,12 +43,6 @@ VoxelSpace::VoxelSpace()
 			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
 		);
 	}
-}
-VoxelSpace::~VoxelSpace()
-{
-	std::cout << "---- VoxelSpace\n";
-
-	Chunks.clear();
 }
 
 VoxelChunk *	VoxelSpace::FindChunkPtr(int x, int y, int z)
@@ -64,12 +68,12 @@ void	VoxelSpace::DrawBound() const
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Chunks[i].getChunkIndex(x, y, z);
-		min.x = x * (int)(VoxelChunk::Voxel_per_Side);
-		min.y = y * (int)(VoxelChunk::Voxel_per_Side);
-		min.z = z * (int)(VoxelChunk::Voxel_per_Side);
-		max.x = min.x + (int)(VoxelChunk::Voxel_per_Side);
-		max.y = min.y + (int)(VoxelChunk::Voxel_per_Side);
-		max.z = min.z + (int)(VoxelChunk::Voxel_per_Side);
+		min.x = x * (int)(VoxelChunk::Voxel_per_Side + 1);
+		min.y = y * (int)(VoxelChunk::Voxel_per_Side + 1);
+		min.z = z * (int)(VoxelChunk::Voxel_per_Side + 1);
+		max.x = min.x + (int)(VoxelChunk::Voxel_per_Side + 1);
+		max.y = min.y + (int)(VoxelChunk::Voxel_per_Side + 1);
+		max.z = min.z + (int)(VoxelChunk::Voxel_per_Side + 1);
 
 		Box box(min, max);
 		box.CreateBuffer();
@@ -82,6 +86,28 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 {
 	if (Chunks.size() > 0)
 	{
-		Chunks[0].Cross(pos, dir);
+		int x, y, z;
+		Chunks[0].getChunkIndex(x, y, z);
+
+		Point chunk_off(
+			x * ((int)VoxelChunk::Voxel_per_Side + 1),
+			y * ((int)VoxelChunk::Voxel_per_Side + 1),
+			z * ((int)VoxelChunk::Voxel_per_Side + 1)
+		);
+
+		Point rel_pos = pos - chunk_off;
+
+		VoxelChunk::ChunkIndex idx = Chunks[0].Cross(rel_pos, dir);
+
+		if (idx.x != 0xFFFFFFFF)
+		{
+			Box box(
+				Point((idx.x + 0) - 0.1f, (idx.y + 0) - 0.1f, (idx.z + 0) - 0.1f) + chunk_off,
+				Point((idx.x + 1) + 0.1f, (idx.y + 1) + 0.1f, (idx.z + 1) + 0.1f) + chunk_off
+			);
+			box.CreateBuffer();
+			box.UpdateBuffer();
+			box.Draw();
+		}
 	}
 }

@@ -1,15 +1,10 @@
 #version 330
 
-layout(location = 0) in uint VIdx;
-
-uniform ivec3 chunk_pos;
 uniform vec3[3] view;
 const float projF = 2.0;
 
-out Vert_Out
-{
-	vec3 NonProj;
-} vs_out;
+layout(location = 0) in vec3 VPos;
+
 
 
 void rot(inout float pls, inout float mns, float wCos, float wSin)
@@ -49,12 +44,6 @@ vec4 proj(vec3 p)
 
 void main()
 {
-	uvec3 idx;
-	idx.x = (VIdx) & uint((0xFF));
-	idx.y = (VIdx >> 8) & uint((0xFF));
-	idx.z = (VIdx >> 16) & uint((0xFF));
-
-	vs_out.NonProj = vec3(idx) + (chunk_pos * (8 + 1));
-
-	gl_Position = proj(vs_out.NonProj);
+	vec3 Absolut = VPos;
+	gl_Position = proj(Absolut);
 }

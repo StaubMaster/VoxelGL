@@ -158,6 +158,7 @@ int main(int argc, char **argv)
 	//chunk1.UpdateBufferIndex(NULL, &chunk2, NULL, NULL, NULL, NULL);
 	//chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
 	VoxelSpace space;
+	space.FillRandom();
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
@@ -179,6 +180,18 @@ int main(int argc, char **argv)
 	box.CreateBuffer();
 	box.UpdateBuffer();
 
+	Shader rayShader(
+		"shaders/Point.vert",
+		"shaders/Fixed.frag"
+	);
+	int Uni_Ray_View = rayShader.FindUniform("view");
+	std::cout << "Uni Ray View " << Uni_Ray_View << "\n";
+
+	unsigned int Buffer_Array;
+	unsigned int Buffer_Ray;
+	glGenVertexArrays(1, &Buffer_Array);
+	glGenBuffers(1, &Buffer_Ray);
+
 	View view;
 
 	glEnable(GL_DEPTH_TEST);
@@ -194,6 +207,12 @@ int main(int argc, char **argv)
 	double last_frame = glfwGetTime();
 	double time_diff;
 
+	Point ray_pos(1.5, 4.5, 1.5);
+	Point ray_dir(1, 0, 2);
+	Point ray_tar;
+	ray_dir = ray_dir / ray_dir.length();
+	ray_tar = ray_pos + (ray_dir * 10);
+
 	std::cout << "loop\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -203,8 +222,13 @@ int main(int argc, char **argv)
 		time_diff *= 60;
 		last_frame = glfwGetTime();
 
+		if (glfwGetKey(win -> win, GLFW_KEY_R))
+		{
+			space.FillRandom();
+		}
 
-		view.move(win -> GetKeyMovement(0.5f));
+
+		view.move(win -> GetKeyMovement(0.2f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -231,19 +255,48 @@ int main(int argc, char **argv)
 		glUniform3fv(Uni_Chunk_View, 3, (float *)&view);
 		//chunk1.Draw(Uni_Chunk_Pos);
 		//chunk2.Draw(Uni_Chunk_Pos);
-		//space.Draw(Uni_Chunk_Pos);
+		space.Draw(Uni_Chunk_Pos);
+
+		ray_pos = view.pos;
+		ray_dir = view.ang.rotate_back(Point(0, 0, 1));
+		ray_tar = ray_pos + (ray_dir * 10);
 
 		boxShader.Use();
 		glUniform3fv(Uni_Box_View, 3, (float *)&view);
 		//box.Draw();
 		space.DrawBound();
-		space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, -1)));
+		//space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
+		space.Cross(ray_pos, ray_dir);
+
+
+		//Point ray[] = { view.pos, view.pos + view.ang.rotate_back(Point(0, 0, 100)) };
+		Point ray[] = { ray_pos, ray_tar };
+		//ray[1].x = -ray[1].x;
+		//ray[1].y = -ray[1].y;
+
+
+		rayShader.Use();
+		glUniform3fv(Uni_Ray_View, 3, (float *)&view);
+		glBindVertexArray(Buffer_Array);
+		glBindBuffer(GL_ARRAY_BUFFER, Buffer_Ray);
+
+		glBufferData(GL_ARRAY_BUFFER, 2 * 3 * sizeof(float), (float *)ray, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribIPointer(0, 3, GL_UNSIGNED_INT, 3 * sizeof(float), (void *)(0 * sizeof(float)));
+
+		glDrawArrays(GL_LINES, 0, 2);
+
+
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
 	delete win;
 	inst_delete();
+
+	glBindVertexArray(Buffer_Array);
+	glDeleteBuffers(1, &Buffer_Ray);
+	glDeleteVertexArrays(1, &Buffer_Array);
 
 	(void)Uni_Chunk_Pos;
 

@@ -18,6 +18,8 @@ class VoxelSpace
 		VoxelSpace();
 		~VoxelSpace();
 
+		void	FillRandom();
+
 		VoxelChunk *	FindChunkPtr(int x, int y, int z);
 
 		void	Draw(int Uni_Chunk_Pos) const;

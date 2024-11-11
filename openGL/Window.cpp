@@ -40,8 +40,8 @@ Window::Window(int w, int h, const char * name)
 	}
 	std::cout << "gl done\n";
 
-	//glViewport(0, 0, w * 2, h * 2);	//	Mac
-	glViewport(0, 0, w, h);				//Windows
+	glViewport(0, 0, w * 2, h * 2);	//	Mac
+	//glViewport(0, 0, w, h);			//Windows
 	std::cout << "viewport done\n";
 
 	tabbed = false;

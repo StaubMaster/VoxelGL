@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 		last_frame = glfwGetTime();
 
 
-		view.move(win -> GetKeyMovement(0.05f));
+		view.move(win -> GetKeyMovement(0.5f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -231,18 +231,21 @@ int main(int argc, char **argv)
 		glUniform3fv(Uni_Chunk_View, 3, (float *)&view);
 		//chunk1.Draw(Uni_Chunk_Pos);
 		//chunk2.Draw(Uni_Chunk_Pos);
-		space.Draw(Uni_Chunk_Pos);
+		//space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();
 		glUniform3fv(Uni_Box_View, 3, (float *)&view);
-		box.Draw();
+		//box.Draw();
 		space.DrawBound();
+		space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, -1)));
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
 	delete win;
 	inst_delete();
+
+	(void)Uni_Chunk_Pos;
 
 	return (0);
 }

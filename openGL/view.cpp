@@ -11,7 +11,7 @@ View::~View()
 }
 void	View::move(Point rel)
 {
-	rotate_fore(&rel.z, &rel.x, ang.cos_y, ang.sin_y);
+	rotate(rel.z, rel.x, ang.cos_y, ang.sin_y);
 	pos.x += rel.x;
 	pos.y += rel.y;
 	pos.z += rel.z;
@@ -56,7 +56,7 @@ static void view_move(t_view *view, GLFWwindow *win)
 	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT))	{ rel[1] += view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_S))			{ rel[2] -= view -> move_speed; }
 	if (glfwGetKey(win, GLFW_KEY_W))			{ rel[2] += view -> move_speed; }
-	rotate_fore(&rel[2], &rel[0], view -> cos_y, view -> sin_y);
+	rotate(rel[2], rel[0], view -> cos_y, view -> sin_y);
 	view -> pos_x += rel[0];
 	view -> pos_y += rel[1];
 	view -> pos_z += rel[2];

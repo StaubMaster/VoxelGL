@@ -55,6 +55,8 @@ class VoxelChunk
 					const VoxelChunk * Yn, const VoxelChunk * Yp,
 					const VoxelChunk * Zn, const VoxelChunk * Zp);
 		void	Draw(int Uni_Chunk_Pos) const;
+
+		unsigned int	Cross(Point pos, Point dir);
 };
 
 #endif

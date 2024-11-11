@@ -64,12 +64,12 @@ void	VoxelSpace::DrawBound() const
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Chunks[i].getChunkIndex(x, y, z);
-		min.x = x * 4 * (int)(VoxelChunk::Voxel_per_Side);
-		min.y = y * 4 * (int)(VoxelChunk::Voxel_per_Side);
-		min.z = z * 4 * (int)(VoxelChunk::Voxel_per_Side);
-		max.x = min.x + 4 * (int)(VoxelChunk::Voxel_per_Side);
-		max.y = min.y + 4 * (int)(VoxelChunk::Voxel_per_Side);
-		max.z = min.z + 4 * (int)(VoxelChunk::Voxel_per_Side);
+		min.x = x * (int)(VoxelChunk::Voxel_per_Side);
+		min.y = y * (int)(VoxelChunk::Voxel_per_Side);
+		min.z = z * (int)(VoxelChunk::Voxel_per_Side);
+		max.x = min.x + (int)(VoxelChunk::Voxel_per_Side);
+		max.y = min.y + (int)(VoxelChunk::Voxel_per_Side);
+		max.z = min.z + (int)(VoxelChunk::Voxel_per_Side);
 
 		Box box(min, max);
 		box.CreateBuffer();
@@ -78,4 +78,10 @@ void	VoxelSpace::DrawBound() const
 	}
 }
 
-
+void	VoxelSpace::Cross(Point pos, Point dir)
+{
+	if (Chunks.size() > 0)
+	{
+		Chunks[0].Cross(pos, dir);
+	}
+}

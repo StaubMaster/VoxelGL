@@ -16,6 +16,18 @@ class Point
 		~Point();
 		Point(const Point & other);
 		const Point & operator =(const Point & other);
+
+		Point operator +(const Point & other) const;
+		Point operator -(const Point & other) const;
+		Point operator *(const Point & other) const;
+		Point operator /(const Point & other) const;
+
+		Point operator *(const float & flt) const;
+		Point operator /(const float & flt) const;
+
+		float operator %(const Point & other) const;	//	scalar Product
+		Point operator ^(const Point & other) const;	//	cross Product
+		float length() const;
 };
 class Angle
 {
@@ -39,9 +51,11 @@ class Angle
 
 	public:
 		void UpdateSinCos();
+
+		Point	rotate_fore(Point p) const;
+		Point	rotate_back(Point p) const;
 };
 
-void	rotate_fore(float *pls, float *mns, float cos, float sin);
-void	rotate_back(float *pls, float *mns, float cos, float sin);
+void	rotate(float & pls, float & mns, float cos, float sin);
 
 #endif

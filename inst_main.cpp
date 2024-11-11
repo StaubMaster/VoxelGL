@@ -133,8 +133,8 @@ int main(int argc, char **argv)
 		unsigned int i = 0;
 		while (++i < instances_count)
 		{
-			instances[i].pos_x = ((rand() & 0xFF) + 15);
-			instances[i].pos_y = (rand() & 0xFF) - 127;
+			instances[i].pos_x = ((rand() & 0xF) + 64);
+			//instances[i].pos_y = (rand() & 0xFF) - 127;
 			instances[i].pos_z = 0;
 
 			w = rand();
@@ -228,7 +228,7 @@ int main(int argc, char **argv)
 		}
 
 
-		view.move(win -> GetKeyMovement(0.2f));
+		view.move(win -> GetKeyMovement(0.02f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 		boxShader.Use();
 		glUniform3fv(Uni_Box_View, 3, (float *)&view);
 		//box.Draw();
-		space.DrawBound();
+		//space.DrawBound();
 		//space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		space.Cross(ray_pos, ray_dir);
 

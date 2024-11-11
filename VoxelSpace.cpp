@@ -93,24 +93,52 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 	if (Chunks.size() > 0)
 	{
-		int x, y, z;
-		Chunks[0].getChunkIndex(x, y, z);
-
-		Point chunk_off(
-			x * ((int)VoxelChunk::Voxel_per_Side + 1),
-			y * ((int)VoxelChunk::Voxel_per_Side + 1),
-			z * ((int)VoxelChunk::Voxel_per_Side + 1)
-		);
+		Point chunk_off = Chunks[0].getChunkOffset();
+		Point chunk_norm_pos = pos / (VoxelChunk::Voxel_per_Side + 1);
 
 		Point rel_pos = pos - chunk_off;
 
-		RayCast3DHit hit = RayCast3D(rel_pos, dir, &Chunks[0], VoxelChunk::CheckVoxel);
-
-		if (hit.isHit)
+		//RayCast3D_Hit hit = RayCast3D(rel_pos, dir, 128, &Chunks[0], VoxelChunk::CheckVoxel);
+		//RayCast3D_Data data = RayCast3D_init(rel_pos, dir);
+		RayCast3D_Data data = RayCast3D_init(chunk_norm_pos, dir);
+		RayCast3D_Hit hit_voxel;
+		hit_voxel.t = 0;
+		hit_voxel.cardinal = 0;
+		hit_voxel.isHit = false;
+		while (hit_voxel.t < 128)
 		{
+			//int check = VoxelChunk::CheckVoxel(&Chunks[0], data.grid_idx);
+			int check = CheckChunk(this, data.grid_idx);
+			if (check < 0)
+			{
+				hit_voxel.isHit = false;
+				break;
+			}
+			else if (check > 0)
+			{
+				hit_voxel = RayCast3D_hit(hit_voxel, data);
+				break;
+			}
+
+			hit_voxel = RayCast3D_continue(data);
+		}
+
+		if (hit_voxel.isHit)
+		{
+			std::cout << "chunk " << hit_voxel.idx.x << ":" << hit_voxel.idx.y << ":" << hit_voxel.idx.z << "\n";
+			//Box box(
+			//	Point((hit_voxel.x + 0) - 0.1f, (hit_voxel.y + 0) - 0.1f, (hit_voxel.z + 0) - 0.1f) + chunk_off,
+			//	Point((hit_voxel.x + 1) + 0.1f, (hit_voxel.y + 1) + 0.1f, (hit_voxel.z + 1) + 0.1f) + chunk_off
+			//);
 			Box box(
-				Point((hit.x + 0) - 0.1f, (hit.y + 0) - 0.1f, (hit.z + 0) - 0.1f) + chunk_off,
-				Point((hit.x + 1) + 0.1f, (hit.y + 1) + 0.1f, (hit.z + 1) + 0.1f) + chunk_off
+				Point(
+					((hit_voxel.idx.x + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+					((hit_voxel.idx.y + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+					((hit_voxel.idx.z + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f),
+				Point(
+					((hit_voxel.idx.x + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+					((hit_voxel.idx.y + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+					((hit_voxel.idx.z + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f)
 			);
 			box.CreateBuffer();
 			box.UpdateBuffer();
@@ -119,13 +147,18 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 	}
 }
 
-int	VoxelSpace::CheckChunk(const void * p, int x, int y, int z)
+int	VoxelSpace::CheckChunk(const void * obj, Index3D idx)
 {
-	VoxelSpace * sp = (VoxelSpace *)p;
+	VoxelSpace * sp = (VoxelSpace *)obj;
 
-	if (sp -> FindChunkPtr(x, y, z) == NULL)
+	VoxelChunk * ch = sp -> FindChunkPtr(idx.x, idx.y, idx.z);
+	if (ch == NULL)
 	{
 		return (-1);
+	}
+	else
+	{
+		return (+1);
 	}
 
 	return (0);

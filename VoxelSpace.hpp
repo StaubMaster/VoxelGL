@@ -26,7 +26,7 @@ class VoxelSpace
 		void	DrawBound() const;
 
 		void		Cross(Point pos, Point dir);
-		static int	CheckChunk(const void * p, int x, int y, int z);
+		static int	CheckChunk(const void * obj, Index3D idx);
 };
 
 #endif

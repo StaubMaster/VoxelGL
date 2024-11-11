@@ -130,6 +130,14 @@ void	VoxelChunk::getChunkIndex(int & x, int & y, int & z) const
 	y = Chunk_Y;
 	z = Chunk_Z;
 }
+Point	VoxelChunk::getChunkOffset() const
+{
+	return Point(
+		Chunk_X * ((int)Voxel_per_Side + 1),
+		Chunk_Y * ((int)Voxel_per_Side + 1),
+		Chunk_Z * ((int)Voxel_per_Side + 1)
+	);
+}
 void	VoxelChunk::FillRandom()
 {
 	/*for (unsigned i = 0; i < Voxel_per_Chunk; i++)
@@ -155,7 +163,6 @@ void	VoxelChunk::FillRandom()
 		}
 	}
 }
-
 
 
 
@@ -366,7 +373,7 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 	glDrawElements(GL_TRIANGLES, Index_Count, GL_UNSIGNED_INT, (void*)0);
 }
 
-VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
+/*VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 {
 	dir.x = -dir.x;
 	dir.y = -dir.y;
@@ -461,20 +468,20 @@ VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 
 	while (ray_sum < 100)
 	{
-		/*if (ray_side_sum_x < ray_side_sum_z)
-		{
-			ray_sum = ray_side_sum_x;
-			ray_side_sum_x += ray_side_len_x;
-			ray_grid_idx_x += ray_grid_dir_x;
-			ray_cardinal_dir = ray_cardinal_side_x;
-		}
-		else
-		{
-			ray_sum = ray_side_sum_z;
-			ray_side_sum_z += ray_side_len_z;
-			ray_grid_idx_z += ray_grid_dir_z;
-			ray_cardinal_dir = ray_cardinal_side_z;
-		}*/
+		//if (ray_side_sum_x < ray_side_sum_z)
+		//{
+		//	ray_sum = ray_side_sum_x;
+		//	ray_side_sum_x += ray_side_len_x;
+		//	ray_grid_idx_x += ray_grid_dir_x;
+		//	ray_cardinal_dir = ray_cardinal_side_x;
+		//}
+		//else
+		//{
+		//	ray_sum = ray_side_sum_z;
+		//	ray_side_sum_z += ray_side_len_z;
+		//	ray_grid_idx_z += ray_grid_dir_z;
+		//	ray_cardinal_dir = ray_cardinal_side_z;
+		//}
 		if (ray_side_sum_x < ray_side_sum_y && ray_side_sum_x < ray_side_sum_z)
 		{
 			ray_sum = ray_side_sum_x;
@@ -517,30 +524,30 @@ VoxelChunk::ChunkIndex	VoxelChunk::Cross(Point pos, Point dir)
 			return (ChunkIndex){ ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z };
 		}
 
-		/*Box box(
-			Point((ray_grid_idx_x + 0), (ray_grid_idx_y + 0), (ray_grid_idx_z + 0)),
-			Point((ray_grid_idx_x + 1), (ray_grid_idx_y + 1), (ray_grid_idx_z + 1))
-		);
-		box.CreateBuffer();
-		box.UpdateBuffer();
-		box.Draw();*/
+		//Box box(
+		//	Point((ray_grid_idx_x + 0), (ray_grid_idx_y + 0), (ray_grid_idx_z + 0)),
+		//	Point((ray_grid_idx_x + 1), (ray_grid_idx_y + 1), (ray_grid_idx_z + 1))
+		//);
+		//box.CreateBuffer();
+		//box.UpdateBuffer();
+		//box.Draw();
 	}
 	return (ChunkIndex){ 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
-}
+}*/
 
-int			VoxelChunk::CheckVoxel(const void * p, int x, int y, int z)
+int	VoxelChunk::CheckVoxel(const void * obj, Index3D idx)
 {
-	if (x < 0 || x >= (int)Voxel_per_Side ||
-		y < 0 || y >= (int)Voxel_per_Side ||
-		z < 0 || z >= (int)Voxel_per_Side)
+	if (idx.x < 0 || idx.x >= (int)Voxel_per_Side ||
+		idx.y < 0 || idx.y >= (int)Voxel_per_Side ||
+		idx.z < 0 || idx.z >= (int)Voxel_per_Side)
 	{
 		return (-1);
 	}
 
-	VoxelChunk * ch = (VoxelChunk *)p;
-	if (ch -> Data[XYZ_to_VoxelIndex(x, y, z)] != 0)
+	VoxelChunk * ch = (VoxelChunk *)obj;
+	if (ch -> Data[XYZ_to_VoxelIndex(idx.x, idx.y, idx.z)] != 0)
 	{
-		return (1);
+		return (+1);
 	}
 
 	return (0);

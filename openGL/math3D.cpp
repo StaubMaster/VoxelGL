@@ -1,10 +1,155 @@
 
 #include "math3D.hpp"
 
-RayCast3DHit	RayCast3D(Point pos, Point dir, const void * obj, int(* hitfunc)(const void *, int, int, int), int max_dist)
+RayCast3D_Data	RayCast3D_init(Point pos, Point dir)
 {
-	RayCast3DHit hit;
+	RayCast3D_Data	data;
+
+	dir.x = -dir.x;
+	dir.y = -dir.y;
+
+	data.grid_idx.x = (int)pos.x;
+	data.grid_idx.y = (int)pos.y;
+	data.grid_idx.z = (int)pos.z;
+	dir = dir / (dir.length());
+
+	if (dir.x != 0) { data.side_len.x = sqrt(dir.y * dir.y + dir.z * dir.z) / dir.x; } else { data.side_len.x = 0xFFFFFFFF; }
+	if (dir.y != 0) { data.side_len.y = sqrt(dir.z * dir.z + dir.x * dir.x) / dir.y; } else { data.side_len.y = 0xFFFFFFFF; }
+	if (dir.z != 0) { data.side_len.z = sqrt(dir.x * dir.x + dir.y * dir.y) / dir.z; } else { data.side_len.z = 0xFFFFFFFF; }
+
+	data.side_len.x = sqrt(1 + data.side_len.x * data.side_len.x);
+	data.side_len.y = sqrt(1 + data.side_len.y * data.side_len.y);
+	data.side_len.z = sqrt(1 + data.side_len.z * data.side_len.z);
+
+	if (dir.x > 0)
+	{
+		data.grid_dir.x = +1;
+		data.side_sum.x = ((data.grid_idx.x + 1) - pos.x) * data.side_len.x;
+		data.cardinal_x = 1;
+	}
+	else
+	{
+		data.grid_dir.x = -1;
+		data.side_sum.x = (pos.x - data.grid_idx.x) * data.side_len.x;
+		data.cardinal_x = 2;
+	}
+
+	if (dir.y > 0)
+	{
+		data.grid_dir.y = +1;
+		data.side_sum.y = ((data.grid_idx.y + 1) - pos.y) * data.side_len.y;
+		data.cardinal_y = 3;
+	}
+	else
+	{
+		data.grid_dir.y = -1;
+		data.side_sum.y = (pos.y - data.grid_idx.y) * data.side_len.y;
+		data.cardinal_y = 4;
+	}
+
+	if (dir.z > 0)
+	{
+		data.grid_dir.z = +1;
+		data.side_sum.z = ((data.grid_idx.z + 1) - pos.z) * data.side_len.z;
+		data.cardinal_z = 5;
+	}
+	else
+	{
+		data.grid_dir.z = -1;
+		data.side_sum.z = (pos.z - data.grid_idx.z) * data.side_len.z;
+		data.cardinal_z = 6;
+	}
+
+	data.ray_pos = pos;
+	data.ray_dir = dir;
+	//data.ray_dir = Point(-dir.x, -dir.y, +dir.z);
+
+	return (data);
+}
+RayCast3D_Hit	RayCast3D_continue(RayCast3D_Data & data)
+{
+	RayCast3D_Hit hit;
 	hit.isHit = false;
+
+	if (data.side_sum.x < data.side_sum.y && data.side_sum.x < data.side_sum.z)
+	{
+		hit.t = data.side_sum.x;
+		data.side_sum.x += data.side_len.x;
+		data.grid_idx.x += data.grid_dir.x;
+		hit.cardinal = data.cardinal_x;
+	}
+	else if (data.side_sum.y < data.side_sum.z && data.side_sum.y < data.side_sum.z)
+	{
+		hit.t = data.side_sum.y;
+		data.side_sum.y += data.side_len.y;
+		data.grid_idx.y += data.grid_dir.y;
+		hit.cardinal = data.cardinal_y;
+	}
+	else
+	{
+		hit.t = data.side_sum.z;
+		data.side_sum.z += data.side_len.z;
+		data.grid_idx.z += data.grid_dir.z;
+		hit.cardinal = data.cardinal_z;
+	}
+
+	return (hit);
+}
+RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data)
+{
+	hit.isHit = true;
+	hit.idx.x = data.grid_idx.x;
+	hit.idx.y = data.grid_idx.y;
+	hit.idx.z = data.grid_idx.z;
+	hit.pos = data.ray_pos + (data.ray_dir * hit.t);
+	return (hit);
+}
+
+
+RayCast3D_Hit	RayCast3D(
+	Point pos, Point dir,
+	int max_dist,
+	const void * obj,
+	int(* hit_func)(const void *, Index3D))
+{
+	RayCast3D_Hit hit;
+	hit.cardinal = 0;
+	hit.t = 0;
+
+	RayCast3D_Data data = RayCast3D_init(pos, dir);
+
+	while (hit.t < max_dist)
+	{
+		int check = hit_func(obj, data.grid_idx);
+		if (check < 0)
+		{
+			hit.isHit = false;
+			return hit;
+		}
+		if (check > 0)
+		{
+			hit = RayCast3D_hit(hit, data);
+			hit.pos = data.ray_pos + (data.ray_dir * hit.t);
+			return hit;
+		}
+
+		hit = RayCast3D_continue(data);
+	}
+
+	hit.isHit = false;
+	return hit;
+}
+
+/*RayCast3D_Hit	RayCast3D_Recursive(
+	Point pos, Point dir,
+	int max_dist,
+	const void * obj,
+	void * obj_hit,
+	int(* hit_func)(const void *, void *, Index3D, Point, Point))
+{
+	RayCast3D_Hit hit;
+	hit.cardinal = 0;
+	hit.t = 0;
 
 	dir.x = -dir.x;
 	dir.y = -dir.y;
@@ -12,124 +157,26 @@ RayCast3DHit	RayCast3D(Point pos, Point dir, const void * obj, int(* hitfunc)(co
 	Point ray_pos = pos;
 	Point ray_dir = dir;
 
-	int	ray_grid_idx_x = (int)pos.x;
-	int	ray_grid_idx_y = (int)pos.y;
-	int	ray_grid_idx_z = (int)pos.z;
-	dir = dir / (dir.length());
+	RayCast3D_Data data = RayCast3D_init(pos, dir);
 
-	float	ray_side_len_x;
-	float	ray_side_len_y = 0;
-	float	ray_side_len_z;
-
-	if (dir.x != 0) { ray_side_len_x = sqrt(dir.y * dir.y + dir.z * dir.z) / dir.x; } else { ray_side_len_x = 0xFFFFFFFF; }
-	if (dir.y != 0) { ray_side_len_y = sqrt(dir.z * dir.z + dir.x * dir.x) / dir.y; } else { ray_side_len_y = 0xFFFFFFFF; }
-	if (dir.z != 0) { ray_side_len_z = sqrt(dir.x * dir.x + dir.y * dir.y) / dir.z; } else { ray_side_len_z = 0xFFFFFFFF; }
-
-	ray_side_len_x = sqrt(1 + ray_side_len_x * ray_side_len_x);
-	ray_side_len_y = sqrt(1 + ray_side_len_y * ray_side_len_y);
-	ray_side_len_z = sqrt(1 + ray_side_len_z * ray_side_len_z);
-
-	float ray_sum = 0;
-
-
-
-	int	ray_grid_dir_x;
-	int	ray_grid_dir_y;
-	int	ray_grid_dir_z;
-
-	float	ray_side_sum_x;
-	float	ray_side_sum_y;
-	float	ray_side_sum_z;
-
-	int	ray_cardinal_side_x;
-	int	ray_cardinal_side_y;
-	int	ray_cardinal_side_z;
-
-	if (dir.x > 0)
+	while (hit.t < max_dist)
 	{
-		ray_grid_dir_x = +1;
-		ray_side_sum_x = ((ray_grid_idx_x + 1) - pos.x) * ray_side_len_x;
-		ray_cardinal_side_x = 1;
-	}
-	else
-	{
-		ray_grid_dir_x = -1;
-		ray_side_sum_x = (pos.x - ray_grid_idx_x) * ray_side_len_x;
-		ray_cardinal_side_x = 2;
-	}
-
-	if (dir.y > 0)
-	{
-		ray_grid_dir_y = +1;
-		ray_side_sum_y = ((ray_grid_idx_y + 1) - pos.y) * ray_side_len_y;
-		ray_cardinal_side_y = 3;
-	}
-	else
-	{
-		ray_grid_dir_y = -1;
-		ray_side_sum_y = (pos.y - ray_grid_idx_y) * ray_side_len_y;
-		ray_cardinal_side_y = 4;
-	}
-
-	if (dir.z > 0)
-	{
-		ray_grid_dir_z = +1;
-		ray_side_sum_z = ((ray_grid_idx_z + 1) - pos.z) * ray_side_len_z;
-		ray_cardinal_side_z = 5;
-	}
-	else
-	{
-		ray_grid_dir_z = -1;
-		ray_side_sum_z = (pos.z - ray_grid_idx_z) * ray_side_len_z;
-		ray_cardinal_side_z = 6;
-	}
-
-	int	ray_cardinal_dir = 0;
-
-
-
-	while (ray_sum < max_dist)
-	{
-		/*if (hitfunc(obj, hit, x, y ,z))
-			return;*/
-
-		int check = hitfunc(obj, ray_grid_idx_x, ray_grid_idx_y, ray_grid_idx_z);
+		hit.pos = ray_pos + (ray_dir * hit.t);
+		int check = hit_func(obj, obj_hit, data.grid_idx, hit.pos, ray_dir);
 		if (check < 0)
 		{
+			hit.isHit = false;
 			return hit;
 		}
 		if (check > 0)
 		{
-			hit.isHit = true;
-			hit.x = ray_grid_idx_x;
-			hit.y = ray_grid_idx_y;
-			hit.z = ray_grid_idx_z;
-			hit.t = ray_sum;
-			hit.pos = ray_pos + (ray_dir * hit.t);
+			hit = RayCast3D_hit(hit, data);
 			return hit;
 		}
 
-		if (ray_side_sum_x < ray_side_sum_y && ray_side_sum_x < ray_side_sum_z)
-		{
-			ray_sum = ray_side_sum_x;
-			ray_side_sum_x += ray_side_len_x;
-			ray_grid_idx_x += ray_grid_dir_x;
-			ray_cardinal_dir = ray_cardinal_side_x;
-		}
-		else if (ray_side_sum_y < ray_side_sum_z && ray_side_sum_y < ray_side_sum_z)
-		{
-			ray_sum = ray_side_sum_y;
-			ray_side_sum_y += ray_side_len_y;
-			ray_grid_idx_y += ray_grid_dir_y;
-			ray_cardinal_dir = ray_cardinal_side_y;
-		}
-		else
-		{
-			ray_sum = ray_side_sum_z;
-			ray_side_sum_z += ray_side_len_z;
-			ray_grid_idx_z += ray_grid_dir_z;
-			ray_cardinal_dir = ray_cardinal_side_z;
-		}
+		hit = RayCast3D_continue(data);
 	}
+
+	hit.isHit = false;
 	return hit;
-}
+}*/

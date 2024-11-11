@@ -46,6 +46,7 @@ class VoxelChunk
 	public:
 		bool	isChunkIndex(int x, int y, int z) const;
 		void	getChunkIndex(int & x, int & y, int & z) const;
+		Point	getChunkOffset() const;
 		void	FillRandom();
 
 	public:
@@ -64,7 +65,10 @@ class VoxelChunk
 		};
 
 		ChunkIndex	Cross(Point pos, Point dir);
-		static int	CheckVoxel(const void * p, int x, int y, int z);
+		static int	CheckVoxel(const void * obj, Index3D idx);
+
+		static Box	getVoxelBox(unsigned int x, unsigned int y, unsigned int z, Point off);
+		static Box	getChunkBox(Index3D);
 };
 
 #endif

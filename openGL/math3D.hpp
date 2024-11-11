@@ -4,17 +4,43 @@
 # include "Point.hpp"
 # include "Angle.hpp"
 
-struct	RayCast3DHit
+struct	Index3D
+{
+	int	x;
+	int	y;
+	int	z;
+};
+
+struct	RayCast3D_Data
+{
+	Point	ray_pos;
+	Point	ray_dir;
+
+	Index3D	grid_idx;
+	Index3D	grid_dir;
+
+	Point	side_len;
+	Point	side_sum;
+
+	char	cardinal_x;
+	char	cardinal_y;
+	char	cardinal_z;
+};
+
+struct	RayCast3D_Hit
 {
 	bool	isHit;
 
-	unsigned int x;
-	unsigned int y;
-	unsigned int z;
+	Index3D	idx;
+	char	cardinal;
 
 	float	t;
 	Point	pos;
 };
+
+RayCast3D_Data	RayCast3D_init(Point pos, Point dir);
+RayCast3D_Hit	RayCast3D_continue(RayCast3D_Data & data);
+RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data);
 
 /*
 	pos, dir				: for th ray
@@ -26,6 +52,7 @@ struct	RayCast3DHit
 
 	return hit				: return a hit to indicate where / how far something was hit
 */
+
 /*
 	hit func needs:
 		pointer to the object to check
@@ -34,6 +61,17 @@ struct	RayCast3DHit
 		pos and dir of ray
 */
 
-RayCast3DHit	RayCast3D(Point pos, Point dir, const void * obj, int(* hitfunc)(const void *, int, int, int), int max_dist = 128);
+RayCast3D_Hit	RayCast3D(
+	Point pos, Point dir,
+	int max_dist,
+	const void * obj,
+	int(* hit_func)(const void *, Index3D));
+
+RayCast3D_Hit	RayCast3D_Recursive(
+	Point pos, Point dir,
+	int max_dist,
+	const void * obj,
+	void * obj_hit,
+	int(* hit_func)(const void *, void *, Index3D, Point, Point));
 
 #endif

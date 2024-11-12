@@ -19,14 +19,19 @@ class VoxelSpace
 		~VoxelSpace();
 
 		void	FillRandom();
+		void	UpdateBuffer(int x, int y, int z);
 
 		VoxelChunk *	FindChunkPtr(int x, int y, int z);
+		VoxelChunk *	FindChunkPtr(Index3D idx);
+		unsigned int	FindChunkIdx(Index3D idx);
+		int				CheckChunk(Index3D idx);
+
+		char	trySub(unsigned int ch, Undex3D vox);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;
 
-		void		Cross(Point pos, Point dir);
-		static int	CheckChunk(const void * obj, Index3D idx);
+		Undex3D		Cross(Point pos, Point dir, unsigned int & chunk_idx);
 };
 
 #endif

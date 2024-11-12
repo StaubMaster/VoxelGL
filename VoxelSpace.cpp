@@ -30,14 +30,28 @@ void	VoxelSpace::FillRandom()
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Chunks[i].FillRandom();
-		Chunks[i].UpdateBufferVertex();
 	}
 
 	int x, y, z;
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Chunks[i].getChunkIndex(x, y, z);
+		Chunks[i].UpdateBufferVertex();
 		Chunks[i].UpdateBufferIndex(
+			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
+			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
+			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
+		);
+	}
+}
+void	VoxelSpace::UpdateBuffer(int x, int y, int z)
+{
+	VoxelChunk * ch = FindChunkPtr(x, y, z);
+
+	if (ch != NULL)
+	{
+		ch -> UpdateBufferVertex();
+		ch -> UpdateBufferIndex(
 			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
 			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
 			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
@@ -54,6 +68,58 @@ VoxelChunk *	VoxelSpace::FindChunkPtr(int x, int y, int z)
 			return (&ch);
 	}
 	return (NULL);
+}
+VoxelChunk *	VoxelSpace::FindChunkPtr(Index3D idx)
+{
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		VoxelChunk & ch = Chunks[i];
+		if (ch.isChunkIndex(idx.x, idx.y, idx.z))
+			return (&ch);
+	}
+	return (NULL);
+}
+unsigned int	VoxelSpace::FindChunkIdx(Index3D idx)
+{
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		VoxelChunk & ch = Chunks[i];
+		if (ch.isChunkIndex(idx.x, idx.y, idx.z))
+			return (i);
+	}
+	return (0xFFFFFFFF);
+}
+int	VoxelSpace::CheckChunk(Index3D idx)
+{
+	VoxelChunk * ch = FindChunkPtr(idx);
+	if (ch == NULL)
+	{
+		return (-1);
+	}
+	else
+	{
+		return (+1);
+	}
+
+	return (0);
+}
+
+char	VoxelSpace::trySub(unsigned int ch, Undex3D vox)
+{
+	char t = Chunks[ch].trySub(vox);
+
+	int x, y, z;
+	Chunks[ch].getChunkIndex(x, y, z);
+
+	UpdateBuffer(x, y, z);
+	UpdateBuffer(x - 1, y, z);
+	UpdateBuffer(x + 1, y, z);
+	UpdateBuffer(x, y - 1, z);
+	UpdateBuffer(x, y + 1, z);
+	UpdateBuffer(x, y, z - 1);
+	UpdateBuffer(x, y, z + 1);
+
+	return t;
 }
 
 void	VoxelSpace::Draw(int Uni_Chunk_Pos) const
@@ -83,7 +149,7 @@ void	VoxelSpace::DrawBound() const
 }
 
 
-void	VoxelSpace::Cross(Point pos, Point dir)
+Undex3D	VoxelSpace::Cross(Point pos, Point dir, unsigned int & chunk_idx)
 {
 	RayCast3D_Hit hit_chunk;
 	RayCast3D_Hit hit_voxel;
@@ -95,7 +161,7 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 	while (hit_chunk.t < 128)
 	{
-		int check = CheckChunk(this, data_chunk.grid_idx);
+		int check = CheckChunk(data_chunk.grid_idx);
 		if (check < 0)
 		{
 			hit_chunk.isHit = false;
@@ -104,7 +170,7 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 		else if (check > 0)
 		{
 			hit_chunk = RayCast3D_hit(hit_chunk, data_chunk);
-			VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx.x, hit_chunk.idx.y, hit_chunk.idx.z);
+			VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx);
 
 			//std::cout << "check " << hit_chunk.idx.x << ":" << hit_chunk.idx.y << ":" << hit_chunk.idx.z << "\n";
 
@@ -138,7 +204,7 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 			while (hit_voxel.t < 128)
 			{
-				int check = VoxelChunk::CheckVoxel(chunk, data_voxel.grid_idx);
+				int check = chunk -> CheckVoxel(data_voxel.grid_idx);
 				if (check < 0)
 				{
 					hit_voxel.isHit = false;
@@ -192,7 +258,7 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 		if (hit_voxel.isHit)
 		{
-			VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx.x, hit_chunk.idx.y, hit_chunk.idx.z);
+			VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx);
 			if (chunk != NULL)
 			{
 				Point chunk_off = chunk -> getChunkOffset();
@@ -217,21 +283,17 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 		}
 	}
 
-}
-
-int	VoxelSpace::CheckChunk(const void * obj, Index3D idx)
-{
-	VoxelSpace * sp = (VoxelSpace *)obj;
-
-	VoxelChunk * ch = sp -> FindChunkPtr(idx.x, idx.y, idx.z);
-	if (ch == NULL)
+	Undex3D voxel_idx;
+	if (hit_chunk.isHit && hit_voxel.isHit)
 	{
-		return (-1);
+		chunk_idx = FindChunkIdx(hit_chunk.idx);
+		voxel_idx.x = hit_voxel.idx.x;
+		voxel_idx.y = hit_voxel.idx.y;
+		voxel_idx.z = hit_voxel.idx.z;
 	}
 	else
 	{
-		return (+1);
+		chunk_idx = 0xFFFFFFFF;
 	}
-
-	return (0);
+	return voxel_idx;
 }

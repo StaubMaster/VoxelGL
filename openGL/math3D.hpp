@@ -10,6 +10,12 @@ struct	Index3D
 	int	y;
 	int	z;
 };
+struct	Undex3D
+{
+	unsigned int	x;
+	unsigned int	y;
+	unsigned int	z;
+};
 
 struct	RayCast3D_Data
 {

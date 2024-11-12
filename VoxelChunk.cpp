@@ -9,6 +9,10 @@ unsigned int VoxelChunk::XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsi
 {
 	return (x + (y + (z) * Vertex_per_Side) * Vertex_per_Side);
 }
+unsigned int VoxelChunk::XYZ_to_VoxelIndex(Undex3D udx)
+{
+	return (udx.x + (udx.y + (udx.z) * Voxel_per_Side) * Voxel_per_Side);
+}
 
 void VoxelChunk::IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
 {
@@ -124,6 +128,10 @@ bool	VoxelChunk::isChunkIndex(int x, int y, int z) const
 {
 	return ((Chunk_X == x) && (Chunk_Y == y) && (Chunk_Z == z));
 }
+bool	VoxelChunk::isChunkIndex(Index3D idx) const
+{
+	return ((Chunk_X == idx.x) && (Chunk_Y == idx.y) && (Chunk_Z == idx.z));
+}
 void	VoxelChunk::getChunkIndex(int & x, int & y, int & z) const
 {
 	x = Chunk_X;
@@ -162,6 +170,40 @@ void	VoxelChunk::FillRandom()
 			}
 		}
 	}
+}
+int		VoxelChunk::CheckVoxel(Index3D idx)
+{
+	if ((idx.x < -1) || (idx.x >= (int)(Voxel_per_Side + 1)) ||
+		(idx.y < -1) || (idx.y >= (int)(Voxel_per_Side + 1)) ||
+		(idx.z < -1) || (idx.z >= (int)(Voxel_per_Side + 1)))
+	{
+		//std::cout << "outside\n";
+		return (-1);
+	}
+
+	if ((idx.x < 0) || (idx.x >= (int)(Voxel_per_Side)) ||
+		(idx.y < 0) || (idx.y >= (int)(Voxel_per_Side)) ||
+		(idx.z < 0) || (idx.z >= (int)(Voxel_per_Side)))
+	{
+		//std::cout << "edge\n";
+		return (0);
+	}
+
+	if (Data[XYZ_to_VoxelIndex(idx.x, idx.y, idx.z)] != 0)
+	{
+		return (+1);
+	}
+
+	return (0);
+}
+
+char	VoxelChunk::trySub(Undex3D idx)
+{
+	unsigned int i = XYZ_to_VoxelIndex(idx);
+	std::cout << "---- " << i << "\n";
+	char d = Data[i];
+	Data[i] = 0;
+	return (d);
 }
 
 
@@ -371,32 +413,4 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 
 	glBindVertexArray(Buffer_Array);
 	glDrawElements(GL_TRIANGLES, Index_Count, GL_UNSIGNED_INT, (void*)0);
-}
-
-
-int	VoxelChunk::CheckVoxel(const void * obj, Index3D idx)
-{
-	if ((idx.x < -1) || (idx.x >= (int)(Voxel_per_Side + 1)) ||
-		(idx.y < -1) || (idx.y >= (int)(Voxel_per_Side + 1)) ||
-		(idx.z < -1) || (idx.z >= (int)(Voxel_per_Side + 1)))
-	{
-		//std::cout << "outside\n";
-		return (-1);
-	}
-
-	if ((idx.x < 0) || (idx.x >= (int)(Voxel_per_Side)) ||
-		(idx.y < 0) || (idx.y >= (int)(Voxel_per_Side)) ||
-		(idx.z < 0) || (idx.z >= (int)(Voxel_per_Side)))
-	{
-		//std::cout << "edge\n";
-		return (0);
-	}
-
-	VoxelChunk * ch = (VoxelChunk *)obj;
-	if (ch -> Data[XYZ_to_VoxelIndex(idx.x, idx.y, idx.z)] != 0)
-	{
-		return (+1);
-	}
-
-	return (0);
 }

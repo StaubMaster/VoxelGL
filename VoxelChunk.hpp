@@ -17,6 +17,7 @@ class VoxelChunk
 
 		static unsigned int XYZ_to_VoxelIndex(unsigned int x, unsigned int y, unsigned int z);
 		static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
+		static unsigned int XYZ_to_VoxelIndex(Undex3D idx);
 
 		static void IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
 		static void IndexFaceXp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
@@ -45,9 +46,15 @@ class VoxelChunk
 
 	public:
 		bool	isChunkIndex(int x, int y, int z) const;
+		bool	isChunkIndex(Index3D idx) const;
+
 		void	getChunkIndex(int & x, int & y, int & z) const;
 		Point	getChunkOffset() const;
+
 		void	FillRandom();
+		int		CheckVoxel(Index3D idx);
+
+		char	trySub(Undex3D idx);
 
 	public:
 		void	UpdateBufferVertex();
@@ -63,9 +70,6 @@ class VoxelChunk
 			unsigned int y;
 			unsigned int z;
 		};
-
-		ChunkIndex	Cross(Point pos, Point dir);
-		static int	CheckVoxel(const void * obj, Index3D idx);
 
 		static Box	getVoxelBox(unsigned int x, unsigned int y, unsigned int z, Point off);
 		static Box	getChunkBox(Index3D);

@@ -261,12 +261,15 @@ int main(int argc, char **argv)
 			ray_dir = view.ang.rotate_back(Point(0, 0, 1));
 		}
 
+		unsigned int chunk_idx;
+		Undex3D voxel_idx;
 		boxShader.Use();
 		glUniform3fv(Uni_Box_View, 3, (float *)&view);
 		//box.Draw();
 		//space.DrawBound();
 		//space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		space.Cross(ray_pos, ray_dir);
+		voxel_idx = space.Cross(ray_pos, ray_dir, chunk_idx);
+
 
 
 		//Point ray[] = { view.pos, view.pos + view.ang.rotate_back(Point(0, 0, 100)) };
@@ -288,6 +291,15 @@ int main(int argc, char **argv)
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
+
+
+		if (glfwGetKey(win -> win, GLFW_KEY_T))
+		{
+			if (chunk_idx != 0xFFFFFFFF)
+			{
+				space.trySub(chunk_idx, voxel_idx);
+			}
+		}
 	}
 	delete win;
 	inst_delete();

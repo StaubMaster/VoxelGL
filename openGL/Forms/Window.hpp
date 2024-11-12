@@ -17,7 +17,7 @@ class Window
 		double	win_middle_x;
 		double	win_middle_y;
 
-		std::vector<KeyPress *>	keys;
+		std::vector<KeyCheck *>	keys;
 
 	private:
 		Window();

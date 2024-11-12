@@ -199,7 +199,7 @@ int main(int argc, char **argv)
 	Point ray_dir(1, 0, 2);
 	ray_dir = ray_dir / ray_dir.length();
 
-	KeyPress voxel_sub_key(GLFW_KEY_T);
+	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_1, true);
 	win -> keys.push_back(&voxel_sub_key);
 
 	std::cout << "loop\n";

@@ -2,7 +2,7 @@
 #ifndef BOX_HPP
 # define BOX_HPP
 # include "openGL/openGL.h"
-# include "openGL/math3D.hpp"
+# include "openGL/Abstract/math3D.hpp"
 # include <iostream>
 
 class Box

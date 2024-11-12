@@ -2,7 +2,7 @@
 #ifndef VOXELSPACE_HPP
 # define VOXELSPACE_HPP
 # include "openGL/openGL.h"
-# include "openGL/math3D.hpp"
+# include "openGL/Abstract/math3D.hpp"
 # include "VoxelChunk.hpp"
 # include <iostream>
 # include <vector>

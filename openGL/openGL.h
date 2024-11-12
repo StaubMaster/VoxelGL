@@ -12,7 +12,5 @@
 # include "glad.h"
 # include <GLFW/glfw3.h>
 
-GLFWwindow *load_window(int w, int h, const char *name);
-GLFWwindow *load_window_ReSize(int w, int h, const char *name);
 
 #endif

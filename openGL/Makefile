@@ -3,7 +3,14 @@ NAME = openGL.a
 
 FLAGS = -Wall -Wextra -Werror
 
-FILE_C = stringHelp.cpp Shader.cpp Window.cpp windowLoader.cpp textureLoadSave.cpp View.cpp math3D.cpp Point.cpp Angle.cpp
+FILE_C = stringHelp.cpp Shader.cpp \
+	Forms/Window.cpp \
+	Forms/KeyCheck.cpp \
+	textureLoadSave.cpp \
+	Abstract/math3D.cpp \
+	Abstract/Point.cpp \
+	Abstract/Angle.cpp \
+	View.cpp
 FILE_O = glad.o $(FILE_C:.cpp=.o)
 
 

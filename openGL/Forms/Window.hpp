@@ -1,9 +1,11 @@
 
 #ifndef WINDOW_HPP
 # define WINDOW_HPP
-# include "openGL.h"
-# include "math3D.hpp"
+# include "KeyCheck.hpp"
+# include "../openGL.h"
+# include "../Abstract/math3D.hpp"
 # include <iostream>
+# include <vector>
 
 class Window
 {
@@ -15,10 +17,12 @@ class Window
 		double	win_middle_x;
 		double	win_middle_y;
 
+		std::vector<KeyPress *>	keys;
+
 	private:
 		Window();
 	public:
-		Window(int w, int h, const char * name);
+		Window(int w, int h, const char * name, bool resize);
 		~Window();
 	private:
 		Window(const Window & other);

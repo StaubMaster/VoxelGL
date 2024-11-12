@@ -6,27 +6,13 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
-#include "openGL/Window.hpp"
+#include "openGL/Abstract/Angle.hpp"
+#include "openGL/Forms/Window.hpp"
 #include "openGL/View.hpp"
 #include "VoxelChunk.hpp"
 #include "VoxelSpace.hpp"
 #include "Box.hpp"
 #include "inst.cpp"
-
-static void free_exit(GLFWwindow *win)
-{
-	inst_delete();
-	(void)win;
-	exit(EXIT_FAILURE);
-}
-
-static void	f_rot(float *pls, float *mns, float cos, float sin)
-{
-	float	temppp;
-	temppp = pls[0] * cos - mns[0] * sin;
-	mns[0] = mns[0] * cos + pls[0] * sin;
-	pls[0] = temppp;
-}
 
 static void use_info()
 {
@@ -40,22 +26,24 @@ int main(int argc, char **argv)
 {
 	if (argc != 2)
 	{
-		(void)argc;
-		(void)argv;
 		use_info();
 		return 0;
 	}
 
-	Window * win = new Window(1000, 1000, "instance test");
+	Window * win = new Window(1000, 1000, "instance test", false);
 
 	inst_init();
 	if (inst_load_program() == 0)
-		free_exit(NULL);
+	{
+		delete win;
+	}
 	std::cout << "instance program done\n";
 
 	inst_texture_gen();
 	if (inst_texture_load(argv[1]) == 0)
-		free_exit(NULL);
+	{
+		delete win;
+	}
 	std::cout << "individual textures done\n";
 
 	inst_buffer_gen();
@@ -138,7 +126,7 @@ int main(int argc, char **argv)
 			instances[i].pos_z = 0;
 
 			w = rand();
-			f_rot(&instances[i].pos_x, &instances[i].pos_z, cos(w), sin(w));
+			Angle::rotate(instances[i].pos_x, instances[i].pos_z, cos(w), sin(w));
 			instances[i].ang_x = (rand() & 0xFF);
 			instances[i].ang_y = (rand() & 0xFF);
 			instances[i].ang_z = (rand() & 0xFF);
@@ -211,6 +199,9 @@ int main(int argc, char **argv)
 	Point ray_dir(1, 0, 2);
 	ray_dir = ray_dir / ray_dir.length();
 
+	KeyPress voxel_sub_key(GLFW_KEY_T);
+	win -> keys.push_back(&voxel_sub_key);
+
 	std::cout << "loop\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -237,7 +228,7 @@ int main(int argc, char **argv)
 				(instances[i].pos_z * instances[i].pos_z));
 			ang = angDist / dist;
 			ang = ang * time_diff;
-			f_rot(&instances[i].pos_x, &instances[i].pos_z, cos(ang), sin(ang));
+			Angle::rotate(instances[i].pos_x, instances[i].pos_z, cos(ang), sin(ang));
 			instances[i].ang_y += 0.01;
 			inst_sin_cos(&instances[i]);
 		}
@@ -293,7 +284,7 @@ int main(int argc, char **argv)
 		glfwPollEvents();
 
 
-		if (glfwGetKey(win -> win, GLFW_KEY_T))
+		if (voxel_sub_key.check())
 		{
 			if (chunk_idx != 0xFFFFFFFF)
 			{

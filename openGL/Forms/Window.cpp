@@ -5,7 +5,7 @@ Window::Window::Window()
 {
 	throw GenericWindowException();
 }
-Window::Window(int w, int h, const char * name)
+Window::Window(int w, int h, const char * name, bool resize)
 {
 	if (!glfwInit())
 	{
@@ -29,6 +29,8 @@ Window::Window(int w, int h, const char * name)
 		std::cout << "window NULL\n";
 		throw GenericWindowException();
 	}
+	glfwSetWindowAttrib(win, GLFW_RESIZABLE, resize);
+
 	glfwMakeContextCurrent(win);
 	std::cout << "window done\n";
 
@@ -73,6 +75,7 @@ void Window::Update()
 	{
 		glfwSetWindowShouldClose(win, 1);
 	}
+
 	if (glfwGetKey(win, GLFW_KEY_TAB))
 	{
 		if (!tabbed_pressed)
@@ -84,6 +87,11 @@ void Window::Update()
 	else
 	{
 		tabbed_pressed = false;
+	}
+
+	for (size_t i = 0; i < keys.size(); i++)
+	{
+		keys[i] -> update(win);
 	}
 }
 Point Window::GetKeyMovement(float speed) const

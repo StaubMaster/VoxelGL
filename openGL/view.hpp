@@ -2,7 +2,7 @@
 #ifndef VIEW_H
 # define VIEW_H
 # include "openGL.h"
-# include "math3D.hpp"
+# include "Abstract/math3D.hpp"
 
 class View
 {

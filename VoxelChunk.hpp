@@ -2,7 +2,8 @@
 #ifndef VOXELCHUNK_HPP
 # define VOXELCHUNK_HPP
 # include "openGL/openGL.h"
-# include "openGL/math3D.hpp"
+# include "openGL/Abstract/math3D.hpp"
+# include "openGL/Abstract/Point.hpp"
 # include "Box.hpp"
 # include "MemorySize.hpp"
 # include <iostream>

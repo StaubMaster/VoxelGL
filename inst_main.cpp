@@ -255,7 +255,7 @@ int main(int argc, char **argv)
 		//chunk2.Draw(Uni_Chunk_Pos);
 		space.Draw(Uni_Chunk_Pos);
 
-		if (glfwGetKey(win -> win, GLFW_KEY_T))
+		//if (glfwGetKey(win -> win, GLFW_KEY_T))
 		{
 			ray_pos = view.pos;
 			ray_dir = view.ang.rotate_back(Point(0, 0, 1));
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
 
 		//Point ray[] = { view.pos, view.pos + view.ang.rotate_back(Point(0, 0, 100)) };
-		Point ray[] = { ray_pos, ray_pos + (Point(-ray_dir.x, -ray_dir.y, +ray_dir.z) * 10) };
+		Point ray[] = { ray_pos, ray_pos + (Point(-ray_dir.x, -ray_dir.y, +ray_dir.z) * 100) };
 
 
 		rayShader.Use();

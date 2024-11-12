@@ -14,9 +14,9 @@ RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 	data.ray_dir = dir;
 
 	data.norm_pos = pos / scale;
-	data.grid_idx.x = (int)data.norm_pos.x;
-	data.grid_idx.y = (int)data.norm_pos.y;
-	data.grid_idx.z = (int)data.norm_pos.z;
+	data.grid_idx.x = (int)floor(data.norm_pos.x);
+	data.grid_idx.y = (int)floor(data.norm_pos.y);
+	data.grid_idx.z = (int)floor(data.norm_pos.z);
 	data.norm_dir = dir / (dir.length());
 
 	if (data.norm_dir.x != 0) { data.side_len.x = sqrt(data.norm_dir.y * data.norm_dir.y + data.norm_dir.z * data.norm_dir.z) / data.norm_dir.x; } else { data.side_len.x = 0xFFFFFFFF; }

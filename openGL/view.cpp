@@ -23,6 +23,10 @@ void	View::turn(Angle rel)
 	ang.z += rel.z;
 	ang.UpdateSinCos();
 }
+void	View::uniform(int uni) const
+{
+	glUniform3fv(uni, 3, (float *)this);
+}
 
 
 

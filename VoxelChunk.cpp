@@ -69,6 +69,136 @@ void VoxelChunk::IndexFaceZp(unsigned int * index, unsigned int idx, unsigned in
 	index[idx + 5] = XYZ_to_VertexIndex(x + 1, y + 1, z);
 }
 
+void VoxelChunk::IndexFaceX(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp)
+{
+	if (vn != NULL && vp != NULL)
+	{
+		if (vn -> isSolid() && !vp -> isSolid())
+		{
+			IndexFaceXn(index, idx, x, y, z);
+			idx += 6;
+		}
+		if (!vn -> isSolid() && vp -> isSolid())
+		{
+			IndexFaceXp(index, idx, x, y, z);
+			idx += 6;
+		}
+	}
+}
+void VoxelChunk::IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp)
+{
+	if (vn != NULL && vp != NULL)
+	{
+		if (vn -> isSolid() && !vp -> isSolid())
+		{
+			IndexFaceYn(index, idx, x, y, z);
+			idx += 6;
+		}
+		if (!vn -> isSolid() && vp -> isSolid())
+		{
+			IndexFaceYp(index, idx, x, y, z);
+			idx += 6;
+		}
+	}
+}
+void VoxelChunk::IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp)
+{
+	if (vn != NULL && vp != NULL)
+	{
+		if (vn -> isSolid() && !vp -> isSolid())
+		{
+			IndexFaceZn(index, idx, x, y, z);
+			idx += 6;
+		}
+		if (!vn -> isSolid() && vp -> isSolid())
+		{
+			IndexFaceZp(index, idx, x, y, z);
+			idx += 6;
+		}
+	}
+}
+
+void VoxelChunk::IndexFaceX(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
+{
+	const Voxel * vn = NULL;
+	const Voxel * vp = NULL;
+	if (x == 0)
+	{
+		if (n != NULL)
+		{
+			vn = &n -> get(Voxel_per_Side - 1, y, z);
+			vp = &t -> get(0, y, z);
+		}
+	}
+	else if (x == Voxel_per_Side)
+	{
+		if (p != NULL)
+		{
+			vn = &t -> get(Voxel_per_Side, y, z);
+			vp = &p -> get(0, y, z);
+		}
+	}
+	else
+	{
+		vn = &t -> get(x - 1, y, z);
+		vp = &t -> get(x - 0, y, z);
+	}
+	IndexFaceX(index, idx, x, y, z, vn, vp);
+}
+void VoxelChunk::IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
+{
+	const Voxel * vn = NULL;
+	const Voxel * vp = NULL;
+	if (y == 0)
+	{
+		if (n != NULL)
+		{
+			vn = &n -> get(x, Voxel_per_Side - 1, z);
+			vp = &t -> get(x, 0, z);
+		}
+	}
+	else if (y == Voxel_per_Side)
+	{
+		if (p != NULL)
+		{
+			vn = &t -> get(x, Voxel_per_Side, z);
+			vp = &p -> get(x, 0, z);
+		}
+	}
+	else
+	{
+		vn = &t -> get(x, y - 1, z);
+		vp = &t -> get(x, y - 0, z);
+	}
+	IndexFaceY(index, idx, x, y, z, vn, vp);
+}
+void VoxelChunk::IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
+{
+	const Voxel * vn = NULL;
+	const Voxel * vp = NULL;
+	if (z == 0)
+	{
+		if (n != NULL)
+		{
+			vn = &n -> get(x, y, Voxel_per_Side - 1);
+			vp = &t -> get(x, y, 0);
+		}
+	}
+	else if (z == Voxel_per_Side)
+	{
+		if (p != NULL)
+		{
+			vn = &t -> get(x, y, Voxel_per_Side);
+			vp = &p -> get(x, y, 0);
+		}
+	}
+	else
+	{
+		vn = &t -> get(x, y, z - 1);
+		vp = &t -> get(x, y, z - 0);
+	}
+	IndexFaceZ(index, idx, x, y, z, vn, vp);
+}
 
 
 
@@ -80,7 +210,7 @@ VoxelChunk::VoxelChunk(int x, int y, int z) :
 		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
 		<< "\n";*/
 
-	Data = new char[Voxel_per_Chunk];
+	Data = new Voxel[Voxel_per_Chunk];
 
 	glGenVertexArrays(1, &Buffer_Array);
 	glGenBuffers(1, &Buffer_Corner);
@@ -108,7 +238,7 @@ VoxelChunk::VoxelChunk(const VoxelChunk & other) :
 		<< Chunk_X << ":" << Chunk_Y << ":" << Chunk_Z
 		<< "\n";*/
 
-	Data = new char[Voxel_per_Chunk];
+	Data = new Voxel[Voxel_per_Chunk];
 
 	glGenVertexArrays(1, &Buffer_Array);
 	glGenBuffers(1, &Buffer_Corner);
@@ -120,7 +250,10 @@ const VoxelChunk & VoxelChunk::operator =(const VoxelChunk & other)
 	(void)other;
 	return (*this);
 }
-
+const Voxel	& VoxelChunk::get(unsigned int x, unsigned int y, unsigned int z) const
+{
+	return (Data[XYZ_to_VoxelIndex(x, y, z)]);
+}
 
 
 
@@ -161,11 +294,11 @@ void	VoxelChunk::FillRandom()
 			{
 				unsigned int i = XYZ_to_VoxelIndex(x, y, z);
 				if (y < half)
-					Data[i] = 0;
+					Data[i] = Voxel(0);
 				else if (y > half)
-					Data[i] = 1;
+					Data[i] = Voxel(1);
 				else
-					Data[i] = std::rand() & 1;
+					Data[i] = Voxel(std::rand() & 1);
 				//std::cout << "[" << i << "] " << (int)(Data[i]) << "\n";
 			}
 		}
@@ -189,7 +322,7 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 		return (0);
 	}
 
-	if (Data[XYZ_to_VoxelIndex(idx.x, idx.y, idx.z)] != 0)
+	if (Data[XYZ_to_VoxelIndex(idx.x, idx.y, idx.z)].isSolid())
 	{
 		return (+1);
 	}
@@ -197,13 +330,13 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 	return (0);
 }
 
-char	VoxelChunk::trySub(Undex3D idx)
+char	VoxelChunk::tryReplace(Undex3D idx, char d)
 {
 	unsigned int i = XYZ_to_VoxelIndex(idx);
-	std::cout << "---- " << i << "\n";
-	char d = Data[i];
-	Data[i] = 0;
-	return (d);
+
+	char t = Data[i].isSolid();
+	Data[i] = Voxel(d);
+	return (t);
 }
 
 
@@ -223,6 +356,7 @@ void	VoxelChunk::UpdateBufferVertex()
 			}
 		}
 	}
+
 	//std::cout << "Vertex Count:" << vertex_count << " (" << (vertex_count * sizeof(unsigned int)) << "B)\n";
 	//std::cout << "Vertex Count:" << vertex_count << " (" << mem_size_1024(vertex_count * sizeof(unsigned int)) << ")\n";
 
@@ -243,121 +377,15 @@ void	VoxelChunk::UpdateBufferIndex(
 	unsigned int * index = new unsigned int[Voxel_per_Chunk * 6 * 3];
 	unsigned int index_count = 0;
 
-	char c1, c2;
 	for (unsigned int z = 0; z < Voxel_per_Side; z++)
 	{
 		for (unsigned int y = 0; y < Voxel_per_Side; y++)
 		{
 			for (unsigned int x = 0; x < Voxel_per_Side; x++)
 			{
-				c1 = 0;
-				c2 = 0;
-				if (x == 0)
-				{
-					if (Xn != NULL)
-					{
-						c1 = Xn -> Data[XYZ_to_VoxelIndex(Voxel_per_Side - 1, y, z)];
-						c2 = Data[XYZ_to_VoxelIndex(0, y, z)];
-					}
-				}
-				else if (x == Voxel_per_Side)
-				{
-					if (Xp != NULL)
-					{
-						c1 = Data[XYZ_to_VoxelIndex(Voxel_per_Side, y, z)];
-						c2 = Xp -> Data[XYZ_to_VoxelIndex(0, y, z)];
-					}
-				}
-				else
-				{
-					c1 = Data[XYZ_to_VoxelIndex(x - 1, y, z)];
-					c2 = Data[XYZ_to_VoxelIndex(x - 0, y, z)];
-				}
-
-				if (c1 == 1 && c2 == 0)
-				{
-					IndexFaceXn(index, index_count, x, y, z);
-					index_count += 6;
-				}
-				if (c1 == 0 && c2 == 1)
-				{
-					IndexFaceXp(index, index_count, x, y, z);
-					index_count += 6;
-				}
-
-
-
-				c1 = 0;
-				c2 = 0;
-				if (y == 0)
-				{
-					if (Yn != NULL)
-					{
-						c1 = Yn -> Data[XYZ_to_VoxelIndex(x, Voxel_per_Side - 1, z)];
-						c2 = Data[XYZ_to_VoxelIndex(x, 0, z)];
-					}
-				}
-				else if (y == Voxel_per_Side)
-				{
-					if (Yp != NULL)
-					{
-						c1 = Data[XYZ_to_VoxelIndex(x, Voxel_per_Side, z)];
-						c2 = Yp -> Data[XYZ_to_VoxelIndex(x, 0, z)];
-					}
-				}
-				else
-				{
-					c1 = Data[XYZ_to_VoxelIndex(x, y - 1, z)];
-					c2 = Data[XYZ_to_VoxelIndex(x, y - 0, z)];
-				}
-
-				if (c1 == 1 && c2 == 0)
-				{
-					IndexFaceYn(index, index_count, x, y, z);
-					index_count += 6;
-				}
-				if (c1 == 0 && c2 == 1)
-				{
-					IndexFaceYp(index, index_count, x, y, z);
-					index_count += 6;
-				}
-
-
-
-				c1 = 0;
-				c2 = 0;
-				if (z == 0)
-				{
-					if (Zn != NULL)
-					{
-						c1 = Zn -> Data[XYZ_to_VoxelIndex(x, y, Voxel_per_Side - 1)];
-						c2 = Data[XYZ_to_VoxelIndex(x, y, 0)];
-					}
-				}
-				else if (z == Voxel_per_Side)
-				{
-					if (Zp != NULL)
-					{
-						c1 = Data[XYZ_to_VoxelIndex(x, y, Voxel_per_Side)];
-						c2 = Zp -> Data[XYZ_to_VoxelIndex(x, y, 0)];
-					}
-				}
-				else
-				{
-					c1 = Data[XYZ_to_VoxelIndex(x, y, z - 1)];
-					c2 = Data[XYZ_to_VoxelIndex(x, y, z - 0)];
-				}
-
-				if (c1 == 1 && c2 == 0)
-				{
-					IndexFaceZn(index, index_count, x, y, z);
-					index_count += 6;
-				}
-				if (c1 == 0 && c2 == 1)
-				{
-					IndexFaceZp(index, index_count, x, y, z);
-					index_count += 6;
-				}
+				IndexFaceX(index, index_count, x, y, z, this, Xn, Xp);
+				IndexFaceY(index, index_count, x, y, z, this, Yn, Yp);
+				IndexFaceZ(index, index_count, x, y, z, this, Zn, Zp);
 			}
 		}
 	}

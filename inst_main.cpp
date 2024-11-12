@@ -137,14 +137,6 @@ int main(int argc, char **argv)
 	}
 	std::cout << "instance buffer done\n";
 
-	//VoxelChunk chunk1(0, 0, 0);
-	//VoxelChunk chunk2(1, 0, 0);
-	//chunk1.FillRandom();
-	//chunk2.FillRandom();
-	//chunk1.UpdateBufferVertex();
-	//chunk2.UpdateBufferVertex();
-	//chunk1.UpdateBufferIndex(NULL, &chunk2, NULL, NULL, NULL, NULL);
-	//chunk2.UpdateBufferIndex(&chunk1, NULL, NULL, NULL, NULL, NULL);
 	VoxelSpace space;
 	space.FillRandom();
 	Shader voxelShader(
@@ -199,7 +191,9 @@ int main(int argc, char **argv)
 	Point ray_dir(1, 0, 2);
 	ray_dir = ray_dir / ray_dir.length();
 
-	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_1, true);
+	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
+	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_2, true);
+	win -> keys.push_back(&voxel_add_key);
 	win -> keys.push_back(&voxel_sub_key);
 
 	std::cout << "loop\n";
@@ -234,6 +228,25 @@ int main(int argc, char **argv)
 		}
 		inst_buffer_data_inst(instances, instances_count);
 
+		ray_pos = view.pos;
+		ray_dir = view.ang.rotate_back(Point(0, 0, 1));
+		VoxelSpace::Voxel_Hover hover;
+		hover = space.Cross(ray_pos, ray_dir);
+		if (voxel_add_key.check())
+		{
+			if (hover.isValid)
+			{
+				space.tryAdd(hover);
+			}
+		}
+		if (voxel_sub_key.check())
+		{
+			if (hover.isValid)
+			{
+				space.trySub(hover);
+			}
+		}
+
 		glClearColor(0.0f, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -241,34 +254,19 @@ int main(int argc, char **argv)
 		inst_draw();
 
 		voxelShader.Use();
-		glUniform3fv(Uni_Chunk_View, 3, (float *)&view);
-		//chunk1.Draw(Uni_Chunk_Pos);
-		//chunk2.Draw(Uni_Chunk_Pos);
+		view.uniform(Uni_Chunk_View);
 		space.Draw(Uni_Chunk_Pos);
 
-		//if (glfwGetKey(win -> win, GLFW_KEY_T))
-		{
-			ray_pos = view.pos;
-			ray_dir = view.ang.rotate_back(Point(0, 0, 1));
-		}
-
-		unsigned int chunk_idx;
-		Undex3D voxel_idx;
 		boxShader.Use();
-		glUniform3fv(Uni_Box_View, 3, (float *)&view);
-		//box.Draw();
-		//space.DrawBound();
-		//space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		voxel_idx = space.Cross(ray_pos, ray_dir, chunk_idx);
+		view.uniform(Uni_Box_View);
+		space.DrawHover(hover);
 
 
-
-		//Point ray[] = { view.pos, view.pos + view.ang.rotate_back(Point(0, 0, 100)) };
 		Point ray[] = { ray_pos, ray_pos + (Point(-ray_dir.x, -ray_dir.y, +ray_dir.z) * 100) };
 
 
 		rayShader.Use();
-		glUniform3fv(Uni_Ray_View, 3, (float *)&view);
+		view.uniform(Uni_Ray_View);
 		glBindVertexArray(Buffer_Array);
 		glBindBuffer(GL_ARRAY_BUFFER, Buffer_Ray);
 
@@ -282,15 +280,6 @@ int main(int argc, char **argv)
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
-
-
-		if (voxel_sub_key.check())
-		{
-			if (chunk_idx != 0xFFFFFFFF)
-			{
-				space.trySub(chunk_idx, voxel_idx);
-			}
-		}
 	}
 	delete win;
 	inst_delete();

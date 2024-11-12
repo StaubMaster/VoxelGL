@@ -4,6 +4,7 @@
 # include "openGL/openGL.h"
 # include "openGL/Abstract/math3D.hpp"
 # include "openGL/Abstract/Point.hpp"
+# include "Voxel.hpp"
 # include "Box.hpp"
 # include "MemorySize.hpp"
 # include <iostream>
@@ -27,8 +28,16 @@ class VoxelChunk
 		static void IndexFaceZn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
 		static void IndexFaceZp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
 
+		static void IndexFaceX(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp);
+		static void IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp);
+		static void IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp);
+
+		static void IndexFaceX(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
+		static void IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
+		static void IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
+
 	private:
-		char *		Data;
+		Voxel *		Data;
 		const int	Chunk_X;
 		const int	Chunk_Y;
 		const int	Chunk_Z;
@@ -44,6 +53,7 @@ class VoxelChunk
 		VoxelChunk(const VoxelChunk & other);
 	private:
 		const VoxelChunk & operator =(const VoxelChunk & other);
+		const Voxel & get(unsigned int x, unsigned int y, unsigned int z) const;
 
 	public:
 		bool	isChunkIndex(int x, int y, int z) const;
@@ -55,7 +65,7 @@ class VoxelChunk
 		void	FillRandom();
 		int		CheckVoxel(Index3D idx);
 
-		char	trySub(Undex3D idx);
+		char	tryReplace(Undex3D idx, char d);
 
 	public:
 		void	UpdateBufferVertex();
@@ -65,15 +75,8 @@ class VoxelChunk
 					const VoxelChunk * Zn, const VoxelChunk * Zp);
 		void	Draw(int Uni_Chunk_Pos) const;
 
-		struct ChunkIndex
-		{
-			unsigned int x;
-			unsigned int y;
-			unsigned int z;
-		};
-
 		static Box	getVoxelBox(unsigned int x, unsigned int y, unsigned int z, Point off);
-		static Box	getChunkBox(Index3D);
+		static Box	getChunkBox(Index3D idx);
 };
 
 #endif

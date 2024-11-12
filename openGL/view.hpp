@@ -17,6 +17,8 @@ class View
 	public:
 		void	move(Point rel);
 		void	turn(Angle rel);
+
+		void	uniform(int uni) const;
 };
 
 typedef struct s_view

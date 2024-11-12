@@ -6,9 +6,26 @@
 
 class View
 {
+	private:
+		struct depth_s
+		{
+			float	depthN;
+			float	depthF;
+
+			float	diff;
+			float	sum;
+
+			float	d0;
+			float	d1;
+			float	d2;
+		};
+		static depth_s calc_depth(float near, float far);
+
 	public:
 		Point	pos;
 		Angle	ang;
+
+		depth_s	depth;
 
 	public:
 		View();
@@ -19,6 +36,7 @@ class View
 		void	turn(Angle rel);
 
 		void	uniform(int uni) const;
+		void	uniform_depth(int uni) const;
 };
 
 typedef struct s_view

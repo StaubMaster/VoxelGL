@@ -294,9 +294,9 @@ void	VoxelChunk::FillRandom()
 			{
 				unsigned int i = XYZ_to_VoxelIndex(x, y, z);
 				if (y < half)
-					Data[i] = Voxel(0);
-				else if (y > half)
 					Data[i] = Voxel(1);
+				else if (y > half)
+					Data[i] = Voxel(0);
 				else
 					Data[i] = Voxel(std::rand() & 1);
 				//std::cout << "[" << i << "] " << (int)(Data[i]) << "\n";

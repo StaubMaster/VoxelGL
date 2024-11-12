@@ -1,9 +1,38 @@
 
 #include "View.hpp"
 
+/*
+            flt[0] = near;
+            flt[1] = far;
+
+            flt[2] = flt[1] - flt[0];
+            flt[3] = flt[1] + flt[0];
+            flt[4] = flt[1] * flt[0] * 2;
+
+            flt[5] = flt[3] / flt[2];
+            flt[6] = flt[4] / flt[2];
+*/
+View::depth_s View::calc_depth(float near, float far)
+{
+	depth_s depth;
+
+	depth.depthN = near;
+	depth.depthF = far;
+
+	depth.diff = far - near;
+	depth.sum = far + near;
+	depth.d0 = far * near * 2;
+
+	depth.d1 = depth.sum / depth.diff;
+	depth.d2 = depth.d0 / depth.diff;
+
+	return (depth);
+}
+
+
 View::View()
 {
-
+	depth = calc_depth(1, 64);
 }
 View::~View()
 {
@@ -26,6 +55,10 @@ void	View::turn(Angle rel)
 void	View::uniform(int uni) const
 {
 	glUniform3fv(uni, 3, (float *)this);
+}
+void	View::uniform_depth(int uni) const
+{
+	glUniform1fv(uni, 7, (float *)&depth);
 }
 
 

@@ -100,10 +100,10 @@ void Window::Update()
 Point Window::GetKeyMovement(float speed) const
 {
 	Point rel;
-	if (glfwGetKey(win, GLFW_KEY_D))			{ rel.x -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_A))			{ rel.x += speed; }
-	if (glfwGetKey(win, GLFW_KEY_SPACE))		{ rel.y -= speed; }
-	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT))	{ rel.y += speed; }
+	if (glfwGetKey(win, GLFW_KEY_A))			{ rel.x -= speed; }
+	if (glfwGetKey(win, GLFW_KEY_D))			{ rel.x += speed; }
+	if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT))	{ rel.y -= speed; }
+	if (glfwGetKey(win, GLFW_KEY_SPACE))		{ rel.y += speed; }
 	if (glfwGetKey(win, GLFW_KEY_S))			{ rel.z -= speed; }
 	if (glfwGetKey(win, GLFW_KEY_W))			{ rel.z += speed; }
 	return (rel);
@@ -130,8 +130,8 @@ Angle Window::GetMouseTurning() const
 	diff_y = win_middle_y - y;
 
 	Angle ang;
-	ang.x -= diff_y * 0.005;
-	ang.y += diff_x * 0.005;
+	ang.x += diff_y * 0.005;
+	ang.y -= diff_x * 0.005;
 	ang.UpdateSinCos();
 	glfwSetCursorPos(win, win_middle_x, win_middle_y);
 

@@ -1,8 +1,6 @@
 #version 330
 
-const vec3 light = vec3(+0.267261, -0.534522, +0.801784);
-
-uniform sampler2D texture0;
+const vec3 light = vec3(+0.267261, +0.534522, +0.801784);
 
 in Geom_Out
 {

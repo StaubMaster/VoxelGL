@@ -8,30 +8,32 @@
 #include "openGL/openGL.h"
 #include "openGL/Abstract/Angle.hpp"
 #include "openGL/Forms/Window.hpp"
+#include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
 #include "VoxelChunk.hpp"
 #include "VoxelSpace.hpp"
 #include "Box.hpp"
-#include "inst.cpp"
+//#include "inst.cpp"
 
-static void use_info()
+/*static void use_info()
 {
 	std::cout
 		<< "./a.out "
 		<< "[texture.uints]"
 		<< "\n";
-}
+}*/
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	/*if (argc != 2)
 	{
 		use_info();
 		return 0;
-	}
+	}*/
 
 	Window * win = new Window(1000, 1000, "instance test", false);
 
+/*
 	inst_init();
 	if (inst_load_program() == 0)
 	{
@@ -136,16 +138,19 @@ int main(int argc, char **argv)
 		inst_buffer_data_inst(instances, instances_count);
 	}
 	std::cout << "instance buffer done\n";
+*/
 
 	VoxelSpace space;
 	space.FillRandom();
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
-		"shaders/dirLightNoCol.frag"
+		//"shaders/dirLightNoCol.frag"
+		"shaders/depth.frag"
 	);
-	int Uni_Chunk_View = voxelShader.FindUniform("view");
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
+	int Uni_Chunk_View = voxelShader.FindUniform("view");
+	int Uni_Chunk_Depth = voxelShader.FindUniform("depthFactor");
 	std::cout << "Uni Chunk View " << Uni_Chunk_View << "\n";
 
 	Shader boxShader(
@@ -154,6 +159,7 @@ int main(int argc, char **argv)
 		"shaders/simple.frag"
 	);
 	int Uni_Box_View = boxShader.FindUniform("view");
+	int Uni_Box_Depth = boxShader.FindUniform("depthFactor");
 	std::cout << "Uni Box View " << Uni_Box_View << "\n";
 
 	Box box(Point(1, 2, 3), Point(4, 5, 6));
@@ -182,10 +188,10 @@ int main(int argc, char **argv)
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	float angDist = 0.1f;
-	float dist, ang;
-	double last_frame = glfwGetTime();
-	double time_diff;
+	//float angDist = 0.1f;
+	//float dist, ang;
+	//double last_frame = glfwGetTime();
+	//double time_diff;
 
 	Point ray_pos(1.5, 4.5, 1.5);
 	Point ray_dir(1, 0, 2);
@@ -201,9 +207,9 @@ int main(int argc, char **argv)
 	{
 		win -> Update();
 
-		time_diff = glfwGetTime() - last_frame;
-		time_diff *= 60;
-		last_frame = glfwGetTime();
+		//time_diff = glfwGetTime() - last_frame;
+		//time_diff *= 60;
+		//last_frame = glfwGetTime();
 
 		if (glfwGetKey(win -> win, GLFW_KEY_R))
 		{
@@ -215,7 +221,7 @@ int main(int argc, char **argv)
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
-		for (unsigned int i = 1; i < instances_count; i++)
+		/*for (unsigned int i = 1; i < instances_count; i++)
 		{
 			dist = sqrt(
 				(instances[i].pos_x * instances[i].pos_x) +
@@ -226,7 +232,7 @@ int main(int argc, char **argv)
 			instances[i].ang_y += 0.01;
 			inst_sin_cos(&instances[i]);
 		}
-		inst_buffer_data_inst(instances, instances_count);
+		inst_buffer_data_inst(instances, instances_count);*/
 
 		ray_pos = view.pos;
 		ray_dir = view.ang.rotate_back(Point(0, 0, 1));
@@ -250,15 +256,17 @@ int main(int argc, char **argv)
 		glClearColor(0.0f, 0, 0, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		inst_view((float *)&(view));
-		inst_draw();
+		//inst_view((float *)&(view));
+		//inst_draw();
 
 		voxelShader.Use();
 		view.uniform(Uni_Chunk_View);
+		view.uniform_depth(Uni_Chunk_Depth);
 		space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();
 		view.uniform(Uni_Box_View);
+		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
 
 
@@ -282,13 +290,13 @@ int main(int argc, char **argv)
 		glfwPollEvents();
 	}
 	delete win;
-	inst_delete();
+	//inst_delete();
 
 	glBindVertexArray(Buffer_Array);
 	glDeleteBuffers(1, &Buffer_Ray);
 	glDeleteVertexArrays(1, &Buffer_Array);
 
-	(void)Uni_Chunk_Pos;
-
 	return (0);
+	(void)argc;
+	(void)argv;
 }

@@ -13,8 +13,12 @@ struct	Index3D
 
 struct	RayCast3D_Data
 {
+	float	scale;
 	Point	ray_pos;
 	Point	ray_dir;
+
+	Point	norm_pos;
+	Point	norm_dir;
 
 	Index3D	grid_idx;
 	Index3D	grid_dir;
@@ -38,7 +42,7 @@ struct	RayCast3D_Hit
 	Point	pos;
 };
 
-RayCast3D_Data	RayCast3D_init(Point pos, Point dir);
+RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale);
 RayCast3D_Hit	RayCast3D_continue(RayCast3D_Data & data);
 RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data);
 
@@ -64,6 +68,7 @@ RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data);
 RayCast3D_Hit	RayCast3D(
 	Point pos, Point dir,
 	int max_dist,
+	float scale,
 	const void * obj,
 	int(* hit_func)(const void *, Index3D));
 

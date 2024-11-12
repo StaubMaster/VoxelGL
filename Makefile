@@ -15,6 +15,7 @@ $(NAME) : $(FILE_O) $(ARC)
 #	c++ $(FLAGS) $(FILE_O) $(ARC) -o $(NAME) -lglfw
 
 all:
+	$(MAKE) -C $(ARC_PATH) all
 	$(MAKE) $(FILE_O)
 	$(MAKE) $(NAME)
 

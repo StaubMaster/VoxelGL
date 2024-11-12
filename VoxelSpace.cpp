@@ -98,51 +98,139 @@ void	VoxelSpace::Cross(Point pos, Point dir)
 
 		Point rel_pos = pos - chunk_off;
 
-		//RayCast3D_Hit hit = RayCast3D(rel_pos, dir, 128, &Chunks[0], VoxelChunk::CheckVoxel);
+		//RayCast3D_Hit hit = RayCast3D(rel_pos, dir, 128, 1, &Chunks[0], VoxelChunk::CheckVoxel);
 		//RayCast3D_Data data = RayCast3D_init(rel_pos, dir);
-		RayCast3D_Data data = RayCast3D_init(chunk_norm_pos, dir);
+		RayCast3D_Hit hit_chunk;
 		RayCast3D_Hit hit_voxel;
-		hit_voxel.t = 0;
-		hit_voxel.cardinal = 0;
-		hit_voxel.isHit = false;
-		while (hit_voxel.t < 128)
+
+		hit_chunk.t = 0;
+		hit_chunk.cardinal = 0;
+		hit_chunk.isHit = false;
+		RayCast3D_Data data_chunk = RayCast3D_init(pos, dir, VoxelChunk::Voxel_per_Side + 1);
+
+		while (hit_chunk.t < 128)
 		{
-			//int check = VoxelChunk::CheckVoxel(&Chunks[0], data.grid_idx);
-			int check = CheckChunk(this, data.grid_idx);
+			int check = CheckChunk(this, data_chunk.grid_idx);
 			if (check < 0)
 			{
-				hit_voxel.isHit = false;
+				hit_chunk.isHit = false;
 				break;
 			}
 			else if (check > 0)
 			{
-				hit_voxel = RayCast3D_hit(hit_voxel, data);
-				break;
+				hit_chunk = RayCast3D_hit(hit_chunk, data_chunk);
+				VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx.x, hit_chunk.idx.y, hit_chunk.idx.z);
+
+				//std::cout << "check " << hit_chunk.idx.x << ":" << hit_chunk.idx.y << ":" << hit_chunk.idx.z << "\n";
+
+				Box box_chunk_hit(
+					hit_chunk.pos - Point(0.1f, 0.1f, 0.1f),
+					hit_chunk.pos + Point(0.1f, 0.1f, 0.1f)
+				);
+				box_chunk_hit.CreateBuffer();
+				box_chunk_hit.UpdateBuffer();
+				box_chunk_hit.Draw();
+
+				Box box_chunk(
+					Point(
+						((hit_chunk.idx.x + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+						((hit_chunk.idx.y + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+						((hit_chunk.idx.z + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f),
+					Point(
+						((hit_chunk.idx.x + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+						((hit_chunk.idx.y + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+						((hit_chunk.idx.z + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f)
+				);
+				box_chunk.CreateBuffer();
+				box_chunk.UpdateBuffer();
+				box_chunk.Draw();
+
+				hit_voxel.t = 0;
+				hit_voxel.cardinal = 0;
+				hit_voxel.isHit = false;
+				RayCast3D_Data data_voxel = RayCast3D_init(hit_chunk.pos - (chunk -> getChunkOffset()), dir, 1);
+				//std::cout << "rel chunk " << data_voxel.ray_pos.x << ":" << data_voxel.ray_pos.y << ":" << data_voxel.ray_pos.z << "\n";
+
+				while (hit_voxel.t < 128)
+				{
+					int check = VoxelChunk::CheckVoxel(chunk, data_voxel.grid_idx);
+					if (check < 0)
+					{
+						hit_voxel.isHit = false;
+						break;
+					}
+					else if (check > 0)
+					{
+						hit_voxel = RayCast3D_hit(hit_voxel, data_voxel);
+						hit_voxel.pos = data_voxel.norm_pos + (data_voxel.norm_dir * hit_voxel.t);
+						break;
+					}
+
+					hit_voxel = RayCast3D_continue(data_voxel);
+				}
+
+				if (hit_voxel.isHit)
+					break;
 			}
 
-			hit_voxel = RayCast3D_continue(data);
+			hit_chunk = RayCast3D_continue(data_chunk);
 		}
 
-		if (hit_voxel.isHit)
+		std::cout
+			<< "chunk (" << hit_chunk.isHit << ")" << hit_chunk.idx.x << ":" << hit_chunk.idx.y << ":" << hit_chunk.idx.z << " [" << hit_chunk.t << "]  "
+			<< "voxel (" << hit_voxel.isHit << ")" << hit_voxel.idx.x << ":" << hit_voxel.idx.y << ":" << hit_voxel.idx.z << " [" << hit_voxel.t << "]  "
+			<< "\n";
+
+		if (hit_chunk.isHit)
 		{
-			std::cout << "chunk " << hit_voxel.idx.x << ":" << hit_voxel.idx.y << ":" << hit_voxel.idx.z << "\n";
-			//Box box(
-			//	Point((hit_voxel.x + 0) - 0.1f, (hit_voxel.y + 0) - 0.1f, (hit_voxel.z + 0) - 0.1f) + chunk_off,
-			//	Point((hit_voxel.x + 1) + 0.1f, (hit_voxel.y + 1) + 0.1f, (hit_voxel.z + 1) + 0.1f) + chunk_off
+			//Box box_chunk(
+			//	Point(
+			//		((hit_chunk.idx.x + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+			//		((hit_chunk.idx.y + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
+			//		((hit_chunk.idx.z + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f),
+			//	Point(
+			//		((hit_chunk.idx.x + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+			//		((hit_chunk.idx.y + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
+			//		((hit_chunk.idx.z + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f)
 			//);
-			Box box(
-				Point(
-					((hit_voxel.idx.x + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
-					((hit_voxel.idx.y + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f,
-					((hit_voxel.idx.z + 0) * ((int)VoxelChunk::Voxel_per_Side + 1)) - 0.1f),
-				Point(
-					((hit_voxel.idx.x + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
-					((hit_voxel.idx.y + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f,
-					((hit_voxel.idx.z + 1) * ((int)VoxelChunk::Voxel_per_Side + 1)) + 0.1f)
-			);
-			box.CreateBuffer();
-			box.UpdateBuffer();
-			box.Draw();
+			//box_chunk.CreateBuffer();
+			//box_chunk.UpdateBuffer();
+			//box_chunk.Draw();
+
+			//Box box_chunk_hit(
+			//	hit_chunk.pos - Point(0.01f, 0.01f, 0.01f),
+			//	hit_chunk.pos + Point(0.01f, 0.01f, 0.01f)
+			//);
+			//box_chunk_hit.CreateBuffer();
+			//box_chunk_hit.UpdateBuffer();
+			//box_chunk_hit.Draw();
+
+			if (hit_voxel.isHit)
+			{
+
+				VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx.x, hit_chunk.idx.y, hit_chunk.idx.z);
+				if (chunk != NULL)
+				{
+					chunk_off = chunk -> getChunkOffset();
+
+					Point shift = Point(-dir.x, -dir.y, dir.z) * -0.01f;
+					Box box_voxel(
+						Point(hit_voxel.idx.x, hit_voxel.idx.y, hit_voxel.idx.z) + shift + Point(0, 0, 0) + chunk_off,
+						Point(hit_voxel.idx.x, hit_voxel.idx.y, hit_voxel.idx.z) + shift + Point(1, 1, 1) + chunk_off
+					);
+					box_voxel.CreateBuffer();
+					box_voxel.UpdateBuffer();
+					box_voxel.Draw();
+				}
+
+				Box box_voxel_hit(
+					hit_voxel.pos + Point(0.01f, 0.01f, 0.01f) + chunk_off,
+					hit_voxel.pos - Point(0.01f, 0.01f, 0.01f) + chunk_off
+				);
+				box_voxel_hit.CreateBuffer();
+				box_voxel_hit.UpdateBuffer();
+				box_voxel_hit.Draw();
+			}
 		}
 	}
 }

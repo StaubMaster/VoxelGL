@@ -537,11 +537,20 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 
 int	VoxelChunk::CheckVoxel(const void * obj, Index3D idx)
 {
-	if (idx.x < 0 || idx.x >= (int)Voxel_per_Side ||
-		idx.y < 0 || idx.y >= (int)Voxel_per_Side ||
-		idx.z < 0 || idx.z >= (int)Voxel_per_Side)
+	if (idx.x < -1 || idx.x >= (int)(Voxel_per_Side + 2) ||
+		idx.y < -1 || idx.y >= (int)(Voxel_per_Side + 2) ||
+		idx.z < -1 || idx.z >= (int)(Voxel_per_Side + 2))
 	{
+		//std::cout << "outside\n";
 		return (-1);
+	}
+
+	if (idx.x < 0 || idx.x >= (int)(Voxel_per_Side) ||
+		idx.y < 0 || idx.y >= (int)(Voxel_per_Side) ||
+		idx.z < 0 || idx.z >= (int)(Voxel_per_Side))
+	{
+		//std::cout << "edge\n";
+		return (0);
 	}
 
 	VoxelChunk * ch = (VoxelChunk *)obj;

@@ -209,9 +209,7 @@ int main(int argc, char **argv)
 
 	Point ray_pos(1.5, 4.5, 1.5);
 	Point ray_dir(1, 0, 2);
-	Point ray_tar;
 	ray_dir = ray_dir / ray_dir.length();
-	ray_tar = ray_pos + (ray_dir * 10);
 
 	std::cout << "loop\n";
 	while (!glfwWindowShouldClose(win -> win))
@@ -257,9 +255,11 @@ int main(int argc, char **argv)
 		//chunk2.Draw(Uni_Chunk_Pos);
 		space.Draw(Uni_Chunk_Pos);
 
-		ray_pos = view.pos;
-		ray_dir = view.ang.rotate_back(Point(0, 0, 1));
-		ray_tar = ray_pos + (ray_dir * 10);
+		if (glfwGetKey(win -> win, GLFW_KEY_T))
+		{
+			ray_pos = view.pos;
+			ray_dir = view.ang.rotate_back(Point(0, 0, 1));
+		}
 
 		boxShader.Use();
 		glUniform3fv(Uni_Box_View, 3, (float *)&view);
@@ -270,9 +270,7 @@ int main(int argc, char **argv)
 
 
 		//Point ray[] = { view.pos, view.pos + view.ang.rotate_back(Point(0, 0, 100)) };
-		Point ray[] = { ray_pos, ray_tar };
-		//ray[1].x = -ray[1].x;
-		//ray[1].y = -ray[1].y;
+		Point ray[] = { ray_pos, ray_pos + (Point(-ray_dir.x, -ray_dir.y, +ray_dir.z) * 10) };
 
 
 		rayShader.Use();

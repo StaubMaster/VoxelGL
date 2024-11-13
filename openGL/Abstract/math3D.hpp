@@ -24,6 +24,12 @@ struct	Undex3D
 	unsigned int	z;
 };
 
+bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max);
+bool Undex3D_loop(Undex3D & idx, unsigned int min, unsigned int max);
+
+bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max);
+bool Index3D_box_exlusive(Index3D idx, Index3D min, Index3D max);
+
 struct	RayCast3D_Data
 {
 	float	scale;

@@ -145,8 +145,8 @@ int main(int argc, char **argv)
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
-		//"shaders/dirLightNoCol.frag"
-		"shaders/depth.frag"
+		"shaders/dirLightNoCol.frag"
+		//"shaders/depth.frag"
 	);
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
 	int Uni_Chunk_View = voxelShader.FindUniform("view");
@@ -202,6 +202,28 @@ int main(int argc, char **argv)
 	win -> keys.push_back(&voxel_add_key);
 	win -> keys.push_back(&voxel_sub_key);
 
+	/*{
+		Undex3D min;
+		Undex3D max;
+		min.x = 0;
+		min.y = 0;
+		min.z = 0;
+		max.x = 2;
+		max.y = 2;
+		max.z = 2;
+		Undex3D idx = min;
+
+		std::cout << "min " << min.x << ":" << min.y << ":" << min.z << "\n";
+		std::cout << "max " << max.x << ":" << max.y << ":" << max.z << "\n";
+		std::cout << "idx " << idx.x << ":" << idx.y << ":" << idx.z << "\n";
+		do
+		{
+			std::cout << "    " << idx.x << ":" << idx.y << ":" << idx.z << "\n";
+		}
+		while (Undex3D_loop(idx, min, max));
+		std::cout << "idx " << idx.x << ":" << idx.y << ":" << idx.z << "\n";
+	}*/
+
 	std::cout << "loop\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -217,7 +239,7 @@ int main(int argc, char **argv)
 		}
 
 
-		view.move(win -> GetKeyMovement(0.02f));
+		view.move(win -> GetKeyMovement(0.005f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 

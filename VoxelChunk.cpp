@@ -328,28 +328,47 @@ Point	VoxelChunk::getChunkOffset() const
 }
 void	VoxelChunk::FillRandom()
 {
-	/*for (unsigned i = 0; i < Voxel_per_Chunk; i++)
+	Index3D chunk_idx;
+	chunk_idx.x = Chunk_X * Voxel_per_Side;
+	chunk_idx.y = Chunk_Y * Voxel_per_Side;
+	chunk_idx.z = Chunk_Z * Voxel_per_Side;
+	Undex3D voxel_idx;
+	voxel_idx.x = 0;
+	voxel_idx.y = 0;
+	voxel_idx.z = 0;
+	Index3D global_idx;
+	unsigned int i;
+
+	Index3D box_min;
+	box_min.x = -10;
+	box_min.y = -10;
+	box_min.z = -10;
+	Index3D box_max;
+	box_max.x = +10;
+	box_max.y = +10;
+	box_max.z = +10;
+
+	do
 	{
-		Data[i] = std::rand() & 1;
-	}*/
-	unsigned int half = Voxel_per_Side / 2;
-	for (unsigned int z = 0; z < Voxel_per_Side; z++)
-	{
-		for (unsigned int y = 0; y < Voxel_per_Side; y++)
+		global_idx.x = chunk_idx.x + voxel_idx.x;
+		global_idx.y = chunk_idx.y + voxel_idx.y;
+		global_idx.z = chunk_idx.z + voxel_idx.z;
+		i = XYZ_to_VoxelIndex(voxel_idx);
+
+		if (!Index3D_box_inlusive(global_idx, box_min, box_max))
 		{
-			for (unsigned int x = 0; x < Voxel_per_Side; x++)
-			{
-				unsigned int i = XYZ_to_VoxelIndex(x, y, z);
-				if (y < half)
-					Data[i] = Voxel(1);
-				else if (y > half)
-					Data[i] = Voxel(0);
-				else
-					Data[i] = Voxel(std::rand() & 1);
-				//std::cout << "[" << i << "] " << (int)(Data[i]) << "\n";
-			}
+			Data[i] = Voxel(0);
+		}
+		else if (Index3D_box_exlusive(global_idx, box_min, box_max))
+		{
+			Data[i] = Voxel(1);
+		}
+		else
+		{
+			Data[i] = Voxel(std::rand() & 1);
 		}
 	}
+	while (Undex3D_loop(voxel_idx, 0, Voxel_per_Side));
 }
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {

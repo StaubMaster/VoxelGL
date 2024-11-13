@@ -1,6 +1,61 @@
 
 #include "math3D.hpp"
 
+bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max)
+{
+	idx.z++;
+	if (idx.z >= max.z)
+	{
+		idx.z = min.z,
+		idx.y++;
+		if (idx.y >= max.y)
+		{
+			idx.y = min.y;
+			idx.x++;
+			if (idx.x >= max.x)
+			{
+				idx.x = min.x;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Undex3D_loop(Undex3D & idx, unsigned int min, unsigned int max)
+{
+	idx.z++;
+	if (idx.z >= max)
+	{
+		idx.z = min,
+		idx.y++;
+		if (idx.y >= max)
+		{
+			idx.y = min;
+			idx.x++;
+			if (idx.x >= max)
+			{
+				idx.x = min;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max)
+{
+	return	(idx.x >= min.x && idx.x <= max.x) &&
+			(idx.y >= min.y && idx.y <= max.y) &&
+			(idx.z >= min.z && idx.z <= max.z);
+}
+bool Index3D_box_exlusive(Index3D idx, Index3D min, Index3D max)
+{
+	return	(idx.x > min.x && idx.x < max.x) &&
+			(idx.y > min.y && idx.y < max.y) &&
+			(idx.z > min.z && idx.z < max.z);
+}
+
+
+
 RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 {
 	RayCast3D_Data	data;

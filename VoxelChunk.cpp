@@ -14,6 +14,53 @@ unsigned int VoxelChunk::XYZ_to_VoxelIndex(Undex3D udx)
 	return (udx.x + (udx.y + (udx.z) * Voxel_per_Side) * Voxel_per_Side);
 }
 
+
+void	VoxelChunk::Loop_Index(unsigned int & vox, int & ch)
+{
+	if (vox == 0xFFFFFFFF)
+	{
+		vox = Voxel_per_Side - 1;
+		ch--;
+	}
+	else if (vox == Voxel_per_Side)
+	{
+		vox = 0;
+		ch++;
+	}
+}
+void	VoxelChunk::Loop_Index(Undex3D & vox, Index3D & ch)
+{
+	Loop_Index(vox.x, ch.x);
+	Loop_Index(vox.y, ch.y);
+	Loop_Index(vox.z, ch.z);
+}
+void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
+{
+	std::cout << "cardinal " << (int)cardinal << "\n";
+	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
+	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
+
+	if (cardinal == CARDINAL_X_NEGATIVE)
+		vox.x--;
+	if (cardinal == CARDINAL_X_POSITIVE)
+		vox.x++;
+	if (cardinal == CARDINAL_Y_NEGATIVE)
+		vox.y--;
+	if (cardinal == CARDINAL_Y_POSITIVE)
+		vox.y++;
+	if (cardinal == CARDINAL_Z_NEGATIVE)
+		vox.z--;
+	if (cardinal == CARDINAL_Z_POSITIVE)
+		vox.z++;
+
+	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
+	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
+	Loop_Index(vox, ch);
+	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
+	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
+}
+
+
 void VoxelChunk::IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z)
 {
 	index[idx + 0] = XYZ_to_VertexIndex(x, y + 0, z + 0);

@@ -106,23 +106,19 @@ int	VoxelSpace::CheckChunk(Index3D idx)
 
 char	VoxelSpace::tryAdd(Voxel_Hover hover)
 {
-	if (hover.cardinal == 1)
-		hover.voxel_idx.x--;
-	if (hover.cardinal == 2)
-		hover.voxel_idx.x++;
-	if (hover.cardinal == 3)
-		hover.voxel_idx.y--;
-	if (hover.cardinal == 4)
-		hover.voxel_idx.y++;
-	if (hover.cardinal == 5)
-		hover.voxel_idx.z--;
-	if (hover.cardinal == 6)
-		hover.voxel_idx.z++;
+	std::cout << "++++\n";
+	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
 
-	char t = Chunks[hover.chunk_idx].tryReplace(hover.voxel_idx, 1);
+
+	VoxelChunk * chunk = FindChunkPtr(hover.chunk_idx);
+	if (chunk == NULL)
+		return (0);
+
+
+	char t = chunk -> tryReplace(hover.voxel_idx, 1);
 
 	int x, y, z;
-	Chunks[hover.chunk_idx].getChunkIndex(x, y, z);
+	chunk -> getChunkIndex(x, y, z);
 
 	UpdateBuffer(x, y, z);
 	UpdateBuffer(x - 1, y, z);
@@ -136,10 +132,15 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 }
 char	VoxelSpace::trySub(Voxel_Hover hover)
 {
-	char t = Chunks[hover.chunk_idx].tryReplace(hover.voxel_idx, 0);
+	VoxelChunk * chunk = &Chunks[hover.chunk_vec_idx];
+	if (!chunk -> isChunkIndex(hover.chunk_idx))
+		chunk = FindChunkPtr(hover.chunk_idx);
+
+
+	char t = chunk -> tryReplace(hover.voxel_idx, 0);
 
 	int x, y, z;
-	Chunks[hover.chunk_idx].getChunkIndex(x, y, z);
+	chunk -> getChunkIndex(x, y, z);
 
 	UpdateBuffer(x, y, z);
 	UpdateBuffer(x - 1, y, z);
@@ -229,6 +230,7 @@ VoxelSpace::Voxel_Hover	VoxelSpace::Cross(Point pos, Point dir)
 			hit_voxel.t = 0;
 			hit_voxel.cardinal = 0;
 			hit_voxel.isHit = false;
+			hit_voxel.cardinal = hit_chunk.cardinal;
 			RayCast3D_Data data_voxel = RayCast3D_init(hit_chunk.pos - (chunk -> getChunkOffset()), dir, 1);
 			//std::cout << "rel chunk " << data_voxel.ray_pos.x << ":" << data_voxel.ray_pos.y << ":" << data_voxel.ray_pos.z << "\n";
 
@@ -318,11 +320,13 @@ VoxelSpace::Voxel_Hover	VoxelSpace::Cross(Point pos, Point dir)
 	if (hit_chunk.isHit && hit_voxel.isHit)
 	{
 		hover.isValid = true;
-		hover.chunk_idx = FindChunkIdx(hit_chunk.idx);
+		hover.chunk_vec_idx = FindChunkIdx(hit_chunk.idx);
+		hover.chunk_idx = hit_chunk.idx;
 		hover.voxel_idx.x = hit_voxel.idx.x;
 		hover.voxel_idx.y = hit_voxel.idx.y;
 		hover.voxel_idx.z = hit_voxel.idx.z;
 		hover.cardinal = hit_voxel.cardinal;
+		hover.dir = dir;
 	}
 	return hover;
 }
@@ -330,13 +334,14 @@ void	VoxelSpace::DrawHover(Voxel_Hover hover) const
 {
 	if (hover.isValid)
 	{
-		Point chunk_off = Chunks[hover.chunk_idx].getChunkOffset();
+		Point chunk_off = Chunks[hover.chunk_vec_idx].getChunkOffset();
 
-		// needs dir to shift the box toward the view so it's allways visible
 		Point voxel_pos(hover.voxel_idx.x, hover.voxel_idx.y, hover.voxel_idx.z);
+		voxel_pos = voxel_pos + chunk_off;
+		voxel_pos = voxel_pos - hover.dir * 0.0625f;
 		Box box_voxel(
-			voxel_pos + Point(0, 0, 0) + Point(0.01f, 0.01f, 0.01f) + chunk_off,
-			voxel_pos + Point(1, 1, 1) - Point(0.01f, 0.01f, 0.01f) + chunk_off
+			voxel_pos + Point(0, 0, 0) + Point(0.01f, 0.01f, 0.01f),
+			voxel_pos + Point(1, 1, 1) - Point(0.01f, 0.01f, 0.01f)
 		);
 		box_voxel.CreateBuffer();
 		box_voxel.UpdateBuffer();

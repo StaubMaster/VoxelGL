@@ -32,7 +32,7 @@ View::depth_s View::calc_depth(float near, float far)
 
 View::View()
 {
-	depth = calc_depth(1, 64);
+	depth = calc_depth(0.125, 64);
 }
 View::~View()
 {
@@ -40,7 +40,7 @@ View::~View()
 }
 void	View::move(Point rel)
 {
-	Angle::rotate(rel.z, rel.x, ang.cos_y, ang.sin_y);
+	Angle::rotate(rel.z, rel.x, ang.cos_x, ang.sin_x);
 	pos.x += rel.x;
 	pos.y += rel.y;
 	pos.z += rel.z;

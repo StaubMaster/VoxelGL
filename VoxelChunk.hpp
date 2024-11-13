@@ -21,6 +21,11 @@ class VoxelChunk
 		static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
 		static unsigned int XYZ_to_VoxelIndex(Undex3D idx);
 
+		static void	Loop_Index(unsigned int & vox, int & ch);
+		static void	Loop_Index(Undex3D & vox, Index3D & ch);
+		static void	Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch);
+
+	private:
 		static void IndexFaceXn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
 		static void IndexFaceXp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
 		static void IndexFaceYn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);

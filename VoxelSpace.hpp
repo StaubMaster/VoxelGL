@@ -13,9 +13,11 @@ class VoxelSpace
 		struct Voxel_Hover
 		{
 			bool			isValid;
-			unsigned int	chunk_idx;
+			unsigned int	chunk_vec_idx;
+			Index3D			chunk_idx;
 			Undex3D			voxel_idx;
 			char			cardinal;
+			Point			dir;
 		};
 
 	private:

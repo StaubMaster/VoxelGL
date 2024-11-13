@@ -130,8 +130,8 @@ Angle Window::GetMouseTurning() const
 	diff_y = win_middle_y - y;
 
 	Angle ang;
-	ang.x += diff_y * 0.005;
-	ang.y -= diff_x * 0.005;
+	ang.x -= diff_x * 0.005;
+	ang.y += diff_y * 0.005;
 	ang.UpdateSinCos();
 	glfwSetCursorPos(win, win_middle_x, win_middle_y);
 

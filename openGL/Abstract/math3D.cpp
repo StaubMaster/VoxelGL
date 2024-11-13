@@ -5,9 +5,6 @@ RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 {
 	RayCast3D_Data	data;
 
-	dir.x = -dir.x;
-	dir.y = -dir.y;
-
 	data.scale = scale;
 
 	data.ray_pos = pos;
@@ -31,39 +28,39 @@ RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 	{
 		data.grid_dir.x = +1;
 		data.side_sum.x = ((data.grid_idx.x + 1) - data.norm_pos.x) * data.side_len.x;
-		data.cardinal_x = 1;
+		data.cardinal_x = CARDINAL_X_NEGATIVE;
 	}
 	else
 	{
 		data.grid_dir.x = -1;
 		data.side_sum.x = (data.norm_pos.x - data.grid_idx.x) * data.side_len.x;
-		data.cardinal_x = 2;
+		data.cardinal_x = CARDINAL_X_POSITIVE;
 	}
 
 	if (data.norm_dir.y > 0)
 	{
 		data.grid_dir.y = +1;
 		data.side_sum.y = ((data.grid_idx.y + 1) - data.norm_pos.y) * data.side_len.y;
-		data.cardinal_y = 3;
+		data.cardinal_y = CARDINAL_Y_NEGATIVE;
 	}
 	else
 	{
 		data.grid_dir.y = -1;
 		data.side_sum.y = (data.norm_pos.y - data.grid_idx.y) * data.side_len.y;
-		data.cardinal_y = 4;
+		data.cardinal_y = CARDINAL_Y_POSITIVE;
 	}
 
 	if (data.norm_dir.z > 0)
 	{
 		data.grid_dir.z = +1;
 		data.side_sum.z = ((data.grid_idx.z + 1) - data.norm_pos.z) * data.side_len.z;
-		data.cardinal_z = 5;
+		data.cardinal_z = CARDINAL_Z_NEGATIVE;
 	}
 	else
 	{
 		data.grid_dir.z = -1;
 		data.side_sum.z = (data.norm_pos.z - data.grid_idx.z) * data.side_len.z;
-		data.cardinal_z = 6;
+		data.cardinal_z = CARDINAL_Z_POSITIVE;
 	}
 
 	return (data);

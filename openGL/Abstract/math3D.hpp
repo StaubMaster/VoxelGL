@@ -4,6 +4,13 @@
 # include "Point.hpp"
 # include "Angle.hpp"
 
+# define CARDINAL_X_NEGATIVE 1
+# define CARDINAL_X_POSITIVE 2
+# define CARDINAL_Y_NEGATIVE 3
+# define CARDINAL_Y_POSITIVE 4
+# define CARDINAL_Z_NEGATIVE 5
+# define CARDINAL_Z_POSITIVE 6
+
 struct	Index3D
 {
 	int	x;

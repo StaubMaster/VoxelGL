@@ -30,7 +30,7 @@ void emitSegment(int i1, int i2, int i3, int i4)
 
 void main()
 {
-	Color = vec3(0, 1, 0);
+	Color = vec3(0, 0, 0);
 	emitSegment(0, 1, 5, 4);
 	emitSegment(1, 2, 6, 5);
 	emitSegment(2, 3, 7, 6);

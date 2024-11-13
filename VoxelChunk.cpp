@@ -36,10 +36,6 @@ void	VoxelChunk::Loop_Index(Undex3D & vox, Index3D & ch)
 }
 void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
 {
-	std::cout << "cardinal " << (int)cardinal << "\n";
-	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
-	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
-
 	if (cardinal == CARDINAL_X_NEGATIVE)
 		vox.x--;
 	if (cardinal == CARDINAL_X_POSITIVE)
@@ -53,11 +49,7 @@ void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
 	if (cardinal == CARDINAL_Z_POSITIVE)
 		vox.z++;
 
-	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
-	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
 	Loop_Index(vox, ch);
-	std::cout << "chunk " << ch.x << ":" << ch.y << ":" << ch.z << "\n";
-	std::cout << "voxel " << vox.x << ":" << vox.y << ":" << vox.z << "\n";
 }
 
 
@@ -332,17 +324,44 @@ void	VoxelChunk::FillRandom()
 	chunk_idx.x = Chunk_X * Voxel_per_Side;
 	chunk_idx.y = Chunk_Y * Voxel_per_Side;
 	chunk_idx.z = Chunk_Z * Voxel_per_Side;
+
 	Undex3D voxel_idx;
 	voxel_idx.x = 0;
 	voxel_idx.y = 0;
 	voxel_idx.z = 0;
+
 	Index3D global_idx;
 	unsigned int i;
 
-	Index3D box_min;
+	do
+	{
+		global_idx.x = chunk_idx.x + voxel_idx.x;
+		global_idx.y = chunk_idx.y + voxel_idx.y;
+		global_idx.z = chunk_idx.z + voxel_idx.z;
+		i = XYZ_to_VoxelIndex(voxel_idx);
+
+		char axis = 0;
+		axis += (voxel_idx.x == 0 || voxel_idx.x == Voxel_per_Side - 1);
+		axis += (voxel_idx.y == 0 || voxel_idx.y == Voxel_per_Side - 1);
+		axis += (voxel_idx.z == 0 || voxel_idx.z == Voxel_per_Side - 1);
+		if (axis >= 3)
+		{
+			Data[i] = Voxel(1);
+		}
+		else
+		{
+			Data[i] = Voxel(0);
+		}
+	}
+	while (Undex3D_loop(voxel_idx, 0, Voxel_per_Side));
+
+	(void) global_idx;
+
+	/*Index3D box_min;
 	box_min.x = -10;
 	box_min.y = -10;
 	box_min.z = -10;
+
 	Index3D box_max;
 	box_max.x = +10;
 	box_max.y = +10;
@@ -368,7 +387,8 @@ void	VoxelChunk::FillRandom()
 			Data[i] = Voxel(std::rand() & 1);
 		}
 	}
-	while (Undex3D_loop(voxel_idx, 0, Voxel_per_Side));
+	while (Undex3D_loop(voxel_idx, 0, Voxel_per_Side));*/
+
 }
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {

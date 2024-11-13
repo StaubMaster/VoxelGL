@@ -21,19 +21,22 @@ class VoxelSpace
 		};
 
 	private:
-		std::vector<VoxelChunk> Chunks;
+		std::vector<VoxelChunk * > Chunks;
 
 	public:
 		VoxelSpace();
 		~VoxelSpace();
 
-		void	FillRandom();
-		void	UpdateBuffer(int x, int y, int z);
-
 		VoxelChunk *	FindChunkPtr(int x, int y, int z);
 		VoxelChunk *	FindChunkPtr(Index3D idx);
+		unsigned int	FindChunkIdx(int x, int y, int c);
 		unsigned int	FindChunkIdx(Index3D idx);
 		int				CheckChunk(Index3D idx);
+
+		void	FillRandom();
+		void	AddChunk(int x, int y, int z);
+		void	UpdateBuffer(int x, int y, int z);
+		void	UpdateBufferNeighbours(int x, int y, int z);
 
 		char	tryAdd(Voxel_Hover hover);
 		char	trySub(Voxel_Hover hover);

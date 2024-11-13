@@ -55,16 +55,17 @@ class VoxelChunk
 	public:
 		VoxelChunk(int x, int y, int z);
 		~VoxelChunk();
-		VoxelChunk(const VoxelChunk & other);
 	private:
+		VoxelChunk(const VoxelChunk & other);
 		const VoxelChunk & operator =(const VoxelChunk & other);
 		const Voxel & get(unsigned int x, unsigned int y, unsigned int z) const;
 
 	public:
 		bool	isChunkIndex(int x, int y, int z) const;
-		bool	isChunkIndex(Index3D idx) const;
-
 		void	getChunkIndex(int & x, int & y, int & z) const;
+
+		bool	isChunkIndex(Index3D idx) const;
+		Index3D	getChunkIndex3D() const;
 		Point	getChunkOffset() const;
 
 		void	FillRandom();

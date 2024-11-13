@@ -145,8 +145,8 @@ int main(int argc, char **argv)
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
-		"shaders/dirLightNoCol.frag"
-		//"shaders/depth.frag"
+		//"shaders/dirLightNoCol.frag"
+		"shaders/depth.frag"
 	);
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
 	int Uni_Chunk_View = voxelShader.FindUniform("view");
@@ -233,15 +233,22 @@ int main(int argc, char **argv)
 		//time_diff *= 60;
 		//last_frame = glfwGetTime();
 
-		if (glfwGetKey(win -> win, GLFW_KEY_R))
+		/*if (glfwGetKey(win -> win, GLFW_KEY_R))
 		{
 			space.FillRandom();
-		}
+		}*/
 
 
 		view.move(win -> GetKeyMovement(0.005f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
+
+		Index3D chunk_current;
+		chunk_current.x = floorf(view.pos.x / VoxelChunk::Voxel_per_Side);
+		chunk_current.y = floorf(view.pos.y / VoxelChunk::Voxel_per_Side);
+		chunk_current.z = floorf(view.pos.z / VoxelChunk::Voxel_per_Side);
+		//std::cout << "current " << chunk_current.x << ":" << chunk_current.y << ":" << chunk_current.z << "\n";
+		space.AddChunk(chunk_current.x, chunk_current.y, chunk_current.z);
 
 		/*for (unsigned int i = 1; i < instances_count; i++)
 		{

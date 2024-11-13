@@ -12,7 +12,7 @@ VoxelSpace::VoxelSpace()
 		{
 			for (int x = -2; x < +2; x++)
 			{
-				Chunks.push_back(VoxelChunk(x, y, z));
+				Chunks.push_back(new VoxelChunk(x, y, z));
 			}
 		}
 	}
@@ -22,50 +22,23 @@ VoxelSpace::~VoxelSpace()
 {
 	std::cout << "---- VoxelSpace\n";
 
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		delete Chunks[i];
+	}
+
 	Chunks.clear();
 }
 
-void	VoxelSpace::FillRandom()
-{
-	for (size_t i = 0; i < Chunks.size(); i++)
-	{
-		Chunks[i].FillRandom();
-	}
 
-	int x, y, z;
-	for (size_t i = 0; i < Chunks.size(); i++)
-	{
-		Chunks[i].getChunkIndex(x, y, z);
-		Chunks[i].UpdateBufferVertex();
-		Chunks[i].UpdateBufferIndex(
-			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
-			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
-			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
-		);
-	}
-}
-void	VoxelSpace::UpdateBuffer(int x, int y, int z)
-{
-	VoxelChunk * ch = FindChunkPtr(x, y, z);
-
-	if (ch != NULL)
-	{
-		ch -> UpdateBufferVertex();
-		ch -> UpdateBufferIndex(
-			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
-			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
-			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
-		);
-	}
-}
 
 VoxelChunk *	VoxelSpace::FindChunkPtr(int x, int y, int z)
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		VoxelChunk & ch = Chunks[i];
-		if (ch.isChunkIndex(x, y, z))
-			return (&ch);
+		VoxelChunk * ch = Chunks[i];
+		if (ch -> isChunkIndex(x, y, z))
+			return (ch);
 	}
 	return (NULL);
 }
@@ -73,22 +46,33 @@ VoxelChunk *	VoxelSpace::FindChunkPtr(Index3D idx)
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		VoxelChunk & ch = Chunks[i];
-		if (ch.isChunkIndex(idx.x, idx.y, idx.z))
-			return (&ch);
+		VoxelChunk * ch = Chunks[i];
+		if (ch -> isChunkIndex(idx.x, idx.y, idx.z))
+			return (ch);
 	}
 	return (NULL);
+}
+unsigned int	VoxelSpace::FindChunkIdx(int x, int y, int z)
+{
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		VoxelChunk * ch = Chunks[i];
+		if (ch -> isChunkIndex(x, y, z))
+			return (i);
+	}
+	return (0xFFFFFFFF);
 }
 unsigned int	VoxelSpace::FindChunkIdx(Index3D idx)
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		VoxelChunk & ch = Chunks[i];
-		if (ch.isChunkIndex(idx.x, idx.y, idx.z))
+		VoxelChunk * ch = Chunks[i];
+		if (ch -> isChunkIndex(idx.x, idx.y, idx.z))
 			return (i);
 	}
 	return (0xFFFFFFFF);
 }
+
 int	VoxelSpace::CheckChunk(Index3D idx)
 {
 	VoxelChunk * ch = FindChunkPtr(idx);
@@ -104,9 +88,69 @@ int	VoxelSpace::CheckChunk(Index3D idx)
 	return (0);
 }
 
+
+
+void	VoxelSpace::FillRandom()
+{
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		Chunks[i] -> FillRandom();
+	}
+
+	int x, y, z;
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		Chunks[i] -> getChunkIndex(x, y, z);
+		UpdateBuffer(x, y, z);
+	}
+}
+void	VoxelSpace::AddChunk(int x, int y, int z)
+{
+	if (FindChunkIdx(x, y, z) != 0xFFFFFFFF)
+		return;
+	std::cout << "chunk not already present\n";
+	Chunks.push_back(new VoxelChunk(x, y, z));
+	std::cout << "chunk ++++\n";
+	unsigned int i = FindChunkIdx(x, y, z);
+	if (i == 0xFFFFFFFF)
+	{
+		std::cout << "chunk not found\n";
+		return;
+	}
+	Chunks[i] -> FillRandom();
+	std::cout << "chunk filled\n";
+	UpdateBufferNeighbours(x, y, z);
+	std::cout << "chunk buffer\n";
+}
+void	VoxelSpace::UpdateBuffer(int x, int y, int z)
+{
+	VoxelChunk * ch = FindChunkPtr(x, y, z);
+
+	if (ch != NULL)
+	{
+		ch -> UpdateBufferVertex();
+		ch -> UpdateBufferIndex(
+			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
+			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
+			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
+		);
+	}
+}
+void	VoxelSpace::UpdateBufferNeighbours(int x, int y, int z)
+{
+	UpdateBuffer(x, y, z);
+	UpdateBuffer(x - 1, y, z);
+	UpdateBuffer(x + 1, y, z);
+	UpdateBuffer(x, y - 1, z);
+	UpdateBuffer(x, y + 1, z);
+	UpdateBuffer(x, y, z - 1);
+	UpdateBuffer(x, y, z + 1);
+}
+
+
+
 char	VoxelSpace::tryAdd(Voxel_Hover hover)
 {
-	std::cout << "++++\n";
 	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
 
 
@@ -119,20 +163,13 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 
 	int x, y, z;
 	chunk -> getChunkIndex(x, y, z);
-
-	UpdateBuffer(x, y, z);
-	UpdateBuffer(x - 1, y, z);
-	UpdateBuffer(x + 1, y, z);
-	UpdateBuffer(x, y - 1, z);
-	UpdateBuffer(x, y + 1, z);
-	UpdateBuffer(x, y, z - 1);
-	UpdateBuffer(x, y, z + 1);
+	UpdateBufferNeighbours(x, y, z);
 
 	return t;
 }
 char	VoxelSpace::trySub(Voxel_Hover hover)
 {
-	VoxelChunk * chunk = &Chunks[hover.chunk_vec_idx];
+	VoxelChunk * chunk = Chunks[hover.chunk_vec_idx];
 	if (!chunk -> isChunkIndex(hover.chunk_idx))
 		chunk = FindChunkPtr(hover.chunk_idx);
 
@@ -141,14 +178,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover)
 
 	int x, y, z;
 	chunk -> getChunkIndex(x, y, z);
-
-	UpdateBuffer(x, y, z);
-	UpdateBuffer(x - 1, y, z);
-	UpdateBuffer(x + 1, y, z);
-	UpdateBuffer(x, y - 1, z);
-	UpdateBuffer(x, y + 1, z);
-	UpdateBuffer(x, y, z - 1);
-	UpdateBuffer(x, y, z + 1);
+	UpdateBufferNeighbours(x, y, z);
 
 	return t;
 }
@@ -156,7 +186,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover)
 void	VoxelSpace::Draw(int Uni_Chunk_Pos) const
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
-		Chunks[i].Draw(Uni_Chunk_Pos);
+		Chunks[i] -> Draw(Uni_Chunk_Pos);
 }
 void	VoxelSpace::DrawBound() const
 {
@@ -164,7 +194,7 @@ void	VoxelSpace::DrawBound() const
 	Point min, max;
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		Chunks[i].getChunkIndex(x, y, z);
+		Chunks[i] -> getChunkIndex(x, y, z);
 		min.x = x * (int)(VoxelChunk::Voxel_per_Side);
 		min.y = y * (int)(VoxelChunk::Voxel_per_Side);
 		min.z = z * (int)(VoxelChunk::Voxel_per_Side);
@@ -334,7 +364,7 @@ void	VoxelSpace::DrawHover(Voxel_Hover hover) const
 {
 	if (hover.isValid)
 	{
-		Point chunk_off = Chunks[hover.chunk_vec_idx].getChunkOffset();
+		Point chunk_off = Chunks[hover.chunk_vec_idx] -> getChunkOffset();
 
 		Point voxel_pos(hover.voxel_idx.x, hover.voxel_idx.y, hover.voxel_idx.z);
 		voxel_pos = voxel_pos + chunk_off;

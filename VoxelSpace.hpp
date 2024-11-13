@@ -27,16 +27,14 @@ class VoxelSpace
 		VoxelSpace();
 		~VoxelSpace();
 
-		VoxelChunk *	FindChunkPtr(int x, int y, int z);
 		VoxelChunk *	FindChunkPtr(Index3D idx);
-		unsigned int	FindChunkIdx(int x, int y, int c);
 		unsigned int	FindChunkIdx(Index3D idx);
 		int				CheckChunk(Index3D idx);
 
 		void	FillRandom();
-		void	AddChunk(int x, int y, int z);
-		void	UpdateBuffer(int x, int y, int z);
-		void	UpdateBufferNeighbours(int x, int y, int z);
+		void	AddChunk(Index3D idx);
+		void	UpdateBuffer(Index3D idx);
+		void	UpdateBufferNeighbours(Index3D idx);
 
 		char	tryAdd(Voxel_Hover hover);
 		char	trySub(Voxel_Hover hover);

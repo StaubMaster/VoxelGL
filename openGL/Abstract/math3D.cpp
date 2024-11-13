@@ -1,7 +1,7 @@
 
 #include "math3D.hpp"
 
-bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max)
+/*bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max)
 {
 	idx.z++;
 	if (idx.z >= max.z)
@@ -40,8 +40,8 @@ bool Undex3D_loop(Undex3D & idx, unsigned int min, unsigned int max)
 		}
 	}
 	return (true);
-}
-bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max)
+}*/
+/*bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max)
 {
 	return	(idx.x >= min.x && idx.x <= max.x) &&
 			(idx.y >= min.y && idx.y <= max.y) &&
@@ -52,7 +52,7 @@ bool Index3D_box_exlusive(Index3D idx, Index3D min, Index3D max)
 	return	(idx.x > min.x && idx.x < max.x) &&
 			(idx.y > min.y && idx.y < max.y) &&
 			(idx.z > min.z && idx.z < max.z);
-}
+}*/
 
 
 

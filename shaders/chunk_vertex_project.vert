@@ -60,7 +60,7 @@ void main()
 	idx.y = (VIdx >> 8) & uint((0xFF));
 	idx.z = (VIdx >> 16) & uint((0xFF));
 
-	vs_out.NonProj = vec3(idx) + (chunk_pos * (8));
+	vs_out.NonProj = vec3(idx) + (chunk_pos * 8);
 
 	gl_Position = proj(ASD(vs_out.NonProj - view[0], view[1], view[2]));
 }

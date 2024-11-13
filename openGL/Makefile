@@ -10,6 +10,8 @@ FILE_C = stringHelp.cpp Shader.cpp \
 	Abstract/math3D.cpp \
 	Abstract/Point.cpp \
 	Abstract/Angle.cpp \
+	Abstract/Index3D.cpp \
+	Abstract/Undex3D.cpp \
 	View.cpp
 FILE_O = glad.o $(FILE_C:.cpp=.o)
 

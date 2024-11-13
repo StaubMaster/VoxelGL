@@ -12,7 +12,7 @@ VoxelSpace::VoxelSpace()
 		{
 			for (int x = -2; x < +2; x++)
 			{
-				Chunks.push_back(new VoxelChunk(x, y, z));
+				Chunks.push_back(new VoxelChunk(Index3D(x, y, z)));
 			}
 		}
 	}
@@ -32,42 +32,22 @@ VoxelSpace::~VoxelSpace()
 
 
 
-VoxelChunk *	VoxelSpace::FindChunkPtr(int x, int y, int z)
-{
-	for (size_t i = 0; i < Chunks.size(); i++)
-	{
-		VoxelChunk * ch = Chunks[i];
-		if (ch -> isChunkIndex(x, y, z))
-			return (ch);
-	}
-	return (NULL);
-}
 VoxelChunk *	VoxelSpace::FindChunkPtr(Index3D idx)
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		VoxelChunk * ch = Chunks[i];
-		if (ch -> isChunkIndex(idx.x, idx.y, idx.z))
+		if (ch -> isChunkIndex(idx))
 			return (ch);
 	}
 	return (NULL);
-}
-unsigned int	VoxelSpace::FindChunkIdx(int x, int y, int z)
-{
-	for (size_t i = 0; i < Chunks.size(); i++)
-	{
-		VoxelChunk * ch = Chunks[i];
-		if (ch -> isChunkIndex(x, y, z))
-			return (i);
-	}
-	return (0xFFFFFFFF);
 }
 unsigned int	VoxelSpace::FindChunkIdx(Index3D idx)
 {
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		VoxelChunk * ch = Chunks[i];
-		if (ch -> isChunkIndex(idx.x, idx.y, idx.z))
+		if (ch -> isChunkIndex(idx))
 			return (i);
 	}
 	return (0xFFFFFFFF);
@@ -97,54 +77,43 @@ void	VoxelSpace::FillRandom()
 		Chunks[i] -> FillRandom();
 	}
 
-	int x, y, z;
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		Chunks[i] -> getChunkIndex(x, y, z);
-		UpdateBuffer(x, y, z);
+		UpdateBuffer(Chunks[i] -> getChunkIndex3D());
 	}
 }
-void	VoxelSpace::AddChunk(int x, int y, int z)
+void	VoxelSpace::AddChunk(Index3D idx)
 {
-	if (FindChunkIdx(x, y, z) != 0xFFFFFFFF)
+	if (FindChunkIdx(idx) != 0xFFFFFFFF)
 		return;
-	std::cout << "chunk not already present\n";
-	Chunks.push_back(new VoxelChunk(x, y, z));
-	std::cout << "chunk ++++\n";
-	unsigned int i = FindChunkIdx(x, y, z);
-	if (i == 0xFFFFFFFF)
-	{
-		std::cout << "chunk not found\n";
-		return;
-	}
-	Chunks[i] -> FillRandom();
-	std::cout << "chunk filled\n";
-	UpdateBufferNeighbours(x, y, z);
-	std::cout << "chunk buffer\n";
+	VoxelChunk * ch = new VoxelChunk(idx);
+	Chunks.push_back(ch);
+	ch -> FillRandom();
+	UpdateBufferNeighbours(idx);
 }
-void	VoxelSpace::UpdateBuffer(int x, int y, int z)
+void	VoxelSpace::UpdateBuffer(Index3D idx)
 {
-	VoxelChunk * ch = FindChunkPtr(x, y, z);
+	VoxelChunk * ch = FindChunkPtr(idx);
 
 	if (ch != NULL)
 	{
 		ch -> UpdateBufferVertex();
 		ch -> UpdateBufferIndex(
-			FindChunkPtr(x - 1, y, z), FindChunkPtr(x + 1, y, z),
-			FindChunkPtr(x, y - 1, z), FindChunkPtr(x, y + 1, z),
-			FindChunkPtr(x, y, z - 1), FindChunkPtr(x, y, z + 1)
+			FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
+			FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
+			FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
 		);
 	}
 }
-void	VoxelSpace::UpdateBufferNeighbours(int x, int y, int z)
+void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 {
-	UpdateBuffer(x, y, z);
-	UpdateBuffer(x - 1, y, z);
-	UpdateBuffer(x + 1, y, z);
-	UpdateBuffer(x, y - 1, z);
-	UpdateBuffer(x, y + 1, z);
-	UpdateBuffer(x, y, z - 1);
-	UpdateBuffer(x, y, z + 1);
+	UpdateBuffer(idx);
+	UpdateBuffer(idx.Xn());
+	UpdateBuffer(idx.Xp());
+	UpdateBuffer(idx.Yn());
+	UpdateBuffer(idx.Yp());
+	UpdateBuffer(idx.Zn());
+	UpdateBuffer(idx.Zp());
 }
 
 
@@ -161,9 +130,7 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 
 	char t = chunk -> tryReplace(hover.voxel_idx, 1);
 
-	int x, y, z;
-	chunk -> getChunkIndex(x, y, z);
-	UpdateBufferNeighbours(x, y, z);
+	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
 	return t;
 }
@@ -176,9 +143,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover)
 
 	char t = chunk -> tryReplace(hover.voxel_idx, 0);
 
-	int x, y, z;
-	chunk -> getChunkIndex(x, y, z);
-	UpdateBufferNeighbours(x, y, z);
+	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
 	return t;
 }
@@ -190,14 +155,14 @@ void	VoxelSpace::Draw(int Uni_Chunk_Pos) const
 }
 void	VoxelSpace::DrawBound() const
 {
-	int x, y, z;
+	Index3D idx;
 	Point min, max;
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		Chunks[i] -> getChunkIndex(x, y, z);
-		min.x = x * (int)(VoxelChunk::Voxel_per_Side);
-		min.y = y * (int)(VoxelChunk::Voxel_per_Side);
-		min.z = z * (int)(VoxelChunk::Voxel_per_Side);
+		idx = Chunks[i] -> getChunkIndex3D();
+		min.x = idx.x * (int)(VoxelChunk::Voxel_per_Side);
+		min.y = idx.y * (int)(VoxelChunk::Voxel_per_Side);
+		min.z = idx.z * (int)(VoxelChunk::Voxel_per_Side);
 		max.x = min.x + (int)(VoxelChunk::Voxel_per_Side);
 		max.y = min.y + (int)(VoxelChunk::Voxel_per_Side);
 		max.z = min.z + (int)(VoxelChunk::Voxel_per_Side);

@@ -145,8 +145,8 @@ int main(int argc, char **argv)
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
-		//"shaders/dirLightNoCol.frag"
-		"shaders/depth.frag"
+		"shaders/dirLightNoCol.frag"
+		//"shaders/depth.frag"
 	);
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
 	int Uni_Chunk_View = voxelShader.FindUniform("view");
@@ -248,7 +248,7 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / VoxelChunk::Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / VoxelChunk::Voxel_per_Side);
 		//std::cout << "current " << chunk_current.x << ":" << chunk_current.y << ":" << chunk_current.z << "\n";
-		space.AddChunk(chunk_current.x, chunk_current.y, chunk_current.z);
+		space.AddChunk(chunk_current);
 
 		/*for (unsigned int i = 1; i < instances_count; i++)
 		{

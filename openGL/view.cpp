@@ -40,17 +40,19 @@ View::~View()
 }
 void	View::move(Point rel)
 {
-	Angle::rotate(rel.z, rel.x, ang.cos_x, ang.sin_x);
+	//Angle::rotate(rel.z, rel.x, ang.cos_x, ang.sin_x);
+	rel = ang.rotate_back(rel);
 	pos.x += rel.x;
 	pos.y += rel.y;
 	pos.z += rel.z;
 }
 void	View::turn(Angle rel)
 {
-	ang.x += rel.x;
-	ang.y += rel.y;
-	ang.z += rel.z;
-	ang.UpdateSinCos();
+	ang = ang.rotate_fore(rel);
+	//ang.x += rel.x;
+	//ang.y += rel.y;
+	//ang.z += rel.z;
+	//ang.UpdateSinCos();
 }
 void	View::uniform(int uni) const
 {

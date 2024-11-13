@@ -3,12 +3,12 @@
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-in Vert_Out
+in Vert_Default
 {
-	vec3 NonProj;
+	vec3 Absolut;
 } gs_in[];
 
-out Geom_Out
+out Geom_Default
 {
 	vec3 Normal;
 } gs_out;
@@ -35,7 +35,7 @@ void calcCorner(int i)
 
 void main()
 {
-	gs_out.Normal = calcNormal(gs_in[0].NonProj, gs_in[1].NonProj, gs_in[2].NonProj);
+	gs_out.Normal = calcNormal(gs_in[0].Absolut, gs_in[1].Absolut, gs_in[2].Absolut);
 	calcCorner(0);
 	calcCorner(1);
 	calcCorner(2);

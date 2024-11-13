@@ -5,7 +5,7 @@ const vec3 light = normalize(vec3(2, 3, 1));
 
 
 
-in Geom_Out
+in Geom_Default
 {
 	vec3 Normal;
 } fs_in;
@@ -23,7 +23,7 @@ void main()
 	dep = 1.0 - dep;
 
 	float l;
-	l = dot(fs_in.Normal, light);
+	l = dot(normalize(fs_in.Normal), light);
 	l = max(l, 0.3);
 
 	vec3 col;

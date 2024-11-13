@@ -37,6 +37,12 @@ const Angle & Angle::operator =(const Angle & other)
 	this -> x = other.x;
 	this -> y = other.y;
 	this -> z = other.z;
+	this -> sin_x = other.sin_x;
+	this -> sin_y = other.sin_y;
+	this -> sin_z = other.sin_z;
+	this -> cos_x = other.cos_x;
+	this -> cos_y = other.cos_y;
+	this -> cos_z = other.cos_z;
 	return *this;
 }
 
@@ -69,6 +75,32 @@ Point	Angle::rotate_back(Point p) const
 	return (p);
 }
 
+Angle	Angle::rotate_fore(Angle a) const
+{
+	Point pX, pY, pZ;
+	pX = a.rotate_fore(rotate_fore(Point(1, 0, 0)));
+	pY = a.rotate_fore(rotate_fore(Point(0, 1, 0)));
+	pZ = a.rotate_fore(rotate_fore(Point(0, 0, 1)));
+
+	return Angle(
+		atan2f(pX.z, pZ.z),
+		asinf(pY.z),
+		atan2(pY.x, pY.y)
+	);
+}
+Angle	Angle::rotate_back(Angle a) const
+{
+	Point pX, pY, pZ;
+	pX = a.rotate_back(rotate_back(Point(1, 0, 0)));
+	pY = a.rotate_back(rotate_back(Point(0, 1, 0)));
+	pZ = a.rotate_back(rotate_back(Point(0, 0, 1)));
+
+	return Angle(
+		atan2f(pZ.x, pZ.z),
+		asinf(pZ.y),
+		atan2(pX.y, pY.y)
+	);
+}
 
 
 void	Angle::rotate(float & pls, float & mns, float cos, float sin)

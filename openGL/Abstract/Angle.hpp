@@ -30,6 +30,9 @@ class Angle
 		Point	rotate_fore(Point p) const;
 		Point	rotate_back(Point p) const;
 
+		Angle	rotate_fore(Angle a) const;
+		Angle	rotate_back(Angle a) const;
+
 	public:
 		static void	rotate(float & pls, float & mns, float cos, float sin);
 };

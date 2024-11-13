@@ -1,7 +1,7 @@
 #version 330
 
 uniform float[7] depthFactor;
-const vec3 light = vec3(+0.267261, -0.534522, +0.801784);
+const vec3 light = normalize(vec3(2, 3, 1));
 
 
 
@@ -10,7 +10,7 @@ in Geom_Out
 	vec3 Normal;
 } fs_in;
 
-out vec4 Color;
+out vec4 Pixel;
 
 
 
@@ -22,7 +22,13 @@ void main()
 	dep = (dep - depthFactor[0]) / depthFactor[1];
 	dep = 1.0 - dep;
 
+	float l;
+	l = dot(fs_in.Normal, light);
+	l = max(l, 0.3);
+
 	vec3 col;
-	col = vec3(dep, dep, dep);
-	Color = vec4(col, 1);
+	col = vec3(1, 1, 1);
+	col = col * l * dep;
+
+	Pixel = vec4(col, 1);
 }

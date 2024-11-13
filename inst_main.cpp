@@ -145,8 +145,9 @@ int main(int argc, char **argv)
 	Shader voxelShader(
 		"shaders/chunk_vertex_project.vert",
 		"shaders/faceNormalNoTex.geom",
-		"shaders/dirLightNoCol.frag"
+		//"shaders/dirLightNoCol.frag"
 		//"shaders/depth.frag"
+		"shaders/depthLightNoCol.frag"
 	);
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
 	int Uni_Chunk_View = voxelShader.FindUniform("view");

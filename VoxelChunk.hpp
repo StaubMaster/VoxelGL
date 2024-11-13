@@ -26,20 +26,20 @@ class VoxelChunk
 		static void	Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch);
 
 	private:
-		static void IndexFaceXn(unsigned int * index, unsigned int idx, Undex3D vox);
-		static void IndexFaceXp(unsigned int * index, unsigned int idx, Undex3D vox);
-		static void IndexFaceYn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
-		static void IndexFaceYp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
-		static void IndexFaceZn(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
-		static void IndexFaceZp(unsigned int * index, unsigned int idx, unsigned int x, unsigned int y, unsigned int z);
+		static void IndexFaceXn(unsigned int * index, unsigned int & idx, Undex3D vox);
+		static void IndexFaceXp(unsigned int * index, unsigned int & idx, Undex3D vox);
+		static void IndexFaceYn(unsigned int * index, unsigned int & idx, Undex3D vox);
+		static void IndexFaceYp(unsigned int * index, unsigned int & idx, Undex3D vox);
+		static void IndexFaceZn(unsigned int * index, unsigned int & idx, Undex3D vox);
+		static void IndexFaceZp(unsigned int * index, unsigned int & idx, Undex3D vox);
 
 		static void IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
-		static void IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp);
-		static void IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const Voxel * vn, const Voxel * vp);
+		static void IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
+		static void IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
 
 		static void IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
-		static void IndexFaceY(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
-		static void IndexFaceZ(unsigned int * index, unsigned int & idx, unsigned int x, unsigned int y, unsigned int z, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
+		static void IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
+		static void IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
 
 	private:
 		Voxel *			Data;
@@ -56,7 +56,6 @@ class VoxelChunk
 	private:
 		VoxelChunk(const VoxelChunk & other);
 		const VoxelChunk & operator =(const VoxelChunk & other);
-		const Voxel & get(unsigned int x, unsigned int y, unsigned int z) const;
 		const Voxel & get(Undex3D idx) const;
 
 	public:

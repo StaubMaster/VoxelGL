@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <iomanip>
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -57,7 +59,9 @@ int main(int argc, char **argv)
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	std::cout << "loop\n";
+	space.AddChunksRange(Index3D(), 3);
+
+	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
 		win -> Update();
@@ -67,28 +71,26 @@ int main(int argc, char **argv)
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
+
 		Index3D chunk_current;
 		chunk_current.x = floorf(view.pos.x / VoxelChunk::Voxel_per_Side);
 		chunk_current.y = floorf(view.pos.y / VoxelChunk::Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / VoxelChunk::Voxel_per_Side);
-		space.AddChunk(chunk_current);
+
+		double t1, t2, t3;
+
+		t1 = glfwGetTime();
+		space.AddChunksRange(chunk_current, 3);
+		t2 = glfwGetTime();
+		space.SubChunksRange(chunk_current, 3);
+		t3 = glfwGetTime();
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		if (voxel_add_key.check())
-		{
-			if (hover.isValid)
-			{
-				space.tryAdd(hover);
-			}
-		}
-		if (voxel_sub_key.check())
-		{
-			if (hover.isValid)
-			{
-				space.trySub(hover);
-			}
-		}
+		if (voxel_add_key.check() && hover.isValid)
+			space.tryAdd(hover);
+		if (voxel_sub_key.check() && hover.isValid)
+			space.trySub(hover);
 
 
 
@@ -96,21 +98,42 @@ int main(int argc, char **argv)
 		glClearColor(0.25f, 0.0f, 0.0f, 1);
 
 
-
 		voxelShader.Use();
 		view.uniform(Uni_Chunk_View);
 		view.uniform_depth(Uni_Chunk_Depth);
+		double t4, t5;
+		t4 = glfwGetTime();
 		space.Draw(Uni_Chunk_Pos);
+		t5 = glfwGetTime();
 
 		boxShader.Use();
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
+		double t6, t7;
+		t6 = glfwGetTime();
 		space.DrawHover(hover);
-
+		t7 = glfwGetTime();
+		//space.DrawBound();
 
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
+
+		std::cout
+			<< "\e[6A\n"
+			<< std::fixed << std::setprecision(8)
+			<< "add   " << ((t2 - t1)) << "s\n"
+			<< "sub   " << ((t3 - t2)) << "s\n"
+			<< "space " << ((t5 - t4)) << "s\n"
+			<< "hover " << ((t7 - t6)) << "s\n"
+			<< "\n";
+		(void)t1;
+		(void)t2;
+		(void)t3;
+		(void)t4;
+		(void)t5;
+		(void)t6;
+		(void)t7;
 	}
 	delete win;
 

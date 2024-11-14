@@ -5,6 +5,10 @@ Index3D::Index3D() : x(0), y(0), z(0)
 {
 
 }
+Index3D::Index3D(int i) : x(i), y(i), z(i)
+{
+
+}
 Index3D::Index3D(int x, int y, int z) : x(x), y(y), z(z)
 {
 
@@ -39,6 +43,17 @@ Index3D Index3D::operator -(const Index3D & other) const
 		x - other.x,
 		y - other.y,
 		z - other.z
+	);
+}
+
+
+
+int	Index3D::ToIndex(int size_per_side) const
+{
+	return (
+		x + 
+		y * size_per_side +
+		z * size_per_side * size_per_side
 	);
 }
 
@@ -82,4 +97,95 @@ bool	Index3D::Box_exclusive(Index3D idx, Index3D min, Index3D max)
 	return	(idx.x > min.x && idx.x < max.x) &&
 			(idx.y > min.y && idx.y < max.y) &&
 			(idx.z > min.z && idx.z < max.z);
+}
+
+
+
+bool Index3D::loop_inclusive(Index3D & idx, Index3D min, Index3D max)
+{
+	idx.z++;
+	if (idx.z > max.z)
+	{
+		idx.z = min.z,
+		idx.y++;
+		if (idx.y > max.y)
+		{
+			idx.y = min.y;
+			idx.x++;
+			if (idx.x > max.x)
+			{
+				idx.x = min.x;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Index3D::loop_exclusive(Index3D & idx, Index3D min, Index3D max)
+{
+	idx.z++;
+	if (idx.z >= max.z)
+	{
+		idx.z = min.z,
+		idx.y++;
+		if (idx.y >= max.y)
+		{
+			idx.y = min.y;
+			idx.x++;
+			if (idx.x >= max.x)
+			{
+				idx.x = min.x;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Index3D::loop_inclusive(Index3D & idx, int min, int max)
+{
+	idx.z++;
+	if (idx.z > max)
+	{
+		idx.z = min,
+		idx.y++;
+		if (idx.y > max)
+		{
+			idx.y = min;
+			idx.x++;
+			if (idx.x > max)
+			{
+				idx.x = min;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Index3D::loop_exclusive(Index3D & idx, int min, int max)
+{
+	idx.z++;
+	if (idx.z >= max)
+	{
+		idx.z = min,
+		idx.y++;
+		if (idx.y >= max)
+		{
+			idx.y = min;
+			idx.x++;
+			if (idx.x >= max)
+			{
+				idx.x = min;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+
+
+
+std::ostream & operator <<(std::ostream & o, const Index3D & idx)
+{
+	o << idx.x << ":" << idx.y << ":" << idx.z;
+	return o;
 }

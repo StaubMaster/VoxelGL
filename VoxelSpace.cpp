@@ -82,15 +82,96 @@ void	VoxelSpace::FillRandom()
 		UpdateBuffer(Chunks[i] -> getChunkIndex3D());
 	}
 }
+
 void	VoxelSpace::AddChunk(Index3D idx)
 {
-	if (FindChunkIdx(idx) != 0xFFFFFFFF)
-		return;
 	VoxelChunk * ch = new VoxelChunk(idx);
 	Chunks.push_back(ch);
+
 	ch -> FillRandom();
 	UpdateBufferNeighbours(idx);
 }
+void	VoxelSpace::SubChunk(Index3D idx)
+{
+	unsigned int i = FindChunkIdx(idx);
+
+	delete Chunks[i];
+	Chunks.erase(Chunks.begin() + i);
+}
+void	VoxelSpace::AddChunksRange(Index3D idx, int range)
+{
+	Index3D min = idx - Index3D(range);
+	Index3D max = idx + Index3D(range);
+
+	int range_per_side = range * 2 + 1;
+	bool * exists = new bool[range_per_side * range_per_side * range_per_side];
+
+	for (int i = 0; i < range_per_side * range_per_side * range_per_side; i++)
+	{
+		exists[i] = false;
+	}
+
+	//std::cout << "\n";
+	//std::cout << "min " << min << "\n";
+	//std::cout << "max " << max << "\n";
+	//std::cout << "\n";
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		Index3D ch_idx = Chunks[i] -> getChunkIndex3D();
+
+		if (Index3D::Box_inclusive(ch_idx, min ,max))
+		{
+			Index3D diff = ch_idx - min;
+			//std::cout << "found " << diff << "\n";
+			exists[diff.ToIndex(range_per_side)] = true;
+		}
+	}
+
+	Index3D i;
+	//std::cout << "\n";
+	do
+	{
+		if (!exists[i.ToIndex(range_per_side)])
+		{
+			//std::cout << "not found " << i << "\n";
+			AddChunk(i + min);
+		}
+	}
+	while (Index3D::loop_exclusive(i, 0, range_per_side));
+	//std::cout << "\n";
+
+	delete [] exists;
+
+	/*i = min;
+	do
+	{
+		if (FindChunkIdx(i) == 0xFFFFFFFF)
+		{
+			AddChunk(i);
+		}
+	}
+	while (Index3D::loop_inclusive(i, min, max));*/
+}
+void	VoxelSpace::SubChunksRange(Index3D idx, int range)
+{
+	Index3D min = idx - Index3D(range);
+	Index3D max = idx + Index3D(range);
+
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		Index3D ch_idx = Chunks[i] -> getChunkIndex3D();
+
+		//if (abs(diff.x) > range || abs(diff.y) > range || abs(diff.z) > range)
+		if (!Index3D::Box_inclusive(ch_idx, min ,max))
+		{
+			SubChunk(ch_idx);
+			i--;
+		}
+	}
+}
+
+
+
 void	VoxelSpace::UpdateBuffer(Index3D idx)
 {
 	VoxelChunk * ch = FindChunkPtr(idx);

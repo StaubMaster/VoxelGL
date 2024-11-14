@@ -2,6 +2,8 @@
 #ifndef INDEX3D_HPP
 # define INDEX3D_HPP
 
+# include <iostream>
+
 class Index3D
 {
 	public:
@@ -11,6 +13,7 @@ class Index3D
 
 	public:
 		Index3D();
+		Index3D(int i);
 		Index3D(int x, int y, int c);
 		~Index3D();
 		Index3D(const Index3D & other);
@@ -18,6 +21,8 @@ class Index3D
 
 		Index3D operator +(const Index3D & other) const;
 		Index3D operator -(const Index3D & other) const;
+
+		int	ToIndex(int size_per_side) const;
 
 	public:
 		Index3D Xn() const;
@@ -29,6 +34,13 @@ class Index3D
 
 		static bool	Box_inclusive(Index3D idx, Index3D min, Index3D max);
 		static bool	Box_exclusive(Index3D idx, Index3D min, Index3D max);
+		
+		static bool	loop_inclusive(Index3D & idx, Index3D min, Index3D max);
+		static bool	loop_exclusive(Index3D & idx, Index3D min, Index3D max);
+		static bool	loop_inclusive(Index3D & idx, int min, int max);
+		static bool	loop_exclusive(Index3D & idx, int min, int max);
 };
+
+std::ostream & operator <<(std::ostream & o, const Index3D & idx);
 
 #endif

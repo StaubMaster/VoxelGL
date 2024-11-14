@@ -521,13 +521,6 @@ void	VoxelChunk::UpdateBufferIndex(
 	Index_Count = index_count;
 
 	delete [] index;
-
-	(void)Xn;
-	(void)Yn;
-	(void)Zn;
-	(void)Xp;
-	(void)Yp;
-	(void)Zp;
 }
 /*		Better Buffers
 	IndexUnCompressed[MaxIndexCount] = 0xFFFFFFFF

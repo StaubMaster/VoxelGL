@@ -33,6 +33,10 @@ class VoxelSpace
 
 		void	FillRandom();
 		void	AddChunk(Index3D idx);
+		void	SubChunk(Index3D idx);
+		void	AddChunksRange(Index3D idx, int range);
+		void	SubChunksRange(Index3D idx, int range);
+
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
 

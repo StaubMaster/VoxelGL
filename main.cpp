@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include "openGL/openGL.h"
+#include "openGL/textureLoadSave.h"
 #include "openGL/Abstract/Angle.hpp"
 #include "openGL/Forms/Window.hpp"
 #include "openGL/Shader.hpp"
@@ -18,16 +19,22 @@
 
 int main(int argc, char **argv)
 {
-	Window * win = new Window(1000, 1000, "instance test", false);
+	Window * win = new Window(1000, 1000, "Voxel", false);
+	std::cout << "window done\n";
 
 	Shader voxelShader(
-		"shaders/chunk_vertex_project.vert",
-		"shaders/faceNormalNoTex.geom",
-		"shaders/depthLightNoCol.frag"
+		//"shaders/chunk_vertex_project.vert",
+		//"shaders/faceNormalNoTex.geom",
+		//"shaders/depthLightNoCol.frag"
+		"shaders/voxel_project_tex.vert",
+		"shaders/voxel_normal_tex.geom",
+		"shaders/voxel_depth_tex.frag"
 	);
 	int Uni_Chunk_View = voxelShader.FindUniform("viewTrans");
 	int Uni_Chunk_Depth = voxelShader.FindUniform("depthFactor");
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
+	//int Uni_Chunk_Tex = voxelShader.FindUniform("tex");
+	//std::cout << "voxel tex " << Uni_Chunk_Tex << "\n";
 
 	Shader boxShader(
 		"shaders/Box.vert",
@@ -43,14 +50,33 @@ int main(int argc, char **argv)
 		std::cout << "  Memory:\n";
 		std::cout << "    per Chunks:\n";
 		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
-		std::cout << "      Vertex Buffer Limit: " << mem_size_1000_original(Vertex_per_Chunk * sizeof(float)) << "\n";
-		std::cout << "      Index Buffer Limit: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(unsigned int) * 6 * 3) << "\n";
+		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelChunk::VoxelDrawData)) << "\n";
+		//std::cout << "      Vertex Buffer Limit: " << mem_size_1000_original(Vertex_per_Chunk * sizeof(float)) << "\n";
+		//std::cout << "      Index Buffer Limit: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(unsigned int) * 6 * 3) << "\n";
 	}
+
+	std::cout << "texture loading ...\n";
+	unsigned int Texture0;
+	glGenTextures(1, &Texture0);
+	glBindTexture(GL_TEXTURE_2D, Texture0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	{
+		int w, h;
+		unsigned int *texData;
+		//texture_load("textures/cube_face_log.uints", &texData, &w, &h);
+		texture_load("textures/cube_face.uints", &texData, &w, &h);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
+		free(texData);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	std::cout << "texture done\n";
 
 	View view;
 	//view.pos.z = -(128 + 10);
 	VoxelSpace space;
-
 
 
 	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
@@ -82,8 +108,8 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		space.AddChunksRange(chunk_current, 3);
-		space.SubChunksRange(chunk_current, 3);
+		space.AddChunksRange(chunk_current, 1);
+		space.SubChunksRange(chunk_current, 1);
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
@@ -101,6 +127,8 @@ int main(int argc, char **argv)
 		voxelShader.Use();
 		view.uniform(Uni_Chunk_View);
 		view.uniform_depth(Uni_Chunk_Depth);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE0, Texture0);
 		space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();
@@ -114,6 +142,8 @@ int main(int argc, char **argv)
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
+
+	glDeleteTextures(1, &Texture0);
 	delete win;
 
 	return (0);

@@ -165,8 +165,13 @@ void	VoxelSpace::UpdateBuffer(Index3D idx)
 
 	if (ch != NULL)
 	{
-		ch -> UpdateBufferVertex();
-		ch -> UpdateBufferIndex(
+		//ch -> UpdateBufferVertex();
+		//ch -> UpdateBufferIndex(
+		//	FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
+		//	FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
+		//	FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
+		//);
+		ch -> UpdateBuffer(
 			FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
 			FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
 			FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())

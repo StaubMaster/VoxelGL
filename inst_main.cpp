@@ -32,17 +32,24 @@ int main(int argc, char **argv)
 	Shader boxShader(
 		"shaders/Box.vert",
 		"shaders/Box.geom",
-		"shaders/simple.frag"
+		"shaders/Cycle.frag"
 	);
 	int Uni_Box_View = boxShader.FindUniform("viewTrans");
 	int Uni_Box_Depth = boxShader.FindUniform("depthFactor");
+	int Uni_Box_Cycle = boxShader.FindUniform("cycle");
 
-
+	{
+		std::cout << "General Info\n";
+		std::cout << "  Memory:\n";
+		std::cout << "    per Chunks:\n";
+		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
+		std::cout << "      Vertex Buffer Limit: " << mem_size_1000_original(Vertex_per_Chunk * sizeof(float)) << "\n";
+		std::cout << "      Index Buffer Limit: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(unsigned int) * 6 * 3) << "\n";
+	}
 
 	View view;
-
+	//view.pos.z = -(128 + 10);
 	VoxelSpace space;
-	space.FillRandom();
 
 
 
@@ -59,8 +66,6 @@ int main(int argc, char **argv)
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	space.AddChunksRange(Index3D(), 3);
-
 	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -73,17 +78,12 @@ int main(int argc, char **argv)
 
 
 		Index3D chunk_current;
-		chunk_current.x = floorf(view.pos.x / VoxelChunk::Voxel_per_Side);
-		chunk_current.y = floorf(view.pos.y / VoxelChunk::Voxel_per_Side);
-		chunk_current.z = floorf(view.pos.z / VoxelChunk::Voxel_per_Side);
+		chunk_current.x = floorf(view.pos.x / Voxel_per_Side);
+		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
+		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		double t1, t2, t3;
-
-		t1 = glfwGetTime();
 		space.AddChunksRange(chunk_current, 3);
-		t2 = glfwGetTime();
 		space.SubChunksRange(chunk_current, 3);
-		t3 = glfwGetTime();
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
@@ -95,45 +95,24 @@ int main(int argc, char **argv)
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.25f, 0.0f, 0.0f, 1);
+		glClearColor(0.0f, 0.0f, 0.0f, 1);
 
 
 		voxelShader.Use();
 		view.uniform(Uni_Chunk_View);
 		view.uniform_depth(Uni_Chunk_Depth);
-		double t4, t5;
-		t4 = glfwGetTime();
 		space.Draw(Uni_Chunk_Pos);
-		t5 = glfwGetTime();
 
 		boxShader.Use();
+		glUniform1f(Uni_Box_Cycle, glfwGetTime() * 16);
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
-		double t6, t7;
-		t6 = glfwGetTime();
 		space.DrawHover(hover);
-		t7 = glfwGetTime();
 		//space.DrawBound();
 
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
-
-		std::cout
-			<< "\e[6A\n"
-			<< std::fixed << std::setprecision(8)
-			<< "add   " << ((t2 - t1)) << "s\n"
-			<< "sub   " << ((t3 - t2)) << "s\n"
-			<< "space " << ((t5 - t4)) << "s\n"
-			<< "hover " << ((t7 - t6)) << "s\n"
-			<< "\n";
-		(void)t1;
-		(void)t2;
-		(void)t3;
-		(void)t4;
-		(void)t5;
-		(void)t6;
-		(void)t7;
 	}
 	delete win;
 

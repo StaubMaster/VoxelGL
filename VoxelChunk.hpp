@@ -8,15 +8,14 @@
 # include "Box.hpp"
 # include "MemorySize.hpp"
 # include <iostream>
+# define Voxel_per_Side 16
+# define Voxel_per_Chunk (Voxel_per_Side*Voxel_per_Side*Voxel_per_Side)
+# define Vertex_per_Side (Voxel_per_Side+1)
+# define Vertex_per_Chunk (Vertex_per_Side*Vertex_per_Side*Vertex_per_Side)
 
 class VoxelChunk
 {
 	public:
-		const static unsigned int	Voxel_per_Side = 8;
-		const static unsigned int	Voxel_per_Chunk = 8 * 8 * 8;
-		const static unsigned int	Vertex_per_Side = 9;
-		const static unsigned int	Vertex_per_Chunk = 9 * 9 * 9;
-
 		static unsigned int XYZ_to_VoxelIndex(unsigned int x, unsigned int y, unsigned int z);
 		static unsigned int XYZ_to_VertexIndex(unsigned int x, unsigned int y, unsigned int z);
 		static unsigned int XYZ_to_VoxelIndex(Undex3D idx);
@@ -63,9 +62,10 @@ class VoxelChunk
 		Index3D	getChunkIndex3D() const;
 		Point	getChunkOffset() const;
 
-		void	FillRandom();
-		int		CheckVoxel(Index3D idx);
+		void	GenerateChunkLimit(char axis_limit);
+		void	GenerateFuzzyCenterCube(int size2);
 
+		int		CheckVoxel(Index3D idx);
 		char	tryReplace(Undex3D idx, char d);
 
 	public:

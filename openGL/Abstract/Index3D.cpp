@@ -29,6 +29,8 @@ const Index3D & Index3D::operator =(const Index3D & other)
 	return (*this);
 }
 
+
+
 Index3D Index3D::operator +(const Index3D & other) const
 {
 	return Index3D(

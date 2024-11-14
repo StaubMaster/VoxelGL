@@ -61,5 +61,18 @@ std::string	mem_size_1024(size_t size)
 	ss << size;
 	ss << " ";
 	ss << suffix;
+
+	return (ss.str());
+}
+
+std::string	mem_size_1000_original(size_t size)
+{
+	std::stringstream ss;
+
+	ss << mem_size_1000(size);
+	ss << " (";
+	ss << size;
+	ss << " B)";
+
 	return (ss.str());
 }

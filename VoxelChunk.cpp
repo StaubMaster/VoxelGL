@@ -57,22 +57,34 @@ void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
 
 void VoxelChunk::IndexFaceXn(unsigned int * index, unsigned int & idx, Undex3D vox)
 {
-	index[idx + 0] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 0);
-	index[idx + 1] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
-	index[idx + 2] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
-	index[idx + 3] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
-	index[idx + 4] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
-	index[idx + 5] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 1);
+	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 1] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 2] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
+	index[idx + 3] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
+	index[idx + 4] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 5] = (vox + Undex3D(0, 1, 1)).ToIndex(Vertex_per_Side);
+	//index[idx + 0] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 0);
+	//index[idx + 1] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
+	//index[idx + 2] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
+	//index[idx + 3] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
+	//index[idx + 4] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
+	//index[idx + 5] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 1);
 	idx += 6;
 }
 void VoxelChunk::IndexFaceXp(unsigned int * index, unsigned int & idx, Undex3D vox)
 {
-	index[idx + 0] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 0);
-	index[idx + 1] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
-	index[idx + 2] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
-	index[idx + 3] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
-	index[idx + 4] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
-	index[idx + 5] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 1);
+	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 1] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
+	index[idx + 2] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 3] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
+	index[idx + 4] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
+	index[idx + 5] = (vox + Undex3D(0, 1, 1)).ToIndex(Vertex_per_Side);
+	//index[idx + 0] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 0);
+	//index[idx + 1] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
+	//index[idx + 2] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
+	//index[idx + 3] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 0);
+	//index[idx + 4] = XYZ_to_VertexIndex(vox.x, vox.y + 0, vox.z + 1);
+	//index[idx + 5] = XYZ_to_VertexIndex(vox.x, vox.y + 1, vox.z + 1);
 	idx += 6;
 }
 void VoxelChunk::IndexFaceYn(unsigned int * index, unsigned int & idx, Undex3D vox)
@@ -362,7 +374,7 @@ Point	VoxelChunk::getChunkOffset() const
 
 
 
-void	VoxelChunk::FillRandom()
+void	VoxelChunk::GenerateChunkLimit(char axis_limit)
 {
 	Index3D chunk_idx;
 	chunk_idx.x = Index.x * Voxel_per_Side;
@@ -370,11 +382,10 @@ void	VoxelChunk::FillRandom()
 	chunk_idx.z = Index.z * Voxel_per_Side;
 
 	Undex3D voxel_idx;
-
 	Index3D global_idx;
 	unsigned int i;
 
-	/*do
+	do
 	{
 		global_idx.x = chunk_idx.x + voxel_idx.x;
 		global_idx.y = chunk_idx.y + voxel_idx.y;
@@ -385,7 +396,7 @@ void	VoxelChunk::FillRandom()
 		axis += (voxel_idx.x == 0 || voxel_idx.x == Voxel_per_Side - 1);
 		axis += (voxel_idx.y == 0 || voxel_idx.y == Voxel_per_Side - 1);
 		axis += (voxel_idx.z == 0 || voxel_idx.z == Voxel_per_Side - 1);
-		if (axis >= 3)
+		if (axis >= axis_limit)
 		{
 			Data[i] = Voxel(1);
 		}
@@ -394,17 +405,21 @@ void	VoxelChunk::FillRandom()
 			Data[i] = Voxel(0);
 		}
 	}
-	while (Undex3D::loop(voxel_idx, 0, Voxel_per_Side));*/
+	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+}
+void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
+{
+	Index3D chunk_idx;
+	chunk_idx.x = Index.x * Voxel_per_Side;
+	chunk_idx.y = Index.y * Voxel_per_Side;
+	chunk_idx.z = Index.z * Voxel_per_Side;
 
-	Index3D box_min;
-	box_min.x = -10;
-	box_min.y = -10;
-	box_min.z = -10;
+	Undex3D voxel_idx;
+	Index3D global_idx;
+	unsigned int i;
 
-	Index3D box_max;
-	box_max.x = +10;
-	box_max.y = +10;
-	box_max.z = +10;
+	Index3D box_min(-size2);
+	Index3D box_max(+size2);
 
 	do
 	{
@@ -426,10 +441,9 @@ void	VoxelChunk::FillRandom()
 			Data[i] = Voxel(std::rand() & 1);
 		}
 	}
-	while (Undex3D::loop(voxel_idx, 0, Voxel_per_Side));
-
-	(void)global_idx;
+	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
 }
+
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {
 	if ((idx.x < -1) || (idx.x >= (int)(Voxel_per_Side + 1)) ||
@@ -455,7 +469,6 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 
 	return (0);
 }
-
 char	VoxelChunk::tryReplace(Undex3D idx, char d)
 {
 	unsigned int i = XYZ_to_VoxelIndex(idx);
@@ -510,7 +523,7 @@ void	VoxelChunk::UpdateBufferIndex(
 		IndexFaceY(index, index_count, voxel_idx, this, Yn, Yp);
 		IndexFaceZ(index, index_count, voxel_idx, this, Zn, Zp);
 	}
-	while (Undex3D::loop(voxel_idx, 0, Voxel_per_Side + 1));
+	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side + 1));
 
 	//std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << " (" << (index_count * sizeof(unsigned int)) << "B)\n";
 

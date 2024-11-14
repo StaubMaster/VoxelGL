@@ -19,6 +19,8 @@ class Undex3D
 		Undex3D operator +(const Undex3D & other) const;
 		Undex3D operator -(const Undex3D & other) const;
 
+		unsigned int	ToIndex(unsigned int size_per_side) const;
+
 	public:
 		Undex3D Xn() const;
 		Undex3D Xp() const;
@@ -34,8 +36,10 @@ class Undex3D
 		static bool	Box_inclusive(Undex3D idx, Undex3D min, Undex3D max);
 		static bool	Box_exclusive(Undex3D idx, Undex3D min, Undex3D max);
 
-		static bool	loop(Undex3D & idx, Undex3D min, Undex3D max);
-		static bool	loop(Undex3D & idx, unsigned int min, unsigned int max);
+		static bool	loop_inclusive(Undex3D & idx, Undex3D min, Undex3D max);
+		static bool	loop_exclusive(Undex3D & idx, Undex3D min, Undex3D max);
+		static bool	loop_inclusive(Undex3D & idx, unsigned int min, unsigned int max);
+		static bool	loop_exclusive(Undex3D & idx, unsigned int min, unsigned int max);
 };
 
 #endif

@@ -60,7 +60,7 @@ void main()
 	idx.y = (VIdx >> 8) & uint((0xFF));
 	idx.z = (VIdx >> 16) & uint((0xFF));
 
-	vs_out.Absolut = vec3(idx) + (chunk_pos * 8);
+	vs_out.Absolut = vec3(idx) + (chunk_pos * 16);
 
 	gl_Position = proj(vs_out.Absolut);
 }

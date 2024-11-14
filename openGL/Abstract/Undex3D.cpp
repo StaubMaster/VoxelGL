@@ -25,6 +25,8 @@ const Undex3D & Undex3D::operator =(const Undex3D & other)
 	return (*this);
 }
 
+
+
 Undex3D Undex3D::operator +(const Undex3D & other) const
 {
 	return Undex3D(
@@ -39,6 +41,17 @@ Undex3D Undex3D::operator -(const Undex3D & other) const
 		x - other.x,
 		y - other.y,
 		z - other.z
+	);
+}
+
+
+
+unsigned int	Undex3D::ToIndex(unsigned int size_per_side) const
+{
+	return (
+		x + 
+		y * size_per_side +
+		z * size_per_side * size_per_side
 	);
 }
 
@@ -101,7 +114,27 @@ bool	Undex3D::Box_exclusive(Undex3D idx, Undex3D min, Undex3D max)
 
 
 
-bool Undex3D::loop(Undex3D & idx, Undex3D min, Undex3D max)
+bool Undex3D::loop_inclusive(Undex3D & idx, Undex3D min, Undex3D max)
+{
+	idx.z++;
+	if (idx.z > max.z)
+	{
+		idx.z = min.z,
+		idx.y++;
+		if (idx.y > max.y)
+		{
+			idx.y = min.y;
+			idx.x++;
+			if (idx.x > max.x)
+			{
+				idx.x = min.x;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Undex3D::loop_exclusive(Undex3D & idx, Undex3D min, Undex3D max)
 {
 	idx.z++;
 	if (idx.z >= max.z)
@@ -121,7 +154,27 @@ bool Undex3D::loop(Undex3D & idx, Undex3D min, Undex3D max)
 	}
 	return (true);
 }
-bool Undex3D::loop(Undex3D & idx, unsigned int min, unsigned int max)
+bool Undex3D::loop_inclusive(Undex3D & idx, unsigned int min, unsigned int max)
+{
+	idx.z++;
+	if (idx.z > max)
+	{
+		idx.z = min,
+		idx.y++;
+		if (idx.y > max)
+		{
+			idx.y = min;
+			idx.x++;
+			if (idx.x > max)
+			{
+				idx.x = min;
+				return (false);
+			}
+		}
+	}
+	return (true);
+}
+bool Undex3D::loop_exclusive(Undex3D & idx, unsigned int min, unsigned int max)
 {
 	idx.z++;
 	if (idx.z >= max)

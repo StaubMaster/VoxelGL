@@ -3,7 +3,7 @@ FLAGS = -Wall -Wextra -Werror
 
 NAME = test
 
-FILE_C = inst_main.cpp \
+FILE_C = main.cpp \
 	Voxel.cpp \
 	VoxelChunk.cpp \
 	VoxelSpace.cpp \

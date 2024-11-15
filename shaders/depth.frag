@@ -17,7 +17,7 @@ out vec4 Color;
 void main()
 {
 	float dep;
-	dep = gl_FragDepth;
+	dep = gl_FragCoord.z;
 	dep = depthFactor[4] / (depthFactor[3] - dep * depthFactor[2]);
 	dep = (dep - depthFactor[0]) / depthFactor[1];
 	dep = 1.0 - dep;

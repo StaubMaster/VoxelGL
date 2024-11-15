@@ -26,25 +26,25 @@ Window::Window(int w, int h, const char * name, bool resize)
 	win = glfwCreateWindow(w, h, name, NULL, NULL);
 	if (win == NULL)
 	{
-		std::cout << "window NULL\n";
+		std::cout << "glfw window NULL\n";
 		throw GenericWindowException();
 	}
 	glfwSetWindowAttrib(win, GLFW_RESIZABLE, resize);
+	std::cout << "glfw window done\n";
 
 	glfwMakeContextCurrent(win);
-	std::cout << "window done\n";
 
 	if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		glfwDestroyWindow(win);
-		std::cout << "failed to Load\n";
+		std::cout << "glad failed\n";
 		throw GenericWindowException();
 	}
-	std::cout << "gl done\n";
+	std::cout << "glad done\n";
 
-	//glViewport(0, 0, w * 2, h * 2);	//	Mac
-	glViewport(0, 0, w, h);			//Windows
-	std::cout << "viewport done\n";
+	glViewport(0, 0, w * 2, h * 2);	//	Mac
+	//glViewport(0, 0, w, h);			//Windows
+	std::cout << "gl viewport done\n";
 
 	tabbed = false;
 	tabbed_pressed = false;

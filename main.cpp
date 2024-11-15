@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 		win -> Update();
 
 
-		view.move(win -> GetKeyMovement(0.005f));
+		view.move(win -> GetKeyMovement(0.1f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -145,6 +145,10 @@ int main(int argc, char **argv)
 
 	glDeleteTextures(1, &Texture0);
 	delete win;
+
+	(void)Uni_Box_Cycle;
+	(void)Uni_Box_View;
+	(void)Uni_Box_Depth;
 
 	return (0);
 	(void)argc;

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 		std::cout << "  Memory:\n";
 		std::cout << "    per Chunks:\n";
 		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
-		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelChunk::VoxelDrawData)) << "\n";
+		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(Voxel::RenderData)) << "\n";
 		//std::cout << "      Vertex Buffer Limit: " << mem_size_1000_original(Vertex_per_Chunk * sizeof(float)) << "\n";
 		//std::cout << "      Index Buffer Limit: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(unsigned int) * 6 * 3) << "\n";
 	}

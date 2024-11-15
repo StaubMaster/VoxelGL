@@ -66,35 +66,10 @@ class VoxelChunk
 
 
 
-	public:
-		struct VoxelDrawData
-		{
-			private:
-				unsigned int	compressed_pos;
-
-				//	this will also be compressed later
-				unsigned int	tex_idx;
-				float			tex_x;
-				float			tex_y;
-
-			public:
-				static VoxelDrawData compress(Undex3D vox_idx, int tex_idx, char corn);
-		};
 	private:
-		static void FaceXn(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-		static void FaceXp(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-		static void FaceYn(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-		static void FaceYp(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-		static void FaceZn(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-		static void FaceZp(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, int tex_idx);
-
-		static void FaceX(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
-		static void FaceY(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
-		static void FaceZ(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
-
-		static void FaceX(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-		static void FaceY(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-		static void FaceZ(VoxelDrawData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
+		static void FaceX(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
+		static void FaceY(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
+		static void FaceZ(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
 
 
 

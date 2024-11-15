@@ -98,7 +98,7 @@ int main(int argc, char **argv)
 		win -> Update();
 
 
-		view.move(win -> GetKeyMovement(0.1f));
+		view.move(win -> GetKeyMovement(0.005f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.0f, 0.0f, 0.0f, 1);
+		glClearColor(0.5f, 0.5f, 0.5f, 1);
 
 
 		voxelShader.Use();

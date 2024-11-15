@@ -27,9 +27,13 @@ chunk chunk_read(int fd)
 	ch.length = read_4(fd);
 	ch.type = read_4(fd);
 	ch.data = malloc(ch.length);
-	if (read(fd, ch.data, ch.length) <= 0 && ch.length != 0)
+	int ret = read(fd, ch.data, ch.length);
+	if (ret <= 0 && ch.length != 0)
 	{
-		printf("read failed\n");
+		printf("read failed in chunk_read()\n");
+		printf("strerror: %s\n", strerror(errno));
+		printf("ret: %i\n", ret);
+		printf("ch.len: %i\n", ch.length);
 	}
 	ch.crc = read_4(fd);
 	return (ch);

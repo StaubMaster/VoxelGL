@@ -14,10 +14,13 @@ unsigned int char4_to_uint(unsigned char *val)
 
 unsigned int read_4(int fd)
 {
-	unsigned char val[4];
-	if (read(fd, val, 4) <= 0)
+	unsigned char val[4] = { 0, 0, 0, 0 };
+	int ret = read(fd, val, 4);
+	if (ret <= 0)
 	{
-		printf("read failed\n");
+		printf("read failed in read_4()\n");
+		printf("strerror: %s\n", strerror(errno));
+		printf("ret: %i\n", ret);
 	}
 	return (char4_to_uint(val));
 }

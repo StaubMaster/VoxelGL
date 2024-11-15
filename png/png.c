@@ -1,25 +1,33 @@
 
 #include "png.h"
+#ifndef O_BINARY
+# define O_BINARY 0
+#endif
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	/*if (argc != 2)
 	{
 		printf("required single file argument\n");
 		return (1);
-	}
+	}*/
 
-	int fd = open(argv[1], O_RDONLY);
+	//int fd = open(argv[1], O_RDONLY);
+	int fd = open("images/cat.png", O_RDONLY | O_BINARY);
 	if (fd == -1)
 	{
-		printf("%s\n", strerror(errno));
+		printf("strerror: %s\n", strerror(errno));
 		return (1);
 	}
+	printf("fd: %i\n", fd);
+
 
 	printf("\n");
 	{
-		uint8_t signature[8];
-		read(fd, signature, 8);
+		uint8_t signature[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		int ret = read(fd, signature, 8);
+		printf("ret: %i\n", ret);
+
 		printf("PNG Signature (should be equal)\n");
 		printf("%02X %02X %02X %02X    %02X %02X %02X %02X\n",
 			0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A);

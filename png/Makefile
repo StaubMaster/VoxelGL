@@ -1,5 +1,5 @@
 
-Name = png_decompressor
+Name = decompressor
 
 File_C = png.c mem.c read.c bits.c chunk.c HuffCodeTree.c block.c filter.c sixel.c
 File_O = $(File_C:.c=.o)

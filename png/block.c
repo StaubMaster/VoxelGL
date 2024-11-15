@@ -103,7 +103,7 @@ void	decompress_block(data_block *bit_data, data_block *decompressed, huff_code_
 
 uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_lit, uint32_t h_dist)
 {
-	uint8_t code_len_code_len_order[19] = (uint8_t [19]) { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
+	uint8_t code_len_code_len_order[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 	uint8_t code_len_code_len[19] = {};
 	for (int j = 0; j < h_clen; j++)
 	{

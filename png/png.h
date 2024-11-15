@@ -10,6 +10,10 @@
 # include <string.h>
 # include <errno.h>
 
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+
 typedef struct s_chunk
 {
 	uint32_t	length;

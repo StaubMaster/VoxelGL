@@ -67,7 +67,7 @@ int main(int argc, char **argv)
 		int w, h;
 		unsigned int *texData;
 		//texture_load("textures/cube_face_log.uints", &texData, &w, &h);
-		texture_load("textures/cube_face.uints", &texData, &w, &h);
+		texture_load("textures/cube_face_col.uints", &texData, &w, &h);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
 		free(texData);
 		glGenerateMipmap(GL_TEXTURE_2D);

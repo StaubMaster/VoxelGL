@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 void	image_header_data(image_header *ihdr)
 {

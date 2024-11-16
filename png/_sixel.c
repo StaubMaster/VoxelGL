@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 static int	char_itoa_len(char n)
 {

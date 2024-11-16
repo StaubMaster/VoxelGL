@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 int main(int argc, char **argv)
 {

@@ -16,7 +16,7 @@
 #include "VoxelChunk.hpp"
 #include "VoxelSpace.hpp"
 #include "Box.hpp"
-#include "png/png.h"
+#include "png/_png.h"
 
 
 

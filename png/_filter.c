@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 static uint32_t	pixel_Idx(uint32_t col, uint32_t x, uint32_t y, image *img)
 {

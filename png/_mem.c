@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 void	mem_free(void *p)
 {

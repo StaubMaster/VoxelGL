@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 unsigned int char4_to_uint(unsigned char *val)
 {

@@ -1,5 +1,5 @@
 
-#include "png.h"
+#include "_png.h"
 
 uint32_t len_base[] = {
     3, 4, 5, 6, 7, 8, 9, 10, //257 - 264
@@ -179,11 +179,40 @@ data_block decompress_all_blocks(data_block *bit_data)
 		printf("B type  : %u\n", b_type);
 
 		if (b_type == 0b00)
-			printf("block type not implemented\n");
+		{
+			printf("Direct ...\n");
+			printf("block type not (fully) implemented\n");
+			{
+				uint32_t	idx_byte = (bit_data -> index) >> 3;
+				uint32_t	idx_bit = (bit_data -> index) & 0b111;
+				printf("byte idx: %u\n", idx_byte);
+				printf("bit  idx: %u\n", idx_bit);
+				if (idx_bit != 0) { idx_byte++; }
+				bit_data -> index = idx_byte << 3;
+				printf("byte idx: %u\n", idx_byte);
+			}
+
+			uint16_t len, nlen;
+			len = bits_RtL_next(bit_data, 16);
+			nlen = bits_RtL_next(bit_data, 16);
+			char bit_str[17];
+			printf(" len: %i\n", len);
+			printf(" len: 0x%04X 0b%s\n", len, bits_str(len, bit_str, 16));
+			printf("nlen: 0x%04X 0b%s\n", nlen, bits_str(nlen, bit_str, 16));
+			printf(" xor: 0x%04X 0b%s\n", (len ^ nlen), bits_str(len ^ nlen, bit_str, 16));
+
+			printf("Direct done\n");
+		}
 		else if (b_type == 0b01)
+		{
+			printf("Static Huffman ...\n");
 			printf("block type not implemented\n");
+			printf("Static Huffman done\n");
+		}
 		else if (b_type == 0b10)
 		{
+			printf("Dynamic Huffman ...\n");
+
 			uint32_t		h_lit;
 			uint32_t		h_dist;
 			uint32_t		h_clen;
@@ -191,7 +220,7 @@ data_block decompress_all_blocks(data_block *bit_data)
 			h_dist = bits_RtL_next(bit_data, 5) + 1;
 			h_clen = bits_RtL_next(bit_data, 4) + 4;
 
-			printf("Decode Trees\n");
+			printf("Decode Trees ...\n");
 			uint8_t			*HuffCode_BitLen_trees;
 			HuffCode_BitLen_trees = decompress_bit_lens(bit_data, h_clen, h_lit, h_dist);
 
@@ -199,13 +228,17 @@ data_block decompress_all_blocks(data_block *bit_data)
 			huff_code_tree	distance;
 			literal = build_HuffCode(&HuffCode_BitLen_trees[0], h_lit);
 			distance = build_HuffCode(&HuffCode_BitLen_trees[h_lit], h_dist);
+			printf("Decode Trees done\n");
 
-			printf("Decode Block\n");
+			printf("Decode Block ...\n");
 			decompress_block(bit_data, &decompressed, literal, distance);
+			printf("Decode Block done\n");
 
 			mem_free(HuffCode_BitLen_trees);
 			mem_free(literal.codes);
 			mem_free(distance.codes);
+
+			printf("Dynamic Huffman done\n");
 		}
 		else
 		{

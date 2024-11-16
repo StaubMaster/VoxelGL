@@ -2,7 +2,8 @@
 #NAME = decompressor
 NAME = png.a
 
-FILE_C = png.c mem.c read.c bits.c chunk.c HuffCodeTree.c block.c filter.c sixel.c
+FILE_C = _png.c _mem.c _read.c _bits.c _chunk.c _HuffCodeTree.c _block.c _filter.c _sixel.c
+
 FILE_O = $(FILE_C:.c=.o)
 
 Flags = -Wall -Wextra -Werror

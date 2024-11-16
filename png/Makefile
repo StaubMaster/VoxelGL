@@ -1,27 +1,26 @@
 
-Name = decompressor
+#NAME = decompressor
+NAME = png.a
 
-File_C = png.c mem.c read.c bits.c chunk.c HuffCodeTree.c block.c filter.c sixel.c
-File_O = $(File_C:.c=.o)
+FILE_C = png.c mem.c read.c bits.c chunk.c HuffCodeTree.c block.c filter.c sixel.c
+FILE_O = $(FILE_C:.c=.o)
 
-#Flags = -Wall -Wextra -Werror
-
-$(Name) : $(File_O)
-	cc $(Flags) $(File_O) -o $(Name)
+Flags = -Wall -Wextra -Werror
 
 all:
-	$(MAKE) $(File_O)
-	$(MAKE) $(Name)
+	$(MAKE) $(FILE_O)
+	ar -rcs $(NAME) $(FILE_O)
+#	cc -o test main.c $(NAME)
 
-%.o: %.cpp
-	cc $(Flags) -c $^ -o $@
+%.o: %.c
+	c++ $(Flags) -c $^ -o $@
 
 clean:
-	rm -f $(File_O)
+	rm -f $(FILE_O)
 
 fclean:
-	rm -f $(File_O)
-	rm -f $(Name)
+	rm -f $(FILE_O)
+	rm -f $(NAME)
 
 re:	fclean all
 

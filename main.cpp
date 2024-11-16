@@ -16,8 +16,104 @@
 #include "VoxelChunk.hpp"
 #include "VoxelSpace.hpp"
 #include "Box.hpp"
+#include "png/png.h"
+
+
 
 int main(int argc, char **argv)
+{
+	if (argc != 2)
+	{
+		return 1;
+	}
+
+	image img = load_png(argv[1]);
+
+	Window * win = new Window(img.w, img.h, argv[1], false);
+	std::cout << "window done\n";
+
+	Shader texShader(
+		"shaders/Tex.vert",
+		"shaders/Tex.frag"
+	);
+
+	std::cout << "texture loading ...\n";
+	unsigned int Texture0;
+	glGenTextures(1, &Texture0);
+	glBindTexture(GL_TEXTURE_2D, Texture0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.w, img.h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img.data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	std::cout << "texture done\n";
+
+	unsigned int Buffer_Array;
+	unsigned int Buffer_Vertex;
+
+	glGenVertexArrays(1, &Buffer_Array);
+	glGenBuffers(1, &Buffer_Vertex);
+
+	{
+		float vertex_data[16] = {
+			-1.0f, -1.0f, 0.0f, 1.0f,
+			-1.0f, +1.0f, 0.0f, 0.0f,
+			+1.0f, -1.0f, 1.0f, 1.0f,
+			+1.0f, +1.0f, 1.0f, 0.0f,
+		};
+
+		glBindVertexArray(Buffer_Array);
+		glBindBuffer(GL_ARRAY_BUFFER, Buffer_Vertex);
+
+		glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), vertex_data, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void *)(0 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+	}
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW);
+
+	std::cout << "loop\n\n\n\n\n\n\n";
+	while (!glfwWindowShouldClose(win -> win))
+	{
+		win -> Update();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.5f, 0.5f, 0.5f, 1);
+
+		texShader.Use();
+		glBindVertexArray(Buffer_Array);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE0, Texture0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+		glfwSwapBuffers(win -> win);
+		glfwPollEvents();
+	}
+
+	glDeleteTextures(1, &Texture0);
+
+	glBindVertexArray(Buffer_Array);
+	glDeleteBuffers(1, &Buffer_Vertex);
+	glDeleteVertexArrays(1, &Buffer_Array);
+
+	delete win;
+	free(img.data);
+
+	return 0;
+}
+
+/*int main(int argc, char **argv)
 {
 	Window * win = new Window(1000, 1000, "Voxel", false);
 	std::cout << "window done\n";
@@ -153,4 +249,4 @@ int main(int argc, char **argv)
 	return (0);
 	(void)argc;
 	(void)argv;
-}
+}*/

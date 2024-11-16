@@ -32,7 +32,7 @@ static void	set_color(char col, unsigned char r, unsigned char g, unsigned char 
 	len_sum += len[3];
 
 	char	*str;
-	str = calloc(len_sum, sizeof(char));
+	str = (char *)calloc(len_sum, sizeof(char));
 	int	idx;
 
 	idx = -1;
@@ -67,21 +67,21 @@ void	sixel_draw(uint8_t *data, uint32_t w, uint32_t h)
 {
 	write(1, "\ePq", 3);
 
-	int		sixl_idx;
+	//int		sixl_idx;
 	char	sixl_sft;
 	char	sixl;
 	int		idx;
 
-	int	x, y;
+	uint32_t	x, y;
 	y = 0;
 	while (y < h)
 	{
-		sixl_idx = y / 6;
+		//sixl_idx = y / 6;
 		sixl_sft = y % 6;
 		x = 0;
 		while (x < w)
 		{
-			idx = (x + y * w) * 3;
+			idx = (x + y * w) * 4;
 			set_color(0, data[idx + 0], data[idx + 1], data[idx + 2]);
 			sixl = 1 << sixl_sft;
 			sixl += 63;
@@ -102,16 +102,16 @@ void	sixel_draw_r(uint8_t *data, uint32_t w, uint32_t h)
 {
 	write(1, "\ePq", 3);
 
-	int		sixl_idx;
+	//int		sixl_idx;
 	char	sixl_sft;
 	char	sixl;
 	int		idx;
 
-	int	x, y;
+	uint32_t	x, y;
 	y = 0;
 	while (y < h)
 	{
-		sixl_idx = y / 6;
+		//sixl_idx = y / 6;
 		sixl_sft = y % 6;
 		x = 0;
 		while (x < w)
@@ -137,16 +137,16 @@ void	sixel_draw_g(uint8_t *data, uint32_t w, uint32_t h)
 {
 	write(1, "\ePq", 3);
 
-	int		sixl_idx;
+	//int		sixl_idx;
 	char	sixl_sft;
 	char	sixl;
 	int		idx;
 
-	int	x, y;
+	uint32_t	x, y;
 	y = 0;
 	while (y < h)
 	{
-		sixl_idx = y / 6;
+		//sixl_idx = y / 6;
 		sixl_sft = y % 6;
 		x = 0;
 		while (x < w)
@@ -172,16 +172,16 @@ void	sixel_draw_b(uint8_t *data, uint32_t w, uint32_t h)
 {
 	write(1, "\ePq", 3);
 
-	int		sixl_idx;
+	//int		sixl_idx;
 	char	sixl_sft;
 	char	sixl;
 	int		idx;
 
-	int	x, y;
+	uint32_t	x, y;
 	y = 0;
 	while (y < h)
 	{
-		sixl_idx = y / 6;
+		//sixl_idx = y / 6;
 		sixl_sft = y % 6;
 		x = 0;
 		while (x < w)

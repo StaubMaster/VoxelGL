@@ -24,7 +24,7 @@ typedef struct s_chunk
 
 typedef struct s_image_header
 {
-	chunk			chunk;
+	chunk		chunk;
 	uint32_t	width;
 	uint32_t	hight;
 
@@ -97,6 +97,7 @@ uint32_t		decode_HuffCode(data_block *bits, huff_code_tree tree);
 //	block.c
 data_block decompress_all_blocks(data_block *bit_data);
 
+//	filter.c
 //void	filter_None(uint8_t	 byte, uint32_t x, uint32_t y, image *img);
 //void	filter_Sub(uint8_t	 byte, uint32_t x, uint32_t y, image *img);
 //void	filter_Up(uint8_t	 byte, uint32_t x, uint32_t y, image *img);
@@ -109,5 +110,7 @@ void	sixel_draw(uint8_t *data, uint32_t w, uint32_t h);
 void	sixel_draw_r(uint8_t *data, uint32_t w, uint32_t h);
 void	sixel_draw_g(uint8_t *data, uint32_t w, uint32_t h);
 void	sixel_draw_b(uint8_t *data, uint32_t w, uint32_t h);
+
+image	load_png(const char * name);
 
 #endif

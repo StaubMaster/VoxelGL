@@ -61,9 +61,9 @@ huff_code_tree build_HuffCode(uint8_t *code_bit_len, uint32_t len)
 	//}
 	//printf("\n");
 
-	uint32_t *code_count = mem_init((max_bit_len + 1), sizeof(uint32_t));
-	uint32_t *first_codes = mem_init((max_bit_len + 1), sizeof(uint32_t));
-	tree.codes = mem_init((len), sizeof(uint32_t));
+	uint32_t *code_count = (uint32_t *)mem_init((max_bit_len + 1), sizeof(uint32_t));
+	uint32_t *first_codes = (uint32_t *)mem_init((max_bit_len + 1), sizeof(uint32_t));
+	tree.codes = (uint32_t *)mem_init((len), sizeof(uint32_t));
 
 	get_bit_len_count(code_count, code_bit_len, len);
 	code_count[0] = 0;

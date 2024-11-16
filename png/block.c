@@ -105,7 +105,7 @@ uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_l
 {
 	uint8_t code_len_code_len_order[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 	uint8_t code_len_code_len[19] = {};
-	for (int j = 0; j < h_clen; j++)
+	for (uint32_t j = 0; j < h_clen; j++)
 	{
 		code_len_code_len[code_len_code_len_order[j]] = bits_RtL_next(bit_data, 3);
 	}
@@ -114,7 +114,7 @@ uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_l
 	huff_code_tree	trees;
 	uint8_t			*HuffCode_BitLen_trees;
 	trees = build_HuffCode(code_len_code_len, 19);
-	HuffCode_BitLen_trees = mem_init(h_lit + h_dist, sizeof(uint8_t));
+	HuffCode_BitLen_trees = (uint8_t *)mem_init(h_lit + h_dist, sizeof(uint8_t));
 	//printf("\n");
 
 	//	decode	trees
@@ -160,7 +160,7 @@ data_block decompress_all_blocks(data_block *bit_data)
 {
 	data_block	decompressed;
 	decompressed.index = 0;
-	decompressed.data = malloc(0xFFFFFFFF);
+	decompressed.data = (uint8_t *)malloc(0xFFFFFFFF);
 	if (decompressed.data == NULL)
 	{
 		printf("no buffer\n");

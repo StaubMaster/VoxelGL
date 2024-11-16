@@ -26,7 +26,7 @@ chunk chunk_read(int fd)
 	chunk ch;
 	ch.length = read_4(fd);
 	ch.type = read_4(fd);
-	ch.data = malloc(ch.length);
+	ch.data = (uint8_t *)malloc(ch.length);
 	int ret = read(fd, ch.data, ch.length);
 	if (ret <= 0 && ch.length != 0)
 	{

@@ -4,20 +4,18 @@
 # define O_BINARY 0
 #endif
 
-int main(int argc, char **argv)
+image	load_png(const char * name)
 {
-	/*if (argc != 2)
-	{
-		printf("required single file argument\n");
-		return (1);
-	}*/
+	image img;
+	img.w = 0;
+	img.h = 0;
+	img.data = NULL;
 
-	//int fd = open(argv[1], O_RDONLY);
-	int fd = open("images/cat.png", O_RDONLY | O_BINARY);
+	int fd = open(name, O_RDONLY | O_BINARY);
 	if (fd == -1)
 	{
 		printf("strerror: %s\n", strerror(errno));
-		return (1);
+		return (img);
 	}
 	printf("fd: %i\n", fd);
 
@@ -74,14 +72,12 @@ int main(int argc, char **argv)
 		}
 	}
 
-	image img;
-
 	printf("\n");
 	{
 		image_header_data(&ihdr);
 		img.w = ihdr.width;
 		img.h = ihdr.hight;
-		img.data = malloc(img.w * img.h * 3);
+		img.data = (uint8_t *)malloc(img.w * img.h * 4);
 	}
 	printf("\n");
 	{
@@ -100,8 +96,6 @@ int main(int argc, char **argv)
 		data_block decompressed;
 		decompressed = decompress_all_blocks(&bit_data);
 
-		printf("unfiltered image:\n");
-		sixel_draw(decompressed.data, img.w, img.h);
 		filter(decompressed, &img);
 		free(decompressed.data);
 	}
@@ -111,10 +105,23 @@ int main(int argc, char **argv)
 		free(chunk_all[i].data);
 	close(fd);
 
-	printf("image:\n");
-	sixel_draw(img.data, img.w, img.h);
-	free(img.data);
-	printf("\n");
+	/*printf("\n");
+	for (uint32_t y = 0; y < img.h; y += 4)
+	{
+		for (uint32_t x = 0; x < img.w; x += 4)
+		{
+			uint8_t r = 0, g = 0, b = 0;
+			r = img.data[((x + y * img.w) * 4) + 0];
+			g = img.data[((x + y * img.w) * 4) + 1];
+			b = img.data[((x + y * img.w) * 4) + 2];
 
-	return (0);
+			printf("\e[38;2;%i;%i;%im##\e[m", r, g, b);
+			//printf("\e[38;2;%i;%i;%im██\e[m", r, g, b);
+			//printf("##");
+		}
+		printf("\n");
+	}
+	printf("\n");*/
+
+	return (img);
 }

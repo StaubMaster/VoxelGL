@@ -40,7 +40,6 @@ void	mem_copy(void *ptr_src, void *ptr_dst, uint32_t len)
 void	*mem_init(uint32_t num, uint32_t siz)
 {
 	void *p;
-	uint8_t *c;
 	if (num == 0 || siz == 0)
 		return (NULL);
 	p = malloc(num * siz);

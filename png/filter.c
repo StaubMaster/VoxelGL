@@ -3,7 +3,7 @@
 
 static uint32_t	pixel_Idx(uint32_t col, uint32_t x, uint32_t y, image *img)
 {
-	return (col + (x + (y * (img -> w))) * 3);
+	return (col + (x + ((img -> w) * y)) * 4);
 }
 static uint8_t	pixel_X(uint32_t col, uint32_t x, uint32_t y, image *img)
 {
@@ -78,12 +78,11 @@ void	filter(data_block decompressed, image *img)
 	uint8_t byte;
 	void (*filter)(uint8_t, uint32_t, uint32_t, uint32_t, image *);
 
-	uint32_t	stride = (img -> w) * 3;
-	uint8_t	*row;
-	uint8_t	*working;
-	row = decompressed.data;
-
-	uint32_t	x_len = (img -> w) * 3;
+//	uint32_t	stride = (img -> w) * 3;
+//	uint8_t	*row;
+//	uint8_t	*working;
+//	row = decompressed.data;
+//	uint32_t	x_len = (img -> w) * 3;
 
 	i = 0;
 	y = 0;
@@ -110,12 +109,16 @@ void	filter(data_block decompressed, image *img)
 			byte = decompressed.data[i];
 			filter(byte, 0, x, y, img);
 			i++;
+
 			byte = decompressed.data[i];
 			filter(byte, 1, x, y, img);
 			i++;
+
 			byte = decompressed.data[i];
 			filter(byte, 2, x, y, img);
 			i++;
+
+			img -> data[pixel_Idx(3, x, y, img)] = 0xFF;
 			x++;
 		}
 		y++;

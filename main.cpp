@@ -17,6 +17,7 @@
 #include "VoxelSpace.hpp"
 #include "Box.hpp"
 #include "png/_png.h"
+#include "png/PNG.hpp"
 
 
 
@@ -26,6 +27,9 @@ int main(int argc, char **argv)
 	{
 		return 1;
 	}
+
+	load_png_better(argv[1]);
+	return 0;
 
 	image img = load_png(argv[1]);
 

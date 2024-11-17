@@ -36,7 +36,7 @@ uint32_t dist_base[] = {
     /*11*/ 4097, 6145,   //24-25
     /*12*/ 8193, 12289,  //26-27
     /*13*/ 16385, 24577, //28-29
-             0   , 0      //30-31, error, shouldn't occur
+           0    , 0      //30-31, error, shouldn't occur
 };
 
 uint32_t dist_base_extra_bits[] = {

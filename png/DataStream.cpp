@@ -20,3 +20,12 @@ void	DataStream::Insert(uint8 data)
 	Data[Index] = data;
 	Index++;
 }
+uint8	DataStream::Exsert()
+{
+	if (Index >= Len)
+		std::cout << "\e[31mDataStream Limit\e[m\n";
+
+	uint8 data = Data[Index];
+	Index++;
+	return (data);
+}

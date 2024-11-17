@@ -158,9 +158,9 @@ void	DEFLATE::decode_Huffman(BitStream & bits, HuffmanTree & literal, HuffmanTre
 
 void	DEFLATE::Block_direct(BitStream & bits, DataStream & data)
 {
-	std::cout << "\e[32mdirect Huffman ...\e[m\n";
+	std::cout << "\e[32mdirect Data ...\e[m\n";
 
-	std::cout << "\e[32mdirect Huffman done\e[m\n";
+	std::cout << "\e[32mdirect Data done\e[m\n";
 	(void)bits;
 	(void)data;
 }
@@ -202,24 +202,11 @@ void	DEFLATE::Blocks(BitStream & bits, DataStream & data)
 
 	do
 	{
+		std::cout << "BitStream.Index " << bits.Index << "\n";
 		BFINAL = bits.bits(1);
 		BTYPE = bits.bits(2);
-
-		{
-			std::cout << "BFINAL : " << uint_Bit(BFINAL, 0) << "\n";
-			std::cout << "BTYPE  : " << uint_Bit(BTYPE, 1) << "\n";
-
-			/*std::cout << "Block: ";
-			if (BFINAL)
-				std::cout << "Final: ";
-			if (BTYPE == 0b00)
-				std::cout << "direct Data";
-			else if (BTYPE == 0b01)
-				std::cout << "static Huffman";
-			else if (BTYPE == 0b10)
-				std::cout << "dynamic Huffman";
-			std::cout << "\n";*/
-		}
+		std::cout << "BFINAL : " << uint_Bit(BFINAL, 0) << "\n";
+		std::cout << "BTYPE  : " << uint_Bit(BTYPE, 1) << "\n";
 
 		if (BTYPE == 0b00)
 		{

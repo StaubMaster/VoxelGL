@@ -59,7 +59,7 @@ void	load_IDAT(BitStream & bits, DataStream & data)
 }
 
 
-PNG_Image	load_png_better(const std::string & file_path)
+PNG_Image *	load_png_better(const std::string & file_path)
 {
 	std::cout << "loading '" << file_path << "' ...\n";
 	const std::string file_str = read_whole_file(file_path);
@@ -88,8 +88,8 @@ PNG_Image	load_png_better(const std::string & file_path)
 	std::cout << "\n";
 
 
-	DataStream * data = NULL;
 	IHDR ihdr;
+	DataStream * data = NULL;
 
 	while (1)
 	{
@@ -102,7 +102,8 @@ PNG_Image	load_png_better(const std::string & file_path)
 		if (chunk.isIHRD())
 		{
 			ihdr = load_IHDR(chunk_stream);
-			data = new DataStream(ihdr.width * (ihdr.height + 1) * 3);
+			//data = new DataStream(ihdr.width * (ihdr.height + 1) * 4);
+			data = new DataStream(0xFFFFFFFF);
 		}
 		if (chunk.isIDAT())
 			load_IDAT(chunk_stream, *data);
@@ -110,12 +111,11 @@ PNG_Image	load_png_better(const std::string & file_path)
 			break;
 	}
 
-	PNG_Image img;
-	img.w = ihdr.width;
-	img.h = ihdr.height;
-	img.data = new uint8[data -> Index];
-	for (uint32 i = 0; i < data -> Index; i++)
-		img.data[i] = data -> Data[i];
+	PNG_Image * img = new PNG_Image();
+	img -> w = ihdr.width;
+	img -> h = ihdr.height;
+	img -> data = new uint8[img -> w * img -> h * 4];
+	PNG_Filter::filter(*data, *img);
 
 	delete data;
 

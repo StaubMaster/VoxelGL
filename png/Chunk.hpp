@@ -6,7 +6,8 @@
 
 class Chunk
 {
-	static uint8	knownTypeIndex(uint32 type);
+	private:
+		static uint8	knownTypeIndex(uint32 type);
 
 	public:
 		const uint32	Length;
@@ -18,6 +19,9 @@ class Chunk
 
 		Chunk(BitStream & bits);
 
+	private:
+		uint32		calc_CRC() const;
+	public:
 		BitStream	ToBitStream() const;
 
 		std::string	ToString() const;

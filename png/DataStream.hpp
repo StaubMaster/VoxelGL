@@ -14,8 +14,8 @@ class DataStream
 		DataStream(uint32 len);
 		~DataStream();
 
-		uint32	getIndex() const;
 		void	Insert(uint8 data);
+		uint8	Exsert();
 };
 
 #endif

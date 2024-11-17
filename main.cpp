@@ -28,13 +28,14 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	load_png_better(argv[1]);
-	return 0;
+	//image img2 = load_png(argv[1]);
+	//free(img2.data);
+	//return 0;
 
-	image img = load_png(argv[1]);
-	free(img.data);
+	PNG_Image * img = load_png_better(argv[1]);
 
-	Window * win = new Window(img.w, img.h, argv[1], false);
+
+	Window * win = new Window(img -> w, img -> h, argv[1], false);
 	std::cout << "window done\n";
 
 	Shader texShader(
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.w, img.h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img.data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	std::cout << "texture done\n";
@@ -113,7 +114,8 @@ int main(int argc, char **argv)
 	glDeleteVertexArrays(1, &Buffer_Array);
 
 	delete win;
-	free(img.data);
+	//free(img.data);
+	delete img;
 
 	return 0;
 }

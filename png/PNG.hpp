@@ -11,6 +11,8 @@
 # include "Huffman.hpp"
 # include "DEFLATE.hpp"
 # include "DataStream.hpp"
+# include "PNG_Filter.hpp"
+# include "PNG_Image.hpp"
 
 struct IHDR
 {
@@ -25,13 +27,6 @@ struct IHDR
 	uint8	interlace_method;
 };
 
-struct PNG_Image
-{
-	uint32	w;
-	uint32	h;
-	uint8	*data;
-};
-
-PNG_Image	load_png_better(const std::string & file_path);
+PNG_Image	* load_png_better(const std::string & file_path);
 
 #endif

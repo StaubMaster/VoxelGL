@@ -10,7 +10,9 @@ FILE_CPP = load.cpp \
 	ZLIB.cpp \
 	Huffman.cpp \
 	DEFLATE.cpp \
-	DataStream.cpp
+	DataStream.cpp \
+	PNG_Filter.cpp \
+	PNG_Image.cpp
 FILE_O = $(FILE_C:.c=.o)
 FILE_O += $(FILE_CPP:.cpp=.o)
 

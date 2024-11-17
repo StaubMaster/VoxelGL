@@ -9,6 +9,8 @@
 # include "Chunk.hpp"
 # include "ZLIB.hpp"
 # include "Huffman.hpp"
+# include "DEFLATE.hpp"
+# include "DataStream.hpp"
 
 struct IHDR
 {
@@ -23,8 +25,13 @@ struct IHDR
 	uint8	interlace_method;
 };
 
-IHDR	load_IHDR(BitStream & bits);
+struct PNG_Image
+{
+	uint32	w;
+	uint32	h;
+	uint8	*data;
+};
 
-void	load_png_better(const std::string & file_path);
+PNG_Image	load_png_better(const std::string & file_path);
 
 #endif

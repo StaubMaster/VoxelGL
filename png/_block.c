@@ -59,12 +59,19 @@ uint32_t dist_base_extra_bits[] = {
 
 void	decompress_block(data_block *bit_data, data_block *decompressed, huff_code_tree literal, huff_code_tree distance)
 {
+	static uint32_t block_idx = 0;
+
 	// zlib deflate
 	while (1)
 	{
 		uint32_t	decode_value;
 		decode_value = decode_HuffCode(bit_data, literal);
-		//printf("decode T val %10u : %u\n", block_idx, decode_value);
+
+		if (block_idx < 16)
+		{
+			//printf("decode %u\n", decode_value);
+			block_idx++;
+		}
 
 		if (decode_value == 256)
 		{
@@ -106,9 +113,9 @@ uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_l
 	uint8_t code_len_code_len_order[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 	uint8_t code_len_code_len[19] = {};
 	for (uint32_t j = 0; j < h_clen; j++)
-	{
 		code_len_code_len[code_len_code_len_order[j]] = bits_RtL_next(bit_data, 3);
-	}
+	//for (uint32_t j = 0; j < h_clen; j++)
+	//	printf("tree_code [%2u] %u\n", j, code_len_code_len[j]);
 
 	//printf("  Tree trees\n");
 	huff_code_tree	trees;
@@ -117,6 +124,8 @@ uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_l
 	HuffCode_BitLen_trees = (uint8_t *)mem_init(h_lit + h_dist, sizeof(uint8_t));
 	//printf("\n");
 
+	static uint32_t block_idx = 16;
+	
 	//	decode	trees
 	uint32_t	code_idx = 0;
 	while (code_idx < (h_dist + h_lit))
@@ -124,6 +133,11 @@ uint8_t *decompress_bit_lens(data_block *bit_data, uint32_t h_clen, uint32_t h_l
 		uint32_t	decode_value;
 		decode_value = decode_HuffCode(bit_data, trees);
 		//printf("decode TT val %3i : %u\n", code_idx, decode_value);
+		if (block_idx < 16)
+		{
+			//printf("decode T val %u\n", decode_value);
+			block_idx++;
+		}
 
 		if (decode_value < 16)
 		{
@@ -168,6 +182,17 @@ data_block decompress_all_blocks(data_block *bit_data)
 		return (decompressed);
 	}
 
+	char bit_str[33];
+//	uint8_t	*ptr = bit_data -> data + ((bit_data -> index) >> 3);
+//	printf("[0]%02X(%s)\n", ptr[0], bits_str(ptr[0], bit_str, 7));
+//	printf("[1]%02X(%s)\n", ptr[1], bits_str(ptr[1], bit_str, 7));
+//	printf("[2]%02X(%s)\n", ptr[2], bits_str(ptr[2], bit_str, 7));
+//	printf("[3]%02X(%s)\n", ptr[3], bits_str(ptr[3], bit_str, 7));
+//	printf("[4]%02X(%s)\n", ptr[4], bits_str(ptr[4], bit_str, 7));
+//	printf("[5]%02X(%s)\n", ptr[5], bits_str(ptr[5], bit_str, 7));
+//	printf("[6]%02X(%s)\n", ptr[6], bits_str(ptr[6], bit_str, 7));
+//	printf("[7]%02X(%s)\n", ptr[7], bits_str(ptr[7], bit_str, 7));
+
 	uint8_t	b_final = 0;
 	uint8_t	b_type;
 
@@ -195,7 +220,6 @@ data_block decompress_all_blocks(data_block *bit_data)
 			uint16_t len, nlen;
 			len = bits_RtL_next(bit_data, 16);
 			nlen = bits_RtL_next(bit_data, 16);
-			char bit_str[17];
 			printf(" len: %i\n", len);
 			printf(" len: 0x%04X 0b%s\n", len, bits_str(len, bit_str, 16));
 			printf("nlen: 0x%04X 0b%s\n", nlen, bits_str(nlen, bit_str, 16));
@@ -216,9 +240,15 @@ data_block decompress_all_blocks(data_block *bit_data)
 			uint32_t		h_lit;
 			uint32_t		h_dist;
 			uint32_t		h_clen;
-			h_lit = bits_RtL_next(bit_data, 5) + 257;
-			h_dist = bits_RtL_next(bit_data, 5) + 1;
-			h_clen = bits_RtL_next(bit_data, 4) + 4;
+			h_lit = bits_RtL_next(bit_data, 5);
+			h_dist = bits_RtL_next(bit_data, 5);
+			h_clen = bits_RtL_next(bit_data, 4);
+			printf("lit  : %u (%s)\n", h_lit, bits_str(h_lit, bit_str, 5));
+			printf("dist : %u (%s)\n", h_dist, bits_str(h_dist, bit_str, 5));
+			printf("clen : %u (%s)\n", h_clen, bits_str(h_dist, bit_str, 4));
+			h_lit += 257;
+			h_dist += 1;
+			h_clen += 4;
 
 			printf("Decode Trees ...\n");
 			uint8_t			*HuffCode_BitLen_trees;
@@ -229,6 +259,14 @@ data_block decompress_all_blocks(data_block *bit_data)
 			literal = build_HuffCode(&HuffCode_BitLen_trees[0], h_lit);
 			distance = build_HuffCode(&HuffCode_BitLen_trees[h_lit], h_dist);
 			printf("Decode Trees done\n");
+
+			//printf("\n");
+			//for (uint32_t i = 0; i < 24; i++)
+			//	printf("\e[34m%02X\e[m\n", HuffCode_BitLen_trees[i]);
+			//printf("\n");
+			//for (uint32_t i = 0; i < 24; i++)
+			//	printf("\e[34m%02X\e[m\n", literal.codes[i]);
+			//printf("\n");
 
 			printf("Decode Block ...\n");
 			decompress_block(bit_data, &decompressed, literal, distance);

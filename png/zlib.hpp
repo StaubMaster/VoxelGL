@@ -4,18 +4,21 @@
 # include "uint.hpp"
 # include "BitStream.hpp"
 
-class zlib
+class ZLIB
 {
 	public:
-		const uint8	CMF;
-		const uint8	FLG;
+		uint8	CMF;
+		uint8	FLG;
 
 		const uint8	*Data;
+		uint32		Length;
 
-		const uint32	DICTID;
-		const uint32	ADLER32;
+		uint32	DICTID;
+		uint32	ADLER32;
 
-		zlib(BitStream & bits);
+		ZLIB(BitStream & bits);
+
+		BitStream	ToBitStream() const;
 
 		std::string	ToString() const;
 };

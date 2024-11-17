@@ -23,22 +23,72 @@ uint32	BitStream::get_BitIndex() const
 {
 	return (Index & 0b111);
 }
-void	BitStream::set_BitIndex(uint32 idx)
+/*void	BitStream::set_BitIndex(uint32 idx)
 {
 	Index = ((Index | 0b111) ^ 0b111) | (idx & 0b111);
-}
+}*/
 uint32	BitStream::get_ByteIndex() const
 {
 	return (Index >> 3);
 }
-void	BitStream::set_ByteIndex(uint32 idx)
+/*void	BitStream::set_ByteIndex(uint32 idx)
 {
 	Index = (Index & 0b111) | (idx << 3);
-}
+}*/
 void	BitStream::set_Index(uint32 bits, uint32 bytes)
 {
 	Index = (bytes << 3) | (bits & 0b111);
 }
+
+
+
+uint32	BitStream::bits(uint32 num, uint8 extra, uint32 skipBytes, uint32 skipBits)
+{
+	if (num == 0)
+		return (0);
+	num--;
+	num = num & 0b11111;
+
+	uint32	n = 0;
+	uint32	bit;
+
+	uint32	bitI;
+	uint32	byteI;
+	uint32	idx = Index;
+
+	uint32	j;
+	for (uint32 i = 0; i <= num; i++)
+	{
+		j = num - i;
+
+		bitI = get_BitIndex();
+		byteI = get_ByteIndex();
+
+		if (byteI > Len)
+			throw LenReachedException();
+
+		bit = (Data[byteI] >> bitI) & 1;
+
+		if (extra & BITSTREAM_REV)
+			n = n | (bit << j);
+		else
+			n = n | (bit << i);
+
+		Index++;
+	}
+
+	if ((extra & BITSTREAM_STAY))
+		Index = idx;
+
+	if ((Index >> 3) > Len)
+		throw LenReachedException();
+
+	return (n);
+	(void)j;
+	(void)skipBits;
+	(void)skipBytes;
+}
+
 
 
 /// @brief Gets the next 8 Byte-aligned Bits
@@ -140,5 +190,10 @@ void	BitStream::moveIndex(uint32 skip)
 	if (get_BitIndex() != 0)
 		idx++;
 	idx += skip;
+	if (idx > Len)
+		throw LenReachedException();
 	set_Index(0, idx);
 }
+
+
+const char * BitStream::LenReachedException::what() const throw() { return "BitStream Length reached"; }

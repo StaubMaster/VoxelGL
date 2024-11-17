@@ -7,6 +7,8 @@
 # include "uint.hpp"
 # include "BitStream.hpp"
 # include "Chunk.hpp"
+# include "ZLIB.hpp"
+# include "Huffman.hpp"
 
 struct IHDR
 {

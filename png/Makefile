@@ -6,9 +6,11 @@ FILE_C = _png.c _mem.c _read.c _bits.c _chunk.c _HuffCodeTree.c _block.c _filter
 FILE_CPP = load.cpp \
 	uint.cpp \
 	BitStream.cpp \
-	Chunk.cpp
-FILE_O = $(FILE_CPP:.cpp=.o)
-FILE_O += $(FILE_C:.c=.o)
+	Chunk.cpp \
+	ZLIB.cpp \
+	Huffman.cpp
+FILE_O = $(FILE_C:.c=.o)
+FILE_O += $(FILE_CPP:.cpp=.o)
 
 Flags = -Wall -Wextra -Werror
 

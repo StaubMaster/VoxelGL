@@ -28,10 +28,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	load_png_better(argv[1]);
-	return 0;
-
 	image img = load_png(argv[1]);
+	load_png_better(argv[1]);
+	free(img.data);
+	return 0;
 
 	Window * win = new Window(img.w, img.h, argv[1], false);
 	std::cout << "window done\n";

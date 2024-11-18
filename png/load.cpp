@@ -55,12 +55,16 @@ void	load_IDAT(BitStream & bits, DataStream & data)
 
 void	zlib_decompress(BitStream & bits, DataStream & data)
 {
+	std::cout << "\e[34mzlib ...\e[m\n";
+
 	ZLIB zlib(bits);
 	zlib.ToString();
 	std::cout << "\n";
 
 	BitStream deflate = zlib.ToBitStream();
 	DEFLATE::Blocks(deflate, data);
+
+	std::cout << "\e[34mzlib done\e[m\n";
 }
 
 PNG_Image *	load_png_better(const std::string & file_path)
@@ -83,6 +87,7 @@ PNG_Image *	load_png_better(const std::string & file_path)
 		if (signature_received != signature_template)
 		{
 			std::cout << "\e[31mSignature Wrong\e[m\n";
+			return (NULL);
 		}
 		else
 		{
@@ -95,24 +100,31 @@ PNG_Image *	load_png_better(const std::string & file_path)
 	IHDR ihdr;
 	DataStream chunk_data(0);
 
-	while (1)
+	try
 	{
-		std::cout << "\n";
-		Chunk chunk(file);
-		BitStream chunk_stream = chunk.ToBitStream();
-		std::cout << chunk.ToString();
-		std::cout << "\n";
-
-		if (chunk.isIHRD())
+		while (1)
 		{
-			ihdr = load_IHDR(chunk_stream);
+			std::cout << "\n";
+			Chunk chunk(file);
+			BitStream chunk_stream = chunk.ToBitStream();
+			std::cout << chunk.ToString();
+			std::cout << "\n";
+			if (chunk.isIHRD())
+			{
+				ihdr = load_IHDR(chunk_stream);
+			}
+			if (chunk.isIDAT())
+			{
+				load_IDAT(chunk_stream, chunk_data);
+			}
+			if (chunk.isIEND())
+				break;
 		}
-		if (chunk.isIDAT())
-		{
-			load_IDAT(chunk_stream, chunk_data);
-		}
-		if (chunk.isIEND())
-			break;
+	}
+	catch (std::exception & e)
+	{
+		std::cout << "Exception: " << e.what() << "\n";
+		return (NULL);
 	}
 
 	BitStream bits(chunk_data.Data, chunk_data.Len);

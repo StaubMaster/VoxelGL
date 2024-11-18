@@ -41,58 +41,56 @@ void	BitStream::set_Index(uint32 bits, uint32 bytes)
 }
 
 
+uint32	reverse(uint32 bits)
+{
+	bits = ((bits & 0xFFFF0000) >> 16) | ((bits & 0x0000FFFF) << 16);
+	bits = ((bits & 0xFF00FF00) >> 8) | ((bits & 0x00FF00FF) << 8);
+	bits = ((bits & 0xF0F0F0F0) >> 4) | ((bits & 0x0F0F0F0F) << 4);
+	bits = ((bits & 0xCCCCCCCC) >> 2) | ((bits & 0x33333333) << 2);
+	bits = ((bits & 0xAAAAAAAA) >> 1) | ((bits & 0x55555555) << 1);
+	return (bits);
+}
 
-uint32	BitStream::bits(uint32 num, uint8 extra, uint32 skipBytes, uint32 skipBits)
+uint32	BitStream::bits(uint32 num, uint8 extra)
 {
 	if (num == 0)
 		return (0);
-	num--;
-	num = num & 0b11111;
+	num = ((num - 1) & 0b11111) + 1;
+	uint32	mun = 32 - num;
 
-	uint32	n = 0;
-	uint32	bit;
+	uint32	bitI = get_BitIndex();
+	uint32	byteI = get_ByteIndex();
 
-	uint32	bitI;
-	uint32	byteI;
-	uint32	idx = Index;
-
-	uint32	j;
-	for (uint32 i = 0; i <= num; i++)
+	uint32 sum;
+	if (bitI == 0)
 	{
-		j = num - i;
-
-		bitI = get_BitIndex();
-		byteI = get_ByteIndex();
-
-		if (byteI > Len)
-		{
-			std::cout << "here 1\n";
-			throw LenReachedException();
-		}
-
-		bit = (Data[byteI] >> bitI) & 1;
-
-		if (extra & BITSTREAM_REV)
-			n = n | (bit << j);
-		else
-			n = n | (bit << i);
-
-		Index++;
+		sum =
+			(((uint32)Data[byteI + 0]) >> (bitI)) |
+			(((uint32)Data[byteI + 1]) << (8 - bitI)) |
+			(((uint32)Data[byteI + 2]) << (16 - bitI)) |
+			(((uint32)Data[byteI + 3]) << (24 - bitI));
+	}
+	else
+	{
+		sum =
+			(((uint32)Data[byteI + 0]) >> (bitI)) |
+			(((uint32)Data[byteI + 1]) << (8 - bitI)) |
+			(((uint32)Data[byteI + 2]) << (16 - bitI)) |
+			(((uint32)Data[byteI + 3]) << (24 - bitI)) |
+			(((uint32)Data[byteI + 4]) << (32 - bitI));
 	}
 
-	if ((extra & BITSTREAM_STAY))
-		Index = idx;
+	if ((extra & BITSTREAM_REV) != 0)
+		sum = (reverse(sum) >> mun);
+	sum = sum & (0xFFFFFFFF >> mun);
+
+	if ((extra & BITSTREAM_STAY) == 0)
+		Index += num;
 
 	if (get_ByteIndex() > Len)
-	{
-		std::cout << "here 2\n";
 		throw LenReachedException();
-	}
 
-	return (n);
-	(void)j;
-	(void)skipBits;
-	(void)skipBytes;
+	return (sum);
 }
 
 

@@ -25,7 +25,7 @@ class BitStream
 		void	set_Index(uint32 bits, uint32 bytes);
 
 	public:
-		uint32	bits(uint32 num, uint8 extra = 0, uint32 skipBytes = 0, uint32 skipBits = 0);
+		uint32	bits(uint32 num, uint8 extra = 0);
 
 		uint8	byte8( uint8 extra = 0, uint32 skipBytes = 0);
 		uint16	byte16(uint8 extra = 0, uint32 skipBytes = 0);

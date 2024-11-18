@@ -113,9 +113,9 @@ huff_code_tree build_HuffCode(uint8_t *code_bit_len, uint32_t len)
 
 uint32_t decode_HuffCode(data_block *bits, huff_code_tree tree)
 {
-	char bits1[33];
-	char bits2[33];
-	static uint32_t yes = 0;
+	//char bits1[33];
+	//char bits2[33];
+	//static uint32_t yes = 0;
 
 	uint32_t	i = 0;
 	while (i < tree.len)
@@ -125,13 +125,13 @@ uint32_t decode_HuffCode(data_block *bits, huff_code_tree tree)
 			uint32_t code;
 			code = bits_LtR_none(bits, tree.bit_lens[i]);
 
-			if (yes < 16)
+			/*if (yes < 16)
 			{
 				bits_str(code, bits1, tree.bit_lens[i]);
 				bits_str(tree.codes[i], bits2, tree.bit_lens[i]);
 				//printf("code [%2u] %8s =?= %8s\n", i, bits1, bits2);
 				yes++;
-			}
+			}*/
 
 			if (tree.codes[i] == code)
 			{

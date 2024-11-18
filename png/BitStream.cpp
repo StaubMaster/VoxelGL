@@ -65,7 +65,10 @@ uint32	BitStream::bits(uint32 num, uint8 extra, uint32 skipBytes, uint32 skipBit
 		byteI = get_ByteIndex();
 
 		if (byteI > Len)
+		{
+			std::cout << "here 1\n";
 			throw LenReachedException();
+		}
 
 		bit = (Data[byteI] >> bitI) & 1;
 
@@ -80,8 +83,11 @@ uint32	BitStream::bits(uint32 num, uint8 extra, uint32 skipBytes, uint32 skipBit
 	if ((extra & BITSTREAM_STAY))
 		Index = idx;
 
-	if ((Index >> 3) > Len)
+	if (get_ByteIndex() > Len)
+	{
+		std::cout << "here 2\n";
 		throw LenReachedException();
+	}
 
 	return (n);
 	(void)j;
@@ -187,6 +193,7 @@ const uint8 *	BitStream::DataAtIndex(uint32 skipBytes) const
 void	BitStream::moveIndex(uint32 skip)
 {
 	uint32	idx = get_ByteIndex();
+	std::cout << "\e[34mskip Byte\e[m\n";
 	if (get_BitIndex() != 0)
 		idx++;
 	idx += skip;

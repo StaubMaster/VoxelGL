@@ -106,57 +106,23 @@ HuffmanTree::~HuffmanTree()
 	delete [] Codes;
 }
 
+
+void	HuffmanTree::ToString() const
+{
+	for (uint32 i = 0; i < Len; i++)
+	{
+		std::cout << "[" << std::setw(3) << i << "] " << uint_Bit(Codes[i], BitLens[i]) << "\n";
+	}
+}
+
+
 uint32	HuffmanTree::decode(BitStream & bits)
 {
-	static uint32	yes = 0;
-
-/*
-code [ 0]    01111 =?=    00110
-code [ 3]   011110 =?=   011100
-code [ 4]    01111 =?=    00111
-code [ 5]   011110 =?=   011101
-code [ 6]   011110 =?=   011110
-code [ 0]    01101 =?=    00110
-code [ 3]   011010 =?=   011100
-code [ 4]    01101 =?=    00111
-code [ 5]   011010 =?=   011101
-code [ 6]   011010 =?=   011110
-code [ 7]    01101 =?=    01000
-code [ 8]    01101 =?=    01001
-code [ 9]    01101 =?=    01010
-code [10]    01101 =?=    01011
-code [11]    01101 =?=    01100
-code [12]     0110 =?=     0000
-
-[ 0]    01111 =!=    00110
-[ 3]   011110 =!=   011100
-[ 4]    01111 =!=    00111
-[ 5]   011110 =!=   011101
-[ 6]   011110 =!=   011110
-[ 0]    01101 =!=    00110
-[ 3]   011010 =!=   011100
-[ 4]    01101 =!=    00111
-[ 5]   011010 =!=   011101
-[ 6]   011010 =!=   011110
-[ 7]    01101 =!=    01000
-[ 8]    01101 =!=    01001
-[ 9]    01101 =!=    01010
-[10]    01101 =!=    01011
-[11]    01101 =!=    01100
-[12]     0110 =!=     0000
-*/
-
 	for (uint32 i = 0; i < Len; i++)
 	{
 		if (BitLens[i] != 0)
 		{
 			uint32 code = bits.bits(BitLens[i], BITSTREAM_STAY | BITSTREAM_REV);
-
-			if (yes < 16)
-			{
-				//std::cout << "[" << std::setw(2) << i << "] " << std::setw(8) << uint_Bit(code, BitLens[i]) << " =!= " << std::setw(8) << uint_Bit(Codes[i], BitLens[i]) << "\n";
-				yes++;
-			}
 
 			if (Codes[i] == code)
 			{

@@ -50,6 +50,11 @@ IHDR	load_IHDR(BitStream & bits)
 }
 void	load_IDAT(BitStream & bits, DataStream & data)
 {
+	data.Concatenation(bits.Data, bits.Len);
+}
+
+void	zlib_decompress(BitStream & bits, DataStream & data)
+{
 	ZLIB zlib(bits);
 	zlib.ToString();
 	std::cout << "\n";
@@ -57,7 +62,6 @@ void	load_IDAT(BitStream & bits, DataStream & data)
 	BitStream deflate = zlib.ToBitStream();
 	DEFLATE::Blocks(deflate, data);
 }
-
 
 PNG_Image *	load_png_better(const std::string & file_path)
 {
@@ -89,7 +93,7 @@ PNG_Image *	load_png_better(const std::string & file_path)
 
 
 	IHDR ihdr;
-	DataStream * data = NULL;
+	DataStream chunk_data(0);
 
 	while (1)
 	{
@@ -102,14 +106,19 @@ PNG_Image *	load_png_better(const std::string & file_path)
 		if (chunk.isIHRD())
 		{
 			ihdr = load_IHDR(chunk_stream);
-			//data = new DataStream(ihdr.width * (ihdr.height + 1) * 4);
-			data = new DataStream(0xFFFFFFFF);
 		}
 		if (chunk.isIDAT())
-			load_IDAT(chunk_stream, *data);
+		{
+			load_IDAT(chunk_stream, chunk_data);
+		}
 		if (chunk.isIEND())
 			break;
 	}
+
+	BitStream bits(chunk_data.Data, chunk_data.Len);
+
+	DataStream * data = new DataStream(0xFFFFFFFF);
+	zlib_decompress(bits, *data);
 
 	PNG_Image * img = new PNG_Image();
 	img -> w = ihdr.width;
@@ -118,6 +127,46 @@ PNG_Image *	load_png_better(const std::string & file_path)
 	PNG_Filter::filter(*data, *img);
 
 	delete data;
+
+
+	/*std::cout << "\n";
+	{
+		std::ofstream hexdump("hexdump");
+
+		uint32 idx = 0;
+		while (idx < file_str.size())
+		{
+			uint32	here = idx;
+			std::string hex = "";
+			std::string chr = "";
+			for (uint32 r = 0; r < 32; r++)
+			{
+				if (r == 8)
+					hex += " ";
+				else if (r == 16)
+					hex += "  ";
+				else if (r == 24)
+					hex += " ";
+				if (idx < file_str.size())
+				{
+					hex += " " + uint_Hex((uint8)file_str[idx]);
+					if (file_str[idx] >= 32 && file_str[idx] <= 126)
+						chr += file_str[idx];
+					else
+						chr += ".";
+					idx++;
+				}
+				else
+				{
+					hex += "  ";
+					chr += " ";
+				}
+			}
+			hexdump << std::setw(8) << here << " | " << hex << " | " << chr << "\n";
+		}
+		hexdump.close();
+	}
+	std::cout << "\n";*/
 
 	return (img);
 }

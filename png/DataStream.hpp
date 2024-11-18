@@ -14,6 +14,8 @@ class DataStream
 		DataStream(uint32 len);
 		~DataStream();
 
+		void	Concatenation(const uint8 * data, uint32 len);
+
 		void	Insert(uint8 data);
 		uint8	Exsert();
 };

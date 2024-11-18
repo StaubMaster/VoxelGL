@@ -1,6 +1,105 @@
 
 #include "DEFLATE.hpp"
 
+static uint32 len_base[] = {
+    3, 4, 5, 6, 7, 8, 9, 10, //257 - 264
+    11, 13, 15, 17,          //265 - 268
+    19, 23, 27, 31,          //269 - 273
+    35, 43, 51, 59,          //274 - 276
+    67, 83, 99, 115,         //278 - 280
+    131, 163, 195, 227,      //281 - 284
+    258                      //285
+};
+
+static uint32 len_base_extra_bits[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
+    1, 1, 1, 1, //265 - 268
+    2, 2, 2, 2, //269 - 273 
+    3, 3, 3, 3, //274 - 276
+    4, 4, 4, 4, //278 - 280
+    5, 5, 5, 5, //281 - 284
+    0           //285
+};
+
+static uint32 dist_base[] = {
+    /*0*/ 1, 2, 3, 4,    //0-3
+    /*1*/ 5, 7,          //4-5
+    /*2*/ 9, 13,         //6-7
+    /*3*/ 17, 25,        //8-9
+    /*4*/ 33, 49,        //10-11
+    /*5*/ 65, 97,        //12-13
+    /*6*/ 129, 193,      //14-15
+    /*7*/ 257, 385,      //16-17
+    /*8*/ 513, 769,      //18-19
+    /*9*/ 1025, 1537,    //20-21
+    /*10*/ 2049, 3073,   //22-23
+    /*11*/ 4097, 6145,   //24-25
+    /*12*/ 8193, 12289,  //26-27
+    /*13*/ 16385, 24577, //28-29
+           0    , 0      //30-31, error, shouldn't occur
+};
+
+static uint32 dist_base_extra_bits[] = {
+    /*0*/ 0, 0, 0, 0, //0-3
+    /*1*/ 1, 1,       //4-5
+    /*2*/ 2, 2,       //6-7
+    /*3*/ 3, 3,       //8-9
+    /*4*/ 4, 4,       //10-11
+    /*5*/ 5, 5,       //12-13
+    /*6*/ 6, 6,       //14-15
+    /*7*/ 7, 7,       //16-17
+    /*8*/ 8, 8,       //18-19
+    /*9*/ 9, 9,       //20-21
+    /*10*/ 10, 10,    //22-23
+    /*11*/ 11, 11,    //24-25
+    /*12*/ 12, 12,    //26-27
+    /*13*/ 13, 13,    //28-29
+            0 , 0     //30-31 error, they shouldn't occur
+};
+
+void	DEFLATE::decode_Huffman(BitStream & bits, HuffmanTree & literal, HuffmanTree & distance, DataStream & data)
+{
+	std::cout << "\e[34mHuffman decode ... \e[m\n";
+
+	while (1)
+	{
+		uint32	decode_value = literal.decode(bits);
+
+		if (decode_value == 256)
+		{
+			break;
+		}
+		else if (decode_value < 256)
+		{
+			data.Insert(decode_value);
+		}
+		else if (decode_value < 286)
+		{
+			uint32 len_idx = decode_value - 257;
+			uint32 len_len = len_base[len_idx] + bits.bits(len_base_extra_bits[len_idx]);
+
+			uint32 dist_idx = distance.decode(bits);
+			uint32 dist_len = dist_base[dist_idx] + bits.bits(dist_base_extra_bits[dist_idx]);
+
+			uint32	back_idx = data.Index - dist_len;
+			while (len_len != 0)
+			{
+				len_len--;
+				data.Insert(data.Data[back_idx]);
+				back_idx++;
+			}
+		}
+		else
+		{
+			std::cout << "\e[31mError: Invalid Huffman Decode\e[m\n";
+		}
+	}
+
+	std::cout << "\e[34mHuffman decode done \e[m\n";
+}
+
+
+
 uint8 *	DEFLATE::dynamic_Huffman(BitStream & bits, uint32 H_LIT, uint32 H_DIST, uint32 H_CLEN)
 {
 	uint8 codeLenCodeLenOrder[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
@@ -57,103 +156,6 @@ uint8 *	DEFLATE::dynamic_Huffman(BitStream & bits, uint32 H_LIT, uint32 H_DIST, 
 	return (Huffman_BitLen_Trees);
 }
 
-static uint32 len_base[] = {
-    3, 4, 5, 6, 7, 8, 9, 10, //257 - 264
-    11, 13, 15, 17,          //265 - 268
-    19, 23, 27, 31,          //269 - 273 
-    35, 43, 51, 59,          //274 - 276
-    67, 83, 99, 115,         //278 - 280
-    131, 163, 195, 227,      //281 - 284
-    258                      //285
-};
-
-static uint32 len_base_extra_bits[] = {
-    0, 0, 0, 0, 0, 0, 0, 0, //257 - 264
-    1, 1, 1, 1, //265 - 268
-    2, 2, 2, 2, //269 - 273 
-    3, 3, 3, 3, //274 - 276
-    4, 4, 4, 4, //278 - 280
-    5, 5, 5, 5, //281 - 284
-    0           //285
-};
-
-static uint32 dist_base[] = {
-    /*0*/ 1, 2, 3, 4,    //0-3
-    /*1*/ 5, 7,          //4-5
-    /*2*/ 9, 13,         //6-7
-    /*3*/ 17, 25,        //8-9
-    /*4*/ 33, 49,        //10-11
-    /*5*/ 65, 97,        //12-13
-    /*6*/ 129, 193,      //14-15
-    /*7*/ 257, 385,      //16-17
-    /*8*/ 513, 769,      //18-19
-    /*9*/ 1025, 1537,    //20-21
-    /*10*/ 2049, 3073,   //22-23
-    /*11*/ 4097, 6145,   //24-25
-    /*12*/ 8193, 12289,  //26-27
-    /*13*/ 16385, 24577, //28-29
-           0    , 0      //30-31, error, shouldn't occur
-};
-
-static uint32 dist_base_extra_bits[] = {
-    /*0*/ 0, 0, 0, 0, //0-3
-    /*1*/ 1, 1,       //4-5
-    /*2*/ 2, 2,       //6-7
-    /*3*/ 3, 3,       //8-9
-    /*4*/ 4, 4,       //10-11
-    /*5*/ 5, 5,       //12-13
-    /*6*/ 6, 6,       //14-15
-    /*7*/ 7, 7,       //16-17
-    /*8*/ 8, 8,       //18-19
-    /*9*/ 9, 9,       //20-21
-    /*10*/ 10, 10,    //22-23
-    /*11*/ 11, 11,    //24-25
-    /*12*/ 12, 12,    //26-27
-    /*13*/ 13, 13,     //28-29
-            0 , 0      //30-31 error, they shouldn't occur
-};
-
-void	DEFLATE::decode_Huffman(BitStream & bits, HuffmanTree & literal, HuffmanTree & distance, DataStream & data)
-{
-	std::cout << "\e[34mHuffman decode ... \e[m\n";
-
-	while (1)
-	{
-		uint32	decode_value = literal.decode(bits);
-
-		if (decode_value == 256)
-		{
-			break;
-		}
-		else if (decode_value < 256)
-		{
-			data.Insert(decode_value);
-		}
-		else if (decode_value < 286)
-		{
-			uint32 len_idx = decode_value - 257;
-			uint32 len_len = len_base[len_idx] + bits.bits(len_base_extra_bits[len_idx]);
-
-			uint32 dist_idx = distance.decode(bits);
-			uint32 dist_len = dist_base[dist_idx] + bits.bits(dist_base_extra_bits[dist_idx]);
-
-			uint32	back_idx = data.Index - dist_len;
-			while (len_len != 0)
-			{
-				len_len--;
-				data.Insert(data.Data[back_idx]);
-				back_idx++;
-			}
-		}
-		else
-		{
-			std::cout << "\e[31mError: Invalid Huffman Decode\e[m\n";
-		}
-	}
-
-	std::cout << "\e[34mHuffman decode done \e[m\n";
-}
-
 
 
 void	DEFLATE::Block_direct(BitStream & bits, DataStream & data)
@@ -183,12 +185,17 @@ void	DEFLATE::Block_dynamic(BitStream & bits, DataStream & data)
 	std::cout << "H_DIST : " << H_DIST << "\n";
 	std::cout << "H_CLEN : " << H_CLEN << "\n";
 
+	std::cout << "Deflate.Index Tree   : " << bits.get_ByteIndex() << "\n";
 	uint8 * bitLens = DEFLATE::dynamic_Huffman(bits, H_LIT, H_DIST, H_CLEN);
 
 	HuffmanTree	literal(&bitLens[0], H_LIT);
 	HuffmanTree	distance(&bitLens[H_LIT], H_DIST);
 
+	std::cout << "Deflate.Index decode : " << bits.get_ByteIndex() << "\n";
+	std::cout << "Data.Index    decode : " << data.Index << "\n";
 	DEFLATE::decode_Huffman(bits, literal, distance, data);
+	std::cout << "Deflate.Index decode : " << bits.get_ByteIndex() << "\n";
+	std::cout << "Data.Index    decode : " << data.Index << "\n";
 
 	delete [] bitLens;
 
@@ -202,7 +209,9 @@ void	DEFLATE::Blocks(BitStream & bits, DataStream & data)
 
 	do
 	{
-		std::cout << "BitStream.Index " << bits.Index << "\n";
+		std::cout << "Deflate.Len          : " << bits.Len << "\n";
+		std::cout << "Deflate.Index Block  : " << bits.get_ByteIndex() << "\n";
+
 		BFINAL = bits.bits(1);
 		BTYPE = bits.bits(2);
 		std::cout << "BFINAL : " << uint_Bit(BFINAL, 0) << "\n";
@@ -227,4 +236,7 @@ void	DEFLATE::Blocks(BitStream & bits, DataStream & data)
 		std::cout << "\n";
 	}
 	while (BFINAL == 0);
+
+	std::cout << "Deflate.Index " << bits.get_ByteIndex() << "\n";
+	std::cout << "Deflate.Len   " << bits.Len << "\n";
 }

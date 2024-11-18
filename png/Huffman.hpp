@@ -21,6 +21,8 @@ class HuffmanTree
 		HuffmanTree(uint8 * codeBitLen, uint32 len);
 		~HuffmanTree();
 
+		void	ToString() const;
+
 		uint32	decode(BitStream & bits);
 };
 

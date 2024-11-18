@@ -94,20 +94,25 @@ void	PNG_Filter::filter(DataStream & data, PNG_Image & img)
 
 		for (pxl.x = 0; pxl.x < img.w; pxl.x++)
 		{
-			data_byte = data.Exsert();
 			pxl.col = 0;
+			data_byte = data.Exsert();
 			filter(pxl, data_byte);
 
-			data_byte = data.Exsert();
 			pxl.col = 1;
+			data_byte = data.Exsert();
 			filter(pxl, data_byte);
 
-			data_byte = data.Exsert();
 			pxl.col = 2;
+			data_byte = data.Exsert();
 			filter(pxl, data_byte);
 
 			pxl.col = 3;
-			img.data[PixelIndex(pxl)] = 0xFF;
+			//	color_type = 6
+			data_byte = data.Exsert();
+			filter(pxl, data_byte);
+
+			//	color_type = 2
+			//img.data[PixelIndex(pxl)] = 0xFF;
 		}
 	}
 }

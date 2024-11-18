@@ -1,11 +1,16 @@
 
 #include "PNG.hpp"
 
+const char * PNG_Exception_BadFile::what() const throw() { return "Problem when opening File"; }
+const char * PNG_Exception_Signature::what() const throw() { return "Incorrect Signature"; }
+
 std::string	read_whole_file(const std::string & file_path)
 {
 	std::ifstream file(file_path, std::ios::binary);
+	if (!file.is_open())
+		throw PNG_Exception_BadFile();
 
-	std::string	file_data;
+	std::string file_data;
 	char	binary_block[1024];
 
 	file.read(binary_block, 1024);
@@ -69,39 +74,32 @@ void	zlib_decompress(BitStream & bits, DataStream & data)
 
 PNG_Image *	load_png_better(const std::string & file_path)
 {
-	std::cout << "loading '" << file_path << "' ...\n";
-	const std::string file_str = read_whole_file(file_path);
-	std::cout << "file length: " << file_str.size() << "\n";
-	BitStream file(file_str);
-
-	std::cout << "\n";
-	{
-		uint64	signature_template = 0x0A1A0A0D474E5089;
-		uint64	signature_received;
-
-		signature_received = file.byte64();
-		std::cout << "signature\n";
-		std::cout << "template: " << uint_Hex(signature_template) << "\n";
-		std::cout << "received: " << uint_Hex(signature_received) << "\n";
-
-		if (signature_received != signature_template)
-		{
-			std::cout << "\e[31mSignature Wrong\e[m\n";
-			return (NULL);
-		}
-		else
-		{
-			std::cout << "\e[32mSignature Match\e[m\n";
-		}
-	}
-	std::cout << "\n";
-
-
-	IHDR ihdr;
-	DataStream chunk_data(0);
-
 	try
 	{
+		std::cout << "loading '" << file_path << "' ...\n";
+		std::string file_str = read_whole_file(file_path);
+
+		std::cout << "file length: " << file_str.size() << "\n";
+		BitStream file(file_str);
+
+		std::cout << "\n";
+		{
+			uint64	signature_template = 0x0A1A0A0D474E5089;
+			uint64	signature_received;
+
+			signature_received = file.byte64();
+			std::cout << "signature\n";
+			std::cout << "template: " << uint_Hex(signature_template) << "\n";
+			std::cout << "received: " << uint_Hex(signature_received) << "\n";
+
+			if (signature_received != signature_template)
+				throw PNG_Exception_Signature();
+		}
+		std::cout << "\n";
+
+		IHDR ihdr;
+		DataStream chunk_data(0);
+
 		while (1)
 		{
 			std::cout << "\n";
@@ -120,65 +118,22 @@ PNG_Image *	load_png_better(const std::string & file_path)
 			if (chunk.isIEND())
 				break;
 		}
+	
+		BitStream bits(chunk_data.Data, chunk_data.Len);
+
+		DataStream * data = new DataStream(0xFFFFFFFF);
+		zlib_decompress(bits, *data);
+
+		PNG_Image * img = new PNG_Image(ihdr.width, ihdr.height);
+		PNG_Filter::filter(*data, *img);
+		delete data;
+
+		return (img);
 	}
-	catch (std::exception & e)
+	catch(const std::exception& e)
 	{
-		std::cout << "Exception: " << e.what() << "\n";
-		return (NULL);
+		std::cout << "Exception while loading Image: " << e.what() << "\n";
+		return (PNG_Image::Missing());
 	}
 
-	BitStream bits(chunk_data.Data, chunk_data.Len);
-
-	DataStream * data = new DataStream(0xFFFFFFFF);
-	zlib_decompress(bits, *data);
-
-	PNG_Image * img = new PNG_Image();
-	img -> w = ihdr.width;
-	img -> h = ihdr.height;
-	img -> data = new uint8[img -> w * img -> h * 4];
-	PNG_Filter::filter(*data, *img);
-
-	delete data;
-
-
-	/*std::cout << "\n";
-	{
-		std::ofstream hexdump("hexdump");
-
-		uint32 idx = 0;
-		while (idx < file_str.size())
-		{
-			uint32	here = idx;
-			std::string hex = "";
-			std::string chr = "";
-			for (uint32 r = 0; r < 32; r++)
-			{
-				if (r == 8)
-					hex += " ";
-				else if (r == 16)
-					hex += "  ";
-				else if (r == 24)
-					hex += " ";
-				if (idx < file_str.size())
-				{
-					hex += " " + uint_Hex((uint8)file_str[idx]);
-					if (file_str[idx] >= 32 && file_str[idx] <= 126)
-						chr += file_str[idx];
-					else
-						chr += ".";
-					idx++;
-				}
-				else
-				{
-					hex += "  ";
-					chr += " ";
-				}
-			}
-			hexdump << std::setw(8) << here << " | " << hex << " | " << chr << "\n";
-		}
-		hexdump.close();
-	}
-	std::cout << "\n";*/
-
-	return (img);
 }

@@ -27,6 +27,9 @@ struct IHDR
 	uint8	interlace_method;
 };
 
+class PNG_Exception_BadFile : public std::exception { public: const char * what() const throw(); };
+class PNG_Exception_Signature : public std::exception { public: const char * what() const throw(); };
+
 PNG_Image	* load_png_better(const std::string & file_path);
 
 #endif

@@ -19,8 +19,9 @@
 #include "png/_png.h"
 #include "png/PNG.hpp"
 
+//#define TEXTURE_TEST
 
-
+#ifdef TEXTURE_TEST
 int main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -33,7 +34,6 @@ int main(int argc, char **argv)
 	//return 0;
 
 	PNG_Image * img = load_png_better(argv[1]);
-
 
 	Window * win = new Window(img -> w, img -> h, argv[1], false);
 	std::cout << "window done\n";
@@ -119,8 +119,10 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+#endif
 
-/*int main(int argc, char **argv)
+#ifndef TEXTURE_TEST
+int main(int argc, char **argv)
 {
 	Window * win = new Window(1000, 1000, "Voxel", false);
 	std::cout << "window done\n";
@@ -136,8 +138,6 @@ int main(int argc, char **argv)
 	int Uni_Chunk_View = voxelShader.FindUniform("viewTrans");
 	int Uni_Chunk_Depth = voxelShader.FindUniform("depthFactor");
 	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
-	//int Uni_Chunk_Tex = voxelShader.FindUniform("tex");
-	//std::cout << "voxel tex " << Uni_Chunk_Tex << "\n";
 
 	Shader boxShader(
 		"shaders/Box.vert",
@@ -167,12 +167,16 @@ int main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	{
-		int w, h;
-		unsigned int *texData;
+		//int w, h;
+		//unsigned int *texData;
 		//texture_load("textures/cube_face_log.uints", &texData, &w, &h);
-		texture_load("textures/cube_face_col.uints", &texData, &w, &h);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
-		free(texData);
+		//texture_load("textures/cube_face_col.uints", &texData, &w, &h);
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
+		//free(texData);
+
+		PNG_Image * img = load_png_better(argv[1]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
+		delete img;
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	std::cout << "texture done\n";
@@ -256,4 +260,5 @@ int main(int argc, char **argv)
 	return (0);
 	(void)argc;
 	(void)argv;
-}*/
+}
+#endif

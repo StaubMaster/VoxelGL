@@ -4,6 +4,17 @@
 # include <iostream>
 # include "openGL/Abstract/Undex3D.hpp"
 
+# define TEXTURE_XM 0b00100
+# define TEXTURE_XP 0b11000
+# define TEXTURE_YM 0b01000
+# define TEXTURE_YP 0b10100
+# define TEXTURE_ZM 0b10000
+# define TEXTURE_ZP 0b01100
+# define TEXTURE_MIN_MIN 0b00
+# define TEXTURE_MAX_MIN 0b10
+# define TEXTURE_MIN_MAX 0b01
+# define TEXTURE_MAX_MAX 0b11
+
 class Voxel
 {
 	private:

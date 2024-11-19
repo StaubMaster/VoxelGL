@@ -177,6 +177,7 @@ int main(int argc, char **argv)
 		PNG_Image * img = load_png_better(argv[1]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
 		delete img;
+
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	std::cout << "texture done\n";

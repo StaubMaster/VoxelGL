@@ -1,7 +1,7 @@
 #version 330
 
 uniform float[7] depthFactor;
-const vec3 light = normalize(vec3(+0.267261, -0.534522, +0.801784));
+const vec3 light = normalize(vec3(+1, -2, +3));
 uniform sampler2D texture0;
 
 
@@ -31,6 +31,7 @@ void main()
 	float l;
 	l = dot(normalize(fs_in.Normal), light);
 	l = max(l, 0.3);
+	l = 1;
 
 	vec4 back = vec4(0.5, 0.5, 0.5, 1);
 

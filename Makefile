@@ -5,6 +5,7 @@ NAME = a.exe
 
 FILE_C = main.cpp \
 	Voxel.cpp \
+	VoxelRenderData.cpp \
 	VoxelChunk.cpp \
 	VoxelSpace.cpp \
 	Box.cpp \

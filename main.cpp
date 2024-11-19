@@ -153,9 +153,7 @@ int main(int argc, char **argv)
 		std::cout << "  Memory:\n";
 		std::cout << "    per Chunks:\n";
 		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
-		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(Voxel::RenderData)) << "\n";
-		//std::cout << "      Vertex Buffer Limit: " << mem_size_1000_original(Vertex_per_Chunk * sizeof(float)) << "\n";
-		//std::cout << "      Index Buffer Limit: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(unsigned int) * 6 * 3) << "\n";
+		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
 	}
 
 	std::cout << "texture loading ...\n";
@@ -167,13 +165,6 @@ int main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	{
-		//int w, h;
-		//unsigned int *texData;
-		//texture_load("textures/cube_face_log.uints", &texData, &w, &h);
-		//texture_load("textures/cube_face_col.uints", &texData, &w, &h);
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, texData);
-		//free(texData);
-
 		PNG_Image * img = load_png_better(argv[1]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
 		delete img;

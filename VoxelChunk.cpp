@@ -181,6 +181,54 @@ void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
 }
+void	VoxelChunk::GenerateVoxelRotationTest()
+{
+	Index3D chunk_idx;
+	chunk_idx.x = Index.x * Voxel_per_Side;
+	chunk_idx.y = Index.y * Voxel_per_Side;
+	chunk_idx.z = Index.z * Voxel_per_Side;
+
+	Undex3D voxel_idx;
+	Index3D global_idx;
+	unsigned int i;
+
+	int X, Y, Z;
+
+	do
+	{
+		global_idx.x = chunk_idx.x + voxel_idx.x;
+		global_idx.y = chunk_idx.y + voxel_idx.y;
+		global_idx.z = chunk_idx.z + voxel_idx.z;
+		i = voxel_idx.ToIndex(Voxel_per_Side);
+
+		Data[i] = Voxel(0);
+		if (global_idx.x % 2 == 0 && global_idx.y % 2 == 0 && global_idx.z % 2 == 0)
+		{
+			X = global_idx.x / 2;
+			Y = global_idx.y / 2;
+			Z = global_idx.z / 2;
+
+			if (X >= 1 && X <= 4 && Y == 0 && Z == 0)
+			{
+				char rot = X - 1;
+				Data[i] = Voxel(1, rot);
+			}
+
+			if (Y >= 1 && Y <= 4 && X == 0 && Z == 0)
+			{
+				char rot = (Y - 1) + 4;
+				Data[i] = Voxel(1, rot);
+			}
+			
+			if (Z >= 1 && Z <= 4 && X == 0 && Y == 0)
+			{
+				char rot = (Z - 1) + 8;
+				Data[i] = Voxel(1, rot);
+			}
+		}
+	}
+	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+}
 
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {
@@ -218,86 +266,6 @@ char	VoxelChunk::tryReplace(Undex3D idx, char d)
 
 
 
-void	VoxelChunk::UpdateBufferVertex()
-{
-	unsigned int vertex_count = Vertex_per_Chunk;
-	unsigned int * vertex = new unsigned int[vertex_count];
-
-	Undex3D idx;
-	do
-	{
-		vertex[idx.ToIndex(Vertex_per_Side)] = idx.x | (idx.y << 8) | (idx.z << 16);
-	}
-	while (Undex3D::loop_exclusive(idx, 0, Vertex_per_Side));
-
-	//std::cout << "Vertex Count:" << vertex_count << " (" << (vertex_count * sizeof(unsigned int)) << "B)\n";
-	//std::cout << "Vertex Count:" << vertex_count << " (" << mem_size_1024(vertex_count * sizeof(unsigned int)) << ")\n";
-
-	glBindVertexArray(Buffer_Array);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
-
-	glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(unsigned int), vertex, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, 1 * sizeof(unsigned int), (void *)0);
-
-	delete [] vertex;
-}
-void	VoxelChunk::UpdateBufferIndex(
-	const VoxelChunk * Xn, const VoxelChunk * Xp,
-	const VoxelChunk * Yn, const VoxelChunk * Yp,
-	const VoxelChunk * Zn, const VoxelChunk * Zp)
-{
-	unsigned int * index = new unsigned int[Voxel_per_Chunk * 6 * 3];
-	unsigned int index_count = 0;
-
-	Undex3D voxel_idx;
-	do
-	{
-		IndexFaceX(index, index_count, voxel_idx, this, Xn, Xp);
-		IndexFaceY(index, index_count, voxel_idx, this, Yn, Yp);
-		IndexFaceZ(index, index_count, voxel_idx, this, Zn, Zp);
-	}
-	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side + 1));
-
-	//std::cout << "Index Count: " << index_count << "/" << (Voxel_per_Chunk * 6 * 3) << " (" << (index_count * sizeof(unsigned int)) << "B)\n";
-
-	glBindVertexArray(Buffer_Array);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Buffer_Index);
-
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), index, GL_STATIC_DRAW);
-	Index_Count = index_count;
-
-	delete [] index;
-}
-/*		Better Buffers
-	IndexUnCompressed[MaxIndexCount] = 0xFFFFFFFF
-	FaceIndexUnCompressed[MaxFaceCount]
-
-	fill FaceIndexUnCompressed as in UpdateBufferIndex()
-		each index used, set IndexUnCompressed[index] = 0
-	count IndexFaceCount
-
-	IndexCount = 0
-	IndexCompressionMap[MaxIndexCount]
-	for each IndexUnCompressed
-		if (IndexUnCompressed[i] == 0)
-		{
-			IndexCompressionMap[i] = IndexCount
-			IndexCount++
-		}
-
-	VertexCompressed[IndexCount]
-	for each IndexUnCompressed
-		if IndexUnCompressed[index] == 0
-			VertexCompressed[index] = setForVertex(IndexCompressionMap[index])
-
-	FaceIndexCompressed[FaceIndexCount]
-	for each FaceIndexUnCompressed
-		FaceIndexCompressed[index] = IndexCompressionMap[FaceIndexUnCompressed[index]]
-
-	put VertexCompressed into Buffer
-	put FaceIndexCompressed into Buffer
-*/
 void	VoxelChunk::UpdateBuffer(
 	const VoxelChunk * Xn, const VoxelChunk * Xp,
 	const VoxelChunk * Yn, const VoxelChunk * Yp,
@@ -305,32 +273,24 @@ void	VoxelChunk::UpdateBuffer(
 {
 	//std::cout << "UpdateBuffer() " << Index << " ...\n";
 
-	Voxel::RenderData * data = new Voxel::RenderData[Vertex_per_Chunk * 6 * 6];
-	unsigned int vertex_count = 0;
+	//VoxelRenderData * data = new VoxelRenderData[Vertex_per_Chunk * 6 * 6];
+	//unsigned int vertex_count = 0;
+
+	VoxelRenderData::DataStream	data(Vertex_per_Chunk * 6 * 6);
 
 	Undex3D voxel_idx;
 	do
 	{
-		FaceX(data, vertex_count, voxel_idx, this, Xn, Xp);
-		FaceY(data, vertex_count, voxel_idx, this, Yn, Yp);
-		FaceZ(data, vertex_count, voxel_idx, this, Zn, Zp);
+		data.FaceX(voxel_idx, this, Xn, Xp);
+		data.FaceY(voxel_idx, this, Yn, Yp);
+		data.FaceZ(voxel_idx, this, Zn, Zp);
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side + 1));
 
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
 
-	glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof(Voxel::RenderData), data, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribIPointer(0, 1, GL_UNSIGNED_INT, sizeof(Voxel::RenderData), (void *)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribIPointer(1, 1, GL_UNSIGNED_INT, sizeof(Voxel::RenderData), (void *)sizeof(unsigned int));
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Voxel::RenderData), (void *)(sizeof(unsigned int) + sizeof(unsigned int)));
-
-	Vertex_Count = vertex_count;
-
-	delete [] data;
+	data.ToBuffer(Vertex_Count);
 
 	//std::cout << "UpdateBuffer() " << Index << " done\n";
 }
@@ -340,370 +300,5 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 	glUniform3i(Uni_Chunk_Pos, Index.x, Index.y, Index.z);
 
 	glBindVertexArray(Buffer_Array);
-	//glDrawElements(GL_TRIANGLES, Index_Count, GL_UNSIGNED_INT, (void*)0);
 	glDrawArrays(GL_TRIANGLES, 0, Vertex_Count);
-}
-
-
-
-void VoxelChunk::FaceX(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_idx.y == Voxel_per_Side || vox_idx.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_idx.x == 0)
-	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_idx.set_get_X(Voxel_per_Side - 1));
-			vp = &here -> get(vox_idx.set_get_X(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox_idx.x == Voxel_per_Side)
-	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_idx.set_get_X(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_idx.set_get_X(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &here -> get(vox_idx.set_get_X(vox_idx.x - 1));
-		vp = &here -> get(vox_idx.set_get_X(vox_idx.x - 0));
-	}
-	Voxel::FaceX(data, idx, vox_idx, vn, vp);
-}
-void VoxelChunk::FaceY(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_idx.x == Voxel_per_Side || vox_idx.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_idx.y == 0)
-	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_idx.set_get_Y(Voxel_per_Side - 1));
-			vp = &here -> get(vox_idx.set_get_Y(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox_idx.y == Voxel_per_Side)
-	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_idx.set_get_Y(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_idx.set_get_Y(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &here -> get(vox_idx.set_get_Y(vox_idx.y - 1));
-		vp = &here -> get(vox_idx.set_get_Y(vox_idx.y - 0));
-	}
-	Voxel::FaceY(data, idx, vox_idx, vn, vp);
-}
-void VoxelChunk::FaceZ(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_idx.x == Voxel_per_Side || vox_idx.y == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_idx.z == 0)
-	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_idx.set_get_Z(Voxel_per_Side - 1));
-			vp = &here -> get(vox_idx.set_get_Z(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox_idx.z == Voxel_per_Side)
-	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_idx.set_get_Z(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_idx.set_get_Z(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &here -> get(vox_idx.set_get_Z(vox_idx.z - 1));
-		vp = &here -> get(vox_idx.set_get_Z(vox_idx.z - 0));
-	}
-	Voxel::FaceZ(data, idx, vox_idx, vn, vp);
-}
-
-
-
-
-
-void VoxelChunk::IndexFaceXn(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(0, 1, 1)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-void VoxelChunk::IndexFaceXp(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(0, 1, 1)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-void VoxelChunk::IndexFaceYn(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(1, 0, 1)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-void VoxelChunk::IndexFaceYp(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(0, 0, 1)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(1, 0, 1)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-void VoxelChunk::IndexFaceZn(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(1, 1, 0)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-void VoxelChunk::IndexFaceZp(unsigned int * index, unsigned int & idx, Undex3D vox)
-{
-	index[idx + 0] = (vox + Undex3D(0, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 1] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 2] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 3] = (vox + Undex3D(1, 0, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 4] = (vox + Undex3D(0, 1, 0)).ToIndex(Vertex_per_Side);
-	index[idx + 5] = (vox + Undex3D(1, 1, 0)).ToIndex(Vertex_per_Side);
-	idx += 6;
-}
-
-void VoxelChunk::IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp)
-{
-	if (vn != NULL && vp != NULL)
-	{
-		if (vn -> isSolid() && !vp -> isSolid())
-		{
-			IndexFaceXn(index, idx, vox);
-		}
-		if (!vn -> isSolid() && vp -> isSolid())
-		{
-			IndexFaceXp(index, idx, vox);
-		}
-	}
-}
-void VoxelChunk::IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp)
-{
-	if (vn != NULL && vp != NULL)
-	{
-		if (vn -> isSolid() && !vp -> isSolid())
-		{
-			IndexFaceYn(index, idx, vox);
-		}
-		if (!vn -> isSolid() && vp -> isSolid())
-		{
-			IndexFaceYp(index, idx, vox);
-		}
-	}
-}
-void VoxelChunk::IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp)
-{
-	if (vn != NULL && vp != NULL)
-	{
-		if (vn -> isSolid() && !vp -> isSolid())
-		{
-			IndexFaceZn(index, idx, vox);
-		}
-		if (!vn -> isSolid() && vp -> isSolid())
-		{
-			IndexFaceZp(index, idx, vox);
-		}
-	}
-}
-
-void VoxelChunk::IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
-{
-	if (vox.y == Voxel_per_Side || vox.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox.x == 0)
-	{
-		if (n != NULL)
-		{
-			vn = &n -> get(vox.set_get_X(Voxel_per_Side - 1));
-			vp = &t -> get(vox.set_get_X(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox.x == Voxel_per_Side)
-	{
-		if (p != NULL)
-		{
-			vn = &t -> get(vox.set_get_X(Voxel_per_Side - 1));
-			vp = &p -> get(vox.set_get_X(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &t -> get(vox.set_get_X(vox.x - 1));
-		vp = &t -> get(vox.set_get_X(vox.x - 0));
-	}
-	IndexFaceX(index, idx, vox, vn, vp);
-}
-void VoxelChunk::IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
-{
-	if (vox.x == Voxel_per_Side || vox.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox.y == 0)
-	{
-		if (n != NULL)
-		{
-			vn = &n -> get(vox.set_get_Y(Voxel_per_Side - 1));
-			vp = &t -> get(vox.set_get_Y(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox.y == Voxel_per_Side)
-	{
-		if (p != NULL)
-		{
-			vn = &t -> get(vox.set_get_Y(Voxel_per_Side - 1));
-			vp = &p -> get(vox.set_get_Y(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &t -> get(vox.set_get_Y(vox.y - 1));
-		vp = &t -> get(vox.set_get_Y(vox.y - 0));
-	}
-	IndexFaceY(index, idx, vox, vn, vp);
-}
-void VoxelChunk::IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p)
-{
-	if (vox.x == Voxel_per_Side || vox.y == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox.z == 0)
-	{
-		if (n != NULL)
-		{
-			vn = &n -> get(vox.set_get_Z(Voxel_per_Side - 1));
-			vp = &t -> get(vox.set_get_Z(0));
-
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else if (vox.z == Voxel_per_Side)
-	{
-		if (p != NULL)
-		{
-			vn = &t -> get(vox.set_get_Z(Voxel_per_Side - 1));
-			vp = &p -> get(vox.set_get_Z(0));
-
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
-	}
-	else
-	{
-		vn = &t -> get(vox.set_get_Z(vox.z - 1));
-		vp = &t -> get(vox.set_get_Z(vox.z - 0));
-	}
-	IndexFaceZ(index, idx, vox, vn, vp);
 }

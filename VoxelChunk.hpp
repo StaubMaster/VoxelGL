@@ -5,6 +5,7 @@
 # include "openGL/Abstract/math3D.hpp"
 # include "openGL/Abstract/Point.hpp"
 # include "Voxel.hpp"
+# include "VoxelRenderData.hpp"
 # include "Box.hpp"
 # include "MemorySize.hpp"
 # include <iostream>
@@ -38,6 +39,8 @@ class VoxelChunk
 	private:
 		VoxelChunk(const VoxelChunk & other);
 		const VoxelChunk & operator =(const VoxelChunk & other);
+
+	public:
 		const Voxel & get(Undex3D idx) const;
 
 	public:
@@ -47,47 +50,17 @@ class VoxelChunk
 
 		void	GenerateChunkLimit(char axis_limit);
 		void	GenerateFuzzyCenterCube(int size2);
+		void	GenerateVoxelRotationTest();
 
 		int		CheckVoxel(Index3D idx);
 		char	tryReplace(Undex3D idx, char d);
 
-	private:
-		void	UpdateBufferVertex();
-		void	UpdateBufferIndex(
-					const VoxelChunk * Xn, const VoxelChunk * Xp,
-					const VoxelChunk * Yn, const VoxelChunk * Yp,
-					const VoxelChunk * Zn, const VoxelChunk * Zp);
 	public:
 		void	UpdateBuffer(
 					const VoxelChunk * Xn, const VoxelChunk * Xp,
 					const VoxelChunk * Yn, const VoxelChunk * Yp,
 					const VoxelChunk * Zn, const VoxelChunk * Zp);
 		void	Draw(int Uni_Chunk_Pos) const;
-
-
-
-	private:
-		static void FaceX(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-		static void FaceY(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-		static void FaceZ(Voxel::RenderData * data, unsigned int & idx, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-
-
-
-	private:
-		static void IndexFaceXn(unsigned int * index, unsigned int & idx, Undex3D vox);
-		static void IndexFaceXp(unsigned int * index, unsigned int & idx, Undex3D vox);
-		static void IndexFaceYn(unsigned int * index, unsigned int & idx, Undex3D vox);
-		static void IndexFaceYp(unsigned int * index, unsigned int & idx, Undex3D vox);
-		static void IndexFaceZn(unsigned int * index, unsigned int & idx, Undex3D vox);
-		static void IndexFaceZp(unsigned int * index, unsigned int & idx, Undex3D vox);
-
-		static void IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
-		static void IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
-		static void IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const Voxel * vn, const Voxel * vp);
-
-		static void IndexFaceX(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
-		static void IndexFaceY(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
-		static void IndexFaceZ(unsigned int * index, unsigned int & idx, Undex3D vox, const VoxelChunk * t, const VoxelChunk * n, const VoxelChunk * p);
 };
 
 #endif

@@ -165,7 +165,11 @@ int main(int argc, char **argv)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	{
-		PNG_Image * img = load_png_better(argv[1]);
+		PNG_Image * img = NULL;
+		if (argc >= 2)
+			img = load_png_better(argv[1]);
+		else
+			img = PNG_Image::Missing();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
 		delete img;
 

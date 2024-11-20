@@ -53,7 +53,8 @@ class VoxelChunk
 		void	GenerateVoxelRotationTest();
 
 		int		CheckVoxel(Index3D idx);
-		char	tryReplace(Undex3D idx, char d);
+		void	tryAdd(Undex3D idx, char id, char axis);
+		char	trySub(Undex3D idx);
 
 	public:
 		void	UpdateBuffer(

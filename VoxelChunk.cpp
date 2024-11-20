@@ -208,22 +208,11 @@ void	VoxelChunk::GenerateVoxelRotationTest()
 			Y = global_idx.y / 2;
 			Z = global_idx.z / 2;
 
-			if (X >= 1 && X <= 4 && Y == 0 && Z == 0)
+			if (X >= 0 && X <= 5 && Y == 0 && Z >= 0 && Z <= 3)
 			{
-				char rot = X - 1;
-				Data[i] = Voxel(1, rot);
-			}
-
-			if (Y >= 1 && Y <= 4 && X == 0 && Z == 0)
-			{
-				char rot = (Y - 1) + 4;
-				Data[i] = Voxel(1, rot);
-			}
-			
-			if (Z >= 1 && Z <= 4 && X == 0 && Y == 0)
-			{
-				char rot = (Z - 1) + 8;
-				Data[i] = Voxel(1, rot);
+				char axis = X;
+				char spin = Z;
+				Data[i] = Voxel(1, axis, spin);
 			}
 		}
 	}
@@ -255,12 +244,19 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 
 	return (0);
 }
-char	VoxelChunk::tryReplace(Undex3D idx, char d)
+void	VoxelChunk::tryAdd(Undex3D idx, char id, char axis)
+{
+	unsigned int i = idx.ToIndex(Voxel_per_Side);
+
+	if (!Data[i].isSolid())
+		Data[i] = Voxel::AxisAligned(id, axis, std::rand() % 4);
+}
+char	VoxelChunk::trySub(Undex3D idx)
 {
 	unsigned int i = idx.ToIndex(Voxel_per_Side);
 
 	char t = Data[i].isSolid();
-	Data[i] = Voxel(d);
+	Data[i] = Voxel(0);
 	return (t);
 }
 
@@ -272,9 +268,6 @@ void	VoxelChunk::UpdateBuffer(
 	const VoxelChunk * Zn, const VoxelChunk * Zp)
 {
 	//std::cout << "UpdateBuffer() " << Index << " ...\n";
-
-	//VoxelRenderData * data = new VoxelRenderData[Vertex_per_Chunk * 6 * 6];
-	//unsigned int vertex_count = 0;
 
 	VoxelRenderData::DataStream	data(Vertex_per_Chunk * 6 * 6);
 

@@ -100,10 +100,6 @@ void	VoxelSpace::AddChunksRange(Index3D idx, int range)
 		exists[i] = false;
 	}
 
-	//std::cout << "\n";
-	//std::cout << "min " << min << "\n";
-	//std::cout << "max " << max << "\n";
-	//std::cout << "\n";
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
 		Index3D ch_idx = Chunks[i] -> getChunkIndex3D();
@@ -111,35 +107,21 @@ void	VoxelSpace::AddChunksRange(Index3D idx, int range)
 		if (Index3D::Box_inclusive(ch_idx, min ,max))
 		{
 			Index3D diff = ch_idx - min;
-			//std::cout << "found " << diff << "\n";
 			exists[diff.ToIndex(range_per_side)] = true;
 		}
 	}
 
 	Index3D i;
-	//std::cout << "\n";
 	do
 	{
 		if (!exists[i.ToIndex(range_per_side)])
 		{
-			//std::cout << "not found " << i << "\n";
 			AddChunk(i + min);
 		}
 	}
 	while (Index3D::loop_exclusive(i, 0, range_per_side));
-	//std::cout << "\n";
 
 	delete [] exists;
-
-	/*i = min;
-	do
-	{
-		if (FindChunkIdx(i) == 0xFFFFFFFF)
-		{
-			AddChunk(i);
-		}
-	}
-	while (Index3D::loop_inclusive(i, min, max));*/
 }
 void	VoxelSpace::SubChunksRange(Index3D idx, int range)
 {
@@ -150,7 +132,6 @@ void	VoxelSpace::SubChunksRange(Index3D idx, int range)
 	{
 		Index3D ch_idx = Chunks[i] -> getChunkIndex3D();
 
-		//if (abs(diff.x) > range || abs(diff.y) > range || abs(diff.z) > range)
 		if (!Index3D::Box_inclusive(ch_idx, min ,max))
 		{
 			SubChunk(ch_idx);
@@ -167,12 +148,6 @@ void	VoxelSpace::UpdateBuffer(Index3D idx)
 
 	if (ch != NULL)
 	{
-		//ch -> UpdateBufferVertex();
-		//ch -> UpdateBufferIndex(
-		//	FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
-		//	FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
-		//	FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
-		//);
 		ch -> UpdateBuffer(
 			FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
 			FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
@@ -203,11 +178,11 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 		return (0);
 
 
-	char t = chunk -> tryReplace(hover.voxel_idx, 1);
+	chunk -> tryAdd(hover.voxel_idx, 1, hover.cardinal);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
-	return t;
+	return 0;
 }
 char	VoxelSpace::trySub(Voxel_Hover hover)
 {
@@ -216,7 +191,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover)
 		chunk = FindChunkPtr(hover.chunk_idx);
 
 
-	char t = chunk -> tryReplace(hover.voxel_idx, 0);
+	char t = chunk -> trySub(hover.voxel_idx);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 

@@ -45,8 +45,9 @@ struct VoxelRenderData
 			TextureCoordFace	ZM;	//	100
 			TextureCoordFace	YP;	//	101
 			TextureCoordFace	XP;	//	110
+			bool TexSwap;
 
-			TextureCoordFace	getFace(char idx) const;
+			TextureCoordFace	getFace(char idx, bool & texSwap) const;
 
 			TextureCoordCube	SpinAroundX() const;
 			TextureCoordCube	SpinAroundY() const;
@@ -72,7 +73,7 @@ struct VoxelRenderData
 	public:
 		VoxelRenderData();
 	private:
-		VoxelRenderData(Undex3D vox_idx, int tex_idx, char tex_info, char tex_rot);
+		VoxelRenderData(Undex3D vox_idx, int tex_idx, char tex_info, char vox_axis, char vox_spin);
 
 	public:
 		struct DataStream
@@ -89,12 +90,12 @@ struct VoxelRenderData
 			void	ToBuffer(unsigned int & count) const;
 
 		public:
-			void FaceXn(Undex3D vox_idx, int tex_idx, char tex_rot);
-			void FaceXp(Undex3D vox_idx, int tex_idx, char tex_rot);
-			void FaceYn(Undex3D vox_idx, int tex_idx, char tex_rot);
-			void FaceYp(Undex3D vox_idx, int tex_idx, char tex_rot);
-			void FaceZn(Undex3D vox_idx, int tex_idx, char tex_rot);
-			void FaceZp(Undex3D vox_idx, int tex_idx, char tex_rot);
+			void FaceXn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceXp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceYn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceYp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceZn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceZp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
 
 			void FaceX(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
 			void FaceY(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);

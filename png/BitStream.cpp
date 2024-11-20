@@ -191,7 +191,6 @@ const uint8 *	BitStream::DataAtIndex(uint32 skipBytes) const
 void	BitStream::moveIndex(uint32 skip)
 {
 	uint32	idx = get_ByteIndex();
-	std::cout << "\e[34mskip Byte\e[m\n";
 	if (get_BitIndex() != 0)
 		idx++;
 	idx += skip;

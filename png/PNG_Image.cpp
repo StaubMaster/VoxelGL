@@ -30,6 +30,34 @@ void	PNG_Image::setPixelRGBA(uint32 x, uint32 y, uint32 pxl)
 }
 
 
+PNG_Image * PNG_Image::Scale(uint32 new_w, uint32 new_h)
+{
+	PNG_Image * img = new PNG_Image(new_w, new_h);
+
+	float scale_x;
+	float scale_y;
+	uint32	idx_old;
+	uint32	idx_new;
+	for (uint32 y = 0; y < new_h; y++)
+	{
+		scale_y = (((float)y) / ((float)new_h)) * ((float)h);
+
+		for (uint32 x = 0; x < new_w; x++)
+		{
+			scale_x = (((float)x) / ((float)new_w)) * ((float)w);
+
+			idx_old = DataIndex(scale_x, scale_y);
+			idx_new = img -> DataIndex(x, y);
+
+			img -> data[idx_new + 0] = data[idx_old + 0];
+			img -> data[idx_new + 1] = data[idx_old + 1];
+			img -> data[idx_new + 2] = data[idx_old + 2];
+			img -> data[idx_new + 3] = data[idx_old + 3];
+		}
+	}
+
+	return (img);
+}
 
 PNG_Image * PNG_Image::Missing()
 {

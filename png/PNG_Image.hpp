@@ -19,6 +19,8 @@ struct PNG_Image
 
 		void	setPixelRGBA(uint32 x, uint32 y, uint32 pxl);
 
+		PNG_Image * Scale(uint32 new_w, uint32 new_h);
+
 	public:
 		static PNG_Image * Missing();
 };

@@ -15,7 +15,7 @@ in Vert_Tex
 out Geom_Tex
 {
 	vec3	Normal;
-	vec2	Tex_pos;
+	vec3	Tex_pos;
 } gs_out;
 
 
@@ -36,8 +36,7 @@ vec3 calcNormal(vec3 a, vec3 b, vec3 c)
 void calcCorner(int i)
 {
 	gl_Position = gl_in[i].gl_Position;
-//	gs_out.Tex_idx = gs_in[i].Tex_idx;
-	gs_out.Tex_pos = gs_in[i].Tex_pos;
+	gs_out.Tex_pos = vec3(gs_in[i].Tex_pos, gs_in[i].Tex_idx);
 	EmitVertex();
 }
 

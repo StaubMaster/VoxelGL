@@ -30,7 +30,6 @@ class VoxelChunk
 		unsigned int	Buffer_Array;
 		unsigned int	Buffer_Corner;
 		unsigned int	Buffer_Index;
-		unsigned int	Index_Count;
 		unsigned int	Vertex_Count;
 
 	public:

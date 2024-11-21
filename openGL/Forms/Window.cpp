@@ -42,8 +42,11 @@ Window::Window(int w, int h, const char * name, bool resize)
 	}
 	std::cout << "glad done\n";
 
-	//glViewport(0, 0, w * 2, h * 2);	//	Mac
+#ifdef _WIN64
 	glViewport(0, 0, w, h);			//Windows
+#elif __APPLE__
+	glViewport(0, 0, w * 2, h * 2);	//	Mac
+#endif
 	std::cout << "gl viewport done\n";
 
 	tabbed = false;

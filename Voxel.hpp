@@ -27,6 +27,7 @@ class Voxel
 
 	public:
 		bool	isSolid() const;
+		char	getID() const;
 		char	getAxis() const;
 		char	getSpin() const;
 

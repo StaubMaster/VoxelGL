@@ -31,6 +31,10 @@ bool	Voxel::isSolid() const
 	}
 	return (true);
 }
+char	Voxel::getID() const
+{
+	return (ID);
+}
 char	Voxel::getAxis() const
 {
 	return (Axis);
@@ -62,11 +66,18 @@ Voxel	Voxel::UnAligned(char id)
 }
 Voxel	Voxel::AxisAligned(char id, char axis, char spin)
 {
-	if (axis == 1 || axis == 2)
+	if (axis == 1)
 		axis = 1;
-	else if (axis == 3 || axis == 4)
+	else if (axis == 2)
+		axis = 4;
+	else if (axis == 3)
 		axis = 0;
-	else if (axis == 5 || axis == 6)
+	else if (axis == 4)
+		axis = 3;
+	else if (axis == 5)
 		axis = 2;
+	else if (axis == 6)
+		axis = 5;
+
 	return Voxel(id, axis, spin);
 }

@@ -2,7 +2,7 @@
 #NAME = decompressor
 NAME = png.a
 
-FILE_C = _png.c _mem.c _read.c _bits.c _chunk.c _HuffCodeTree.c _block.c _filter.c _sixel.c
+#FILE_C = _png.c _mem.c _read.c _bits.c _chunk.c _HuffCodeTree.c _block.c _filter.c _sixel.c
 FILE_CPP = load.cpp \
 	uint.cpp \
 	BitStream.cpp \
@@ -13,8 +13,8 @@ FILE_CPP = load.cpp \
 	DataStream.cpp \
 	PNG_Filter.cpp \
 	PNG_Image.cpp
-FILE_O = $(FILE_C:.c=.o)
-FILE_O += $(FILE_CPP:.cpp=.o)
+#FILE_O = $(FILE_C:.c=.o)
+FILE_O = $(FILE_CPP:.cpp=.o)
 
 Flags = -Wall -Wextra -Werror
 

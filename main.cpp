@@ -29,8 +29,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	//image img2 = load_png(argv[1]);
-	//free(img2.data);
+	//image img[1] = load_png(argv[1]);
+	//free(img[1].data);
 	//return 0;
 
 	PNG_Image * img = load_png_better(argv[1]);
@@ -157,23 +157,40 @@ int main(int argc, char **argv)
 	}
 
 	std::cout << "texture loading ...\n";
-	unsigned int Texture0;
-	glGenTextures(1, &Texture0);
-	glBindTexture(GL_TEXTURE_2D, Texture0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	unsigned int Texture0 = 0;
 	{
-		PNG_Image * img = NULL;
-		if (argc >= 2)
-			img = load_png_better(argv[1]);
-		else
-			img = PNG_Image::Missing();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
-		delete img;
+		glGenTextures(1, &Texture0);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
+		glActiveTexture(GL_TEXTURE0);
 
-		glGenerateMipmap(GL_TEXTURE_2D);
+		int	tex_w = 128;
+		int	tex_h = 64;
+
+		PNG_Image ** img = new PNG_Image * [2];
+		if (argc >= 2) { img[0] = load_png_better(argv[1]); } else { img[0] = load_png_better("images/TextureAlign.png"); }
+		if (argc >= 3) { img[1] = load_png_better(argv[2]); } else { img[1] = load_png_better("images/RedWood.png"); }
+
+		for (int i = 0; i < 2; i++)
+		{
+			PNG_Image * temp = img[i] -> Scale(tex_w, tex_h);
+			delete img[i];
+			img[i] = temp;
+		}
+
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,   tex_w, tex_h, 2, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
+		for (int i = 0; i < 2; i++)
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, tex_w, tex_h, 1, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img[i] -> data);
+
+		for (int i = 0; i < 2; i++)
+			delete img[i];
+		delete [] img;
+
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 	}
 	std::cout << "texture done\n";
 
@@ -195,13 +212,21 @@ int main(int argc, char **argv)
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
+	double	FrameTimeLast = glfwGetTime();
+	double	FrameTimeCurr;
+	double	FrameTimeDelta;
+
 	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
 		win -> Update();
 
+		FrameTimeCurr = glfwGetTime();
+		FrameTimeDelta = FrameTimeCurr - FrameTimeLast;
+		FrameTimeLast = FrameTimeCurr;
 
-		view.move(win -> GetKeyMovement(0.005f));
+
+		view.move(win -> GetKeyMovement(5.0f * FrameTimeDelta));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -232,6 +257,8 @@ int main(int argc, char **argv)
 		view.uniform_depth(Uni_Chunk_Depth);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE0, Texture0);
+		//glActiveTexture(GL_TEXTURE_2D_ARRAY);
+		//glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
 		space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();

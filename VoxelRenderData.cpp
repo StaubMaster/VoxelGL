@@ -241,7 +241,7 @@ VoxelRenderData::VoxelRenderData()
 VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, int tex_idx, char tex_info, char vox_axis, char vox_spin)
 {
 	compressed_pos = (vox_pos_idx.x | (vox_pos_idx.y << 8) | (vox_pos_idx.z << 16));
-	tex_idx = tex_idx;
+	this -> tex_idx = tex_idx;
 
 	TextureCoordCube coords;
 
@@ -254,21 +254,21 @@ VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, int tex_idx, char tex_info
 
 	if (vox_axis % 3 == 0)
 	{
-		     if (vox_spin == 0) { coords = coords; }
+		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateYM(); }
 		else if (vox_spin == 2) { coords = coords.SpinAroundY(); }
 		else if (vox_spin == 3) { coords = coords.RotateYP(); }
 	}
 	else if (vox_axis % 3 == 1)
 	{
-		     if (vox_spin == 0) { coords = coords; }
+		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateXM(); }
 		else if (vox_spin == 2) { coords = coords.SpinAroundX(); }
 		else if (vox_spin == 3) { coords = coords.RotateXP(); }
 	}
 	else if (vox_axis % 3 == 2)
 	{
-		     if (vox_spin == 0) { coords = coords; }
+		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateZM(); }
 		else if (vox_spin == 2) { coords = coords.SpinAroundZ(); }
 		else if (vox_spin == 3) { coords = coords.RotateZP(); }
@@ -383,11 +383,11 @@ void VoxelRenderData::DataStream::FaceX(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceXn(vox_pos_idx, 0, v_n -> getAxis(), v_n -> getSpin());
+			FaceXn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceXp(vox_pos_idx, 0, v_p -> getAxis(), v_p -> getSpin());
+			FaceXp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
 		}
 	}
 }
@@ -397,11 +397,11 @@ void VoxelRenderData::DataStream::FaceY(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceYn(vox_pos_idx, 0, v_n -> getAxis(), v_n -> getSpin());
+			FaceYn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceYp(vox_pos_idx, 0, v_p -> getAxis(), v_p -> getSpin());
+			FaceYp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
 		}
 	}
 }
@@ -411,11 +411,11 @@ void VoxelRenderData::DataStream::FaceZ(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceZn(vox_pos_idx, 0, v_n -> getAxis(), v_n -> getSpin());
+			FaceZn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceZp(vox_pos_idx, 0, v_p -> getAxis(), v_p -> getSpin());
+			FaceZp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
 		}
 	}
 }

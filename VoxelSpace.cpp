@@ -178,7 +178,7 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 		return (0);
 
 
-	chunk -> tryAdd(hover.voxel_idx, 1, hover.cardinal);
+	chunk -> tryAdd(hover.voxel_idx, 2, hover.cardinal);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 

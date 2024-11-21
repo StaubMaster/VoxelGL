@@ -2,14 +2,14 @@
 
 uniform float[7] depthFactor;
 const vec3 light = normalize(vec3(+1, -2, +3));
-uniform sampler2D texture0;
+uniform sampler2DArray texture0;
 
 
 
 in Geom_Tex
 {
 	vec3	Normal;
-	vec2	Tex_pos;
+	vec3	Tex_pos;
 } fs_in;
 
 out vec4 Pixel;

@@ -238,8 +238,12 @@ VoxelRenderData::VoxelRenderData()
 {
 
 }
-VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, int tex_idx, char tex_info, char vox_axis, char vox_spin)
+VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, char tex_info, const Voxel & vox)
 {
+	char	tex_idx = vox.getID() - 1;
+	char	vox_axis = vox.getAxis();
+	char	vox_spin = vox.getSpin();
+
 	compressed_pos = (vox_pos_idx.x | (vox_pos_idx.y << 8) | (vox_pos_idx.z << 16));
 	this -> tex_idx = tex_idx;
 
@@ -314,64 +318,64 @@ void	VoxelRenderData::DataStream::ToBuffer(unsigned int & count) const
 	count = Index;
 }
 
-void VoxelRenderData::DataStream::FaceXn(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceXn(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_XM | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_XM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_XM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_XM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_XM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 1), tex_idx, TEXTURE_XM | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_XM | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_XM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_XM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_XM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_XM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 1), TEXTURE_XM | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
-void VoxelRenderData::DataStream::FaceXp(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceXp(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_XP | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_XP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_XP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_XP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_XP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 1), tex_idx, TEXTURE_XP | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_XP | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_XP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_XP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_XP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_XP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 1), TEXTURE_XP | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
-void VoxelRenderData::DataStream::FaceYn(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceYn(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_YM | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_YM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_YM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_YM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_YM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 1), tex_idx, TEXTURE_YM | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_YM | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_YM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_YM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_YM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_YM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 1), TEXTURE_YM | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
-void VoxelRenderData::DataStream::FaceYp(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceYp(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_YP | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_YP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_YP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), tex_idx, TEXTURE_YP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_YP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 1), tex_idx, TEXTURE_YP | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_YP | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_YP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_YP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 1), TEXTURE_YP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_YP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 1), TEXTURE_YP | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
-void VoxelRenderData::DataStream::FaceZn(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceZn(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_ZM | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_ZM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_ZM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_ZM | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_ZM | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 1, 0), tex_idx, TEXTURE_ZM | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_ZM | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_ZM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_ZM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_ZM | TEXTURE_MAX_MIN, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_ZM | TEXTURE_MIN_MAX, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 1, 0), TEXTURE_ZM | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
-void VoxelRenderData::DataStream::FaceZp(Undex3D vox_pos_idx, int tex_idx, char vox_axis, char vox_spin)
+void VoxelRenderData::DataStream::FaceZp(Undex3D vox_pos_idx, const Voxel & vox)
 {
-	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), tex_idx, TEXTURE_ZP | TEXTURE_MIN_MIN, vox_axis, vox_spin);
-	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_ZP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_ZP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), tex_idx, TEXTURE_ZP | TEXTURE_MIN_MAX, vox_axis, vox_spin);
-	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), tex_idx, TEXTURE_ZP | TEXTURE_MAX_MIN, vox_axis, vox_spin);
-	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 1, 0), tex_idx, TEXTURE_ZP | TEXTURE_MAX_MAX, vox_axis, vox_spin);
+	Data[Index + 0] = VoxelRenderData(vox_pos_idx + Undex3D(0, 0, 0), TEXTURE_ZP | TEXTURE_MIN_MIN, vox);
+	Data[Index + 1] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_ZP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 2] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_ZP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 3] = VoxelRenderData(vox_pos_idx + Undex3D(1, 0, 0), TEXTURE_ZP | TEXTURE_MIN_MAX, vox);
+	Data[Index + 4] = VoxelRenderData(vox_pos_idx + Undex3D(0, 1, 0), TEXTURE_ZP | TEXTURE_MAX_MIN, vox);
+	Data[Index + 5] = VoxelRenderData(vox_pos_idx + Undex3D(1, 1, 0), TEXTURE_ZP | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
 
@@ -383,11 +387,11 @@ void VoxelRenderData::DataStream::FaceX(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceXn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
+			FaceXn(vox_pos_idx, *v_n);
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceXp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
+			FaceXp(vox_pos_idx, *v_p);
 		}
 	}
 }
@@ -397,11 +401,11 @@ void VoxelRenderData::DataStream::FaceY(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceYn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
+			FaceYn(vox_pos_idx, *v_n);
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceYp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
+			FaceYp(vox_pos_idx, *v_p);
 		}
 	}
 }
@@ -411,11 +415,11 @@ void VoxelRenderData::DataStream::FaceZ(Undex3D vox_pos_idx, const Voxel * v_n, 
 	{
 		if (v_n -> isSolid() && !v_p -> isSolid())
 		{
-			FaceZn(vox_pos_idx, v_n -> getID() - 1, v_n -> getAxis(), v_n -> getSpin());
+			FaceZn(vox_pos_idx, *v_n);
 		}
 		if (!v_n -> isSolid() && v_p -> isSolid())
 		{
-			FaceZp(vox_pos_idx, v_p -> getID() - 1, v_p -> getAxis(), v_p -> getSpin());
+			FaceZp(vox_pos_idx, *v_p);
 		}
 	}
 }
@@ -431,31 +435,25 @@ void VoxelRenderData::DataStream::FaceX(Undex3D vox_pos_idx, const VoxelChunk * 
 	const Voxel * vp = NULL;
 	if (vox_pos_idx.x == 0)
 	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
-			vp = &here -> get(vox_pos_idx.set_get_X(0));
+		if (ch_n == NULL)
+			return;
 
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &ch_n -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
+		vp = &here -> get(vox_pos_idx.set_get_X(0));
+
+		if (!vp -> isSolid())
+			return;
 	}
 	else if (vox_pos_idx.x == Voxel_per_Side)
 	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_pos_idx.set_get_X(0));
+		if (ch_p == NULL)
+			return;
 
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &here -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
+		vp = &ch_p -> get(vox_pos_idx.set_get_X(0));
+
+		if (!vn -> isSolid())
+			return;
 	}
 	else
 	{
@@ -473,31 +471,25 @@ void VoxelRenderData::DataStream::FaceY(Undex3D vox_pos_idx, const VoxelChunk * 
 	const Voxel * vp = NULL;
 	if (vox_pos_idx.y == 0)
 	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
-			vp = &here -> get(vox_pos_idx.set_get_Y(0));
+		if (ch_n == NULL)
+			return;
 
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &ch_n -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
+		vp = &here -> get(vox_pos_idx.set_get_Y(0));
+
+		if (!vp -> isSolid())
+			return;
 	}
 	else if (vox_pos_idx.y == Voxel_per_Side)
 	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_pos_idx.set_get_Y(0));
+		if (ch_p == NULL)
+			return;
 
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &here -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
+		vp = &ch_p -> get(vox_pos_idx.set_get_Y(0));
+
+		if (!vn -> isSolid())
+			return;
 	}
 	else
 	{
@@ -515,31 +507,25 @@ void VoxelRenderData::DataStream::FaceZ(Undex3D vox_pos_idx, const VoxelChunk * 
 	const Voxel * vp = NULL;
 	if (vox_pos_idx.z == 0)
 	{
-		if (ch_n != NULL)
-		{
-			vn = &ch_n -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
-			vp = &here -> get(vox_pos_idx.set_get_Z(0));
+		if (ch_n == NULL)
+			return;
 
-			if (!vp -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &ch_n -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
+		vp = &here -> get(vox_pos_idx.set_get_Z(0));
+
+		if (!vp -> isSolid())
+			return;
 	}
 	else if (vox_pos_idx.z == Voxel_per_Side)
 	{
-		if (ch_p != NULL)
-		{
-			vn = &here -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
-			vp = &ch_p -> get(vox_pos_idx.set_get_Z(0));
+		if (ch_p == NULL)
+			return;
 
-			if (!vn -> isSolid())
-			{
-				vn = NULL;
-				vp = NULL;
-			}
-		}
+		vn = &here -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
+		vp = &ch_p -> get(vox_pos_idx.set_get_Z(0));
+
+		if (!vn -> isSolid())
+			return;
 	}
 	else
 	{

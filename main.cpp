@@ -165,23 +165,25 @@ int main(int argc, char **argv)
 
 		int	tex_w = 128;
 		int	tex_h = 64;
+		int	img_count = 3;
 
-		PNG_Image ** img = new PNG_Image * [2];
+		PNG_Image ** img = new PNG_Image * [img_count];
 		if (argc >= 2) { img[0] = load_png_better(argv[1]); } else { img[0] = load_png_better("images/TextureAlign.png"); }
 		if (argc >= 3) { img[1] = load_png_better(argv[2]); } else { img[1] = load_png_better("images/RedWood.png"); }
+		if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/cat_cube.png"); }
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < img_count; i++)
 		{
 			PNG_Image * temp = img[i] -> Scale(tex_w, tex_h);
 			delete img[i];
 			img[i] = temp;
 		}
 
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,   tex_w, tex_h, 2, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
-		for (int i = 0; i < 2; i++)
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,   tex_w, tex_h, img_count, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
+		for (int i = 0; i < img_count; i++)
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, tex_w, tex_h, 1, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img[i] -> data);
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < img_count; i++)
 			delete img[i];
 		delete [] img;
 
@@ -216,6 +218,12 @@ int main(int argc, char **argv)
 	double	FrameTimeCurr;
 	double	FrameTimeDelta;
 
+	char	placeID = 0;
+	KeyPress place_add_key(GLFW_MOUSE_BUTTON_4, true);
+	KeyPress place_sub_key(GLFW_MOUSE_BUTTON_5, true);
+	win -> keys.push_back(&place_add_key);
+	win -> keys.push_back(&place_sub_key);
+
 	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -230,6 +238,17 @@ int main(int argc, char **argv)
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
+		if (place_add_key.check())
+		{
+			placeID++;
+			if (placeID > 3) { placeID = 0; }
+		}
+		if (place_sub_key.check())
+		{
+			placeID--;
+			if (placeID < 0) { placeID = 3; }
+		}
+
 
 		Index3D chunk_current;
 		chunk_current.x = floorf(view.pos.x / Voxel_per_Side);
@@ -242,9 +261,9 @@ int main(int argc, char **argv)
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid)
-			space.tryAdd(hover);
+			space.tryAdd(hover, placeID);
 		if (voxel_sub_key.check() && hover.isValid)
-			space.trySub(hover);
+			space.trySub(hover, placeID);
 
 
 

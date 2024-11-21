@@ -168,7 +168,7 @@ void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 
 
 
-char	VoxelSpace::tryAdd(Voxel_Hover hover)
+char	VoxelSpace::tryAdd(Voxel_Hover hover, char id)
 {
 	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
 
@@ -178,13 +178,13 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover)
 		return (0);
 
 
-	chunk -> tryAdd(hover.voxel_idx, 2, hover.cardinal);
+	chunk -> tryAdd(hover.voxel_idx, id, hover.cardinal);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
 	return 0;
 }
-char	VoxelSpace::trySub(Voxel_Hover hover)
+char	VoxelSpace::trySub(Voxel_Hover hover, char id)
 {
 	VoxelChunk * chunk = Chunks[hover.chunk_vec_idx];
 	if (!chunk -> isChunkIndex(hover.chunk_idx))
@@ -196,6 +196,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover)
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
 	return t;
+	(void)id;
 }
 
 void	VoxelSpace::Draw(int Uni_Chunk_Pos) const

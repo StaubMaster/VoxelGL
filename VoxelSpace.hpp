@@ -40,8 +40,8 @@ class VoxelSpace
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
 
-		char	tryAdd(Voxel_Hover hover);
-		char	trySub(Voxel_Hover hover);
+		char	tryAdd(Voxel_Hover hover, char id);
+		char	trySub(Voxel_Hover hover, char id);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;

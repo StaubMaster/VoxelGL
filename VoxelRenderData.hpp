@@ -73,7 +73,7 @@ struct VoxelRenderData
 	public:
 		VoxelRenderData();
 	private:
-		VoxelRenderData(Undex3D vox_idx, int tex_idx, char tex_info, char vox_axis, char vox_spin);
+		VoxelRenderData(Undex3D vox_idx, char tex_info, const Voxel & vox);
 
 	public:
 		struct DataStream
@@ -90,12 +90,12 @@ struct VoxelRenderData
 			void	ToBuffer(unsigned int & count) const;
 
 		public:
-			void FaceXn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
-			void FaceXp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
-			void FaceYn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
-			void FaceYp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
-			void FaceZn(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
-			void FaceZp(Undex3D vox_idx, int tex_idx, char vox_axis, char vox_spin);
+			void FaceXn(Undex3D vox_idx, const Voxel & vox);
+			void FaceXp(Undex3D vox_idx, const Voxel & vox);
+			void FaceYn(Undex3D vox_idx, const Voxel & vox);
+			void FaceYp(Undex3D vox_idx, const Voxel & vox);
+			void FaceZn(Undex3D vox_idx, const Voxel & vox);
+			void FaceZp(Undex3D vox_idx, const Voxel & vox);
 
 			void FaceX(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
 			void FaceY(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);

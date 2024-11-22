@@ -121,6 +121,11 @@ int main(int argc, char **argv)
 }
 #endif
 
+float interpolate(float v0, float v1, float t)
+{
+	return (v0 * (t - 0)) + (v1 * (1 - t));
+}
+
 #ifndef TEXTURE_TEST
 int main(int argc, char **argv)
 {
@@ -169,8 +174,9 @@ int main(int argc, char **argv)
 
 		PNG_Image ** img = new PNG_Image * [img_count];
 		if (argc >= 2) { img[0] = load_png_better(argv[1]); } else { img[0] = load_png_better("images/TextureAlign.png"); }
-		if (argc >= 3) { img[1] = load_png_better(argv[2]); } else { img[1] = load_png_better("images/RedWood.png"); }
-		if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/cat_cube.png"); }
+		if (argc >= 3) { img[1] = load_png_better(argv[2]); } else { img[1] = load_png_better("images/fancy_RedWood2.png"); }
+		if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/fancy_GreenDirt2.png"); }
+		//if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/cat_cube.png"); }
 
 		for (int i = 0; i < img_count; i++)
 		{

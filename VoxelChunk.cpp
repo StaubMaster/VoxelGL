@@ -202,17 +202,15 @@ void	VoxelChunk::GenerateVoxelRotationTest()
 		i = voxel_idx.ToIndex(Voxel_per_Side);
 
 		Data[i] = Voxel(0);
-		if (global_idx.x % 2 == 0 && global_idx.y % 2 == 0 && global_idx.z % 2 == 0)
+		if (global_idx.x % 2 == 0 && global_idx.y % 4 == 0 && global_idx.z % 2 == 0)
 		{
 			X = global_idx.x / 2;
-			Y = global_idx.y / 2;
+			Y = global_idx.y / 4;
 			Z = global_idx.z / 2;
 
-			if (X >= 0 && X <= 5 && Y == 0 && Z >= 0 && Z <= 3)
+			if (X >= 0 && X <= 5 && Z >= 0 && Z <= 3 && Y >= 0 && Y <= 3)
 			{
-				char axis = X;
-				char spin = Z;
-				Data[i] = Voxel(1, axis, spin);
+				Data[i] = Voxel(Y, X, Z);
 			}
 		}
 	}

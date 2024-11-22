@@ -1,11 +1,13 @@
 
 #ifndef DEFLATE_HPP
 # define DEFLATE_HPP
-# include "uint.hpp"
-# include "BitStream.hpp"
-# include "PNG.hpp"
+# include "../DebugManager.hpp"
+# include "../uint.hpp"
+# include "../BitStream.hpp"
+# include "../DataStream.hpp"
+
 # include "Huffman.hpp"
-# include "DataStream.hpp"
+# include "PNG_Image.hpp"
 
 class DEFLATE
 {

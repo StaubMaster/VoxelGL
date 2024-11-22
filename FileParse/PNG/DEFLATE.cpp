@@ -59,7 +59,8 @@ static uint32 dist_base_extra_bits[] = {
 
 void	DEFLATE::decode_Huffman(BitStream & bits, HuffmanTree & literal, HuffmanTree & distance, DataStream & data)
 {
-	std::cout << "\e[34mHuffman decode ... \e[m\n";
+	std::ostream & os = DebugManager::GetOut();
+	os << "\e[34mHuffman decode ... \e[m\n";
 
 	uint32	decode_value;
 
@@ -101,17 +102,20 @@ void	DEFLATE::decode_Huffman(BitStream & bits, HuffmanTree & literal, HuffmanTre
 		}
 		else
 		{
-			std::cout << "\e[31mError: Invalid Huffman Decode\e[m\n";
+			throw PNG_Image::PNG_Exception_InvalidData();
+			os << "\e[31mError: Invalid Huffman Decode\e[m\n";
 		}
 	}
 
-	std::cout << "\e[34mHuffman decode done \e[m\n";
+	os << "\e[34mHuffman decode done \e[m\n";
 }
 
 
 
 uint8 *	DEFLATE::dynamic_Huffman(BitStream & bits, uint32 H_LIT, uint32 H_DIST, uint32 H_CLEN)
 {
+	std::ostream & os = DebugManager::GetOut();
+
 	uint8 codeLenCodeLenOrder[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 	uint8 codeLenCodeLen[19];
 	for (uint32 i = 0; i < 19; i++)
@@ -151,7 +155,8 @@ uint8 *	DEFLATE::dynamic_Huffman(BitStream & bits, uint32 H_LIT, uint32 H_DIST, 
 			}
 			else
 			{
-				std::cout << "\e[31mError: Invalid Huffman Decode\e[m\n";
+				os << "\e[31mError: Invalid Huffman Decode\e[m\n";
+				throw PNG_Image::PNG_Exception_InvalidData();
 			}
 
 			for (uint32 r = 0; r < repeat_count; r++)
@@ -170,30 +175,37 @@ uint8 *	DEFLATE::dynamic_Huffman(BitStream & bits, uint32 H_LIT, uint32 H_DIST, 
 
 void	DEFLATE::Block_direct(BitStream & bits, DataStream & data)
 {
-	std::cout << "\e[34mdirect Data ...\e[m\n";
+	std::ostream & os = DebugManager::GetOut();
+	os << "\e[34mdirect Data ...\e[m\n";
 
-	std::cout << "\e[34mdirect Data done\e[m\n";
+	throw PNG_Image::PNG_Exception_NotImplemented();
+
+	os << "\e[34mdirect Data done\e[m\n";
 	(void)bits;
 	(void)data;
 }
 void	DEFLATE::Block_static(BitStream & bits, DataStream & data)
 {
-	std::cout << "\e[34mstatic Huffman ...\e[m\n";
+	std::ostream & os = DebugManager::GetOut();
+	os << "\e[34mstatic Huffman ...\e[m\n";
 
-	std::cout << "\e[34mstatic Huffman done\e[m\n";
+	throw PNG_Image::PNG_Exception_NotImplemented();
+
+	os << "\e[34mstatic Huffman done\e[m\n";
 	(void)bits;
 	(void)data;
 }
 void	DEFLATE::Block_dynamic(BitStream & bits, DataStream & data)
 {
-	std::cout << "\e[34mdynamic Huffman ...\e[m\n";
+	std::ostream & os = DebugManager::GetOut();
+	os << "\e[34mdynamic Huffman ...\e[m\n";
 
 	uint32	H_LIT = bits.bits(5) + 257;
 	uint32	H_DIST = bits.bits(5) + 1;
 	uint32	H_CLEN = bits.bits(4) + 4;
-	std::cout << "H_LIT  : " << H_LIT  << "\n";
-	std::cout << "H_DIST : " << H_DIST << "\n";
-	std::cout << "H_CLEN : " << H_CLEN << "\n";
+	os << "H_LIT  : " << H_LIT  << "\n";
+	os << "H_DIST : " << H_DIST << "\n";
+	os << "H_CLEN : " << H_CLEN << "\n";
 
 	uint8 * bitLens = DEFLATE::dynamic_Huffman(bits, H_LIT, H_DIST, H_CLEN);
 
@@ -204,22 +216,24 @@ void	DEFLATE::Block_dynamic(BitStream & bits, DataStream & data)
 
 	delete [] bitLens;
 
-	std::cout << "\e[34mdynamic Huffman done\e[m\n";
+	os << "\e[34mdynamic Huffman done\e[m\n";
 }
 
 void	DEFLATE::Blocks(BitStream & bits, DataStream & data)
 {
+	std::ostream & os = DebugManager::GetOut();
+
 	uint8	BFINAL;
 	uint8	BTYPE;
 
 	do
 	{
-		std::cout << "decoding ...  " << bits.get_ByteIndex() << "/" << bits.Len << "\n";
+		os << "decoding ...  " << bits.get_ByteIndex() << "/" << bits.Len << "\n";
 
 		BFINAL = bits.bits(1);
 		BTYPE = bits.bits(2);
-		std::cout << "BFINAL : " << uint_Bit(BFINAL, 0) << "\n";
-		std::cout << "BTYPE  : " << uint_Bit(BTYPE, 1) << "\n";
+		os << "BFINAL : " << uint_Bit(BFINAL, 0) << "\n";
+		os << "BTYPE  : " << uint_Bit(BTYPE, 1) << "\n";
 
 		if (BTYPE == 0b00)
 		{
@@ -235,10 +249,11 @@ void	DEFLATE::Blocks(BitStream & bits, DataStream & data)
 		}
 		else
 		{
-			std::cout << "\e[31mError: Invalid Block Type\e[m\n";
+			throw PNG_Image::PNG_Exception_InvalidData();
+			os << "\e[31mError: Invalid Block Type\e[m\n";
 		}
-		std::cout << "\n";
+		os << "\n";
 	}
 	while (BFINAL == 0);
-	std::cout << "decoding done " << bits.get_ByteIndex() << "/" << bits.Len << "\n";
+	os << "decoding done " << bits.get_ByteIndex() << "/" << bits.Len << "\n";
 }

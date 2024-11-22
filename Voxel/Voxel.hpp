@@ -2,7 +2,8 @@
 #ifndef VOXEL_HPP
 # define VOXEL_HPP
 # include <iostream>
-# include "openGL/Abstract/Undex3D.hpp"
+
+# include "../openGL/Abstract/Undex3D.hpp"
 
 # define VOXEL_AXIS_XM 0b000
 # define VOXEL_AXIS_XP 0b000

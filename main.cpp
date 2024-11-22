@@ -13,120 +13,19 @@
 #include "openGL/Forms/Window.hpp"
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
-#include "VoxelChunk.hpp"
-#include "VoxelSpace.hpp"
+
+#include "Voxel/VoxelChunk.hpp"
+#include "Voxel/VoxelSpace.hpp"
+
 #include "Box.hpp"
-#include "png/_png.h"
-#include "png/PNG.hpp"
 
-//#define TEXTURE_TEST
-
-#ifdef TEXTURE_TEST
-int main(int argc, char **argv)
-{
-	if (argc != 2)
-	{
-		return 1;
-	}
-
-	//image img[1] = load_png(argv[1]);
-	//free(img[1].data);
-	//return 0;
-
-	PNG_Image * img = load_png_better(argv[1]);
-
-	Window * win = new Window(img -> w, img -> h, argv[1], false);
-	std::cout << "window done\n";
-
-	Shader texShader(
-		"shaders/Tex.vert",
-		"shaders/Tex.frag"
-	);
-
-	std::cout << "texture loading ...\n";
-	unsigned int Texture0;
-	glGenTextures(1, &Texture0);
-	glBindTexture(GL_TEXTURE_2D, Texture0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img -> w, img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img -> data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	std::cout << "texture done\n";
-
-	unsigned int Buffer_Array;
-	unsigned int Buffer_Vertex;
-
-	glGenVertexArrays(1, &Buffer_Array);
-	glGenBuffers(1, &Buffer_Vertex);
-
-	{
-		float vertex_data[16] = {
-			-1.0f, -1.0f, 0.0f, 1.0f,
-			-1.0f, +1.0f, 0.0f, 0.0f,
-			+1.0f, -1.0f, 1.0f, 1.0f,
-			+1.0f, +1.0f, 1.0f, 0.0f,
-		};
-
-		glBindVertexArray(Buffer_Array);
-		glBindBuffer(GL_ARRAY_BUFFER, Buffer_Vertex);
-
-		glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), vertex_data, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 2, GL_FLOAT, false, 4 * sizeof(float), (void *)(0 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, false, 4 * sizeof(float), (void *)(2 * sizeof(float)));
-	}
-
-	glEnable(GL_DEPTH_TEST);
-	glDepthMask(GL_TRUE);
-	glDepthFunc(GL_LESS);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-	glFrontFace(GL_CCW);
-
-	std::cout << "loop\n\n\n\n\n\n\n";
-	while (!glfwWindowShouldClose(win -> win))
-	{
-		win -> Update();
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.5f, 0.5f, 0.5f, 1);
-
-		texShader.Use();
-		glBindVertexArray(Buffer_Array);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE0, Texture0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-		glfwSwapBuffers(win -> win);
-		glfwPollEvents();
-	}
-
-	glDeleteTextures(1, &Texture0);
-
-	glBindVertexArray(Buffer_Array);
-	glDeleteBuffers(1, &Buffer_Vertex);
-	glDeleteVertexArrays(1, &Buffer_Array);
-
-	delete win;
-	//free(img.data);
-	delete img;
-
-	return 0;
-}
-#endif
+#include "FileParse/PNG/PNG_Image.hpp"
 
 float interpolate(float v0, float v1, float t)
 {
 	return (v0 * (t - 0)) + (v1 * (1 - t));
 }
 
-#ifndef TEXTURE_TEST
 int main(int argc, char **argv)
 {
 	Window * win = new Window(1000, 1000, "Voxel", false);
@@ -168,15 +67,23 @@ int main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
 		glActiveTexture(GL_TEXTURE0);
 
+		const char * file_names[] = {
+			"images/TextureAlign.png",
+			"images/fancy_GreenDirt.png",
+			"images/fancy_RedWood.png",
+			"images/fancy_BlueSpiral.png",
+			"images/BlueSpiral.png",
+		};
+
 		int	tex_w = 128;
 		int	tex_h = 64;
-		int	img_count = 3;
+		int	img_count = 5;
 
 		PNG_Image ** img = new PNG_Image * [img_count];
-		if (argc >= 2) { img[0] = load_png_better(argv[1]); } else { img[0] = load_png_better("images/TextureAlign.png"); }
-		if (argc >= 3) { img[1] = load_png_better(argv[2]); } else { img[1] = load_png_better("images/fancy_RedWood2.png"); }
-		if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/fancy_GreenDirt2.png"); }
-		//if (argc >= 4) { img[2] = load_png_better(argv[3]); } else { img[2] = load_png_better("images/cat_cube.png"); }
+		for (int i = 0; i < img_count; i++)
+		{
+			img[i] = PNG_Image::Load(file_names[i]);
+		}
 
 		for (int i = 0; i < img_count; i++)
 		{
@@ -247,12 +154,12 @@ int main(int argc, char **argv)
 		if (place_add_key.check())
 		{
 			placeID++;
-			if (placeID > 3) { placeID = 0; }
+			if (placeID > 4) { placeID = 0; }
 		}
 		if (place_sub_key.check())
 		{
 			placeID--;
-			if (placeID < 0) { placeID = 3; }
+			if (placeID < 0) { placeID = 4; }
 		}
 
 
@@ -287,7 +194,7 @@ int main(int argc, char **argv)
 		space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();
-		glUniform1f(Uni_Box_Cycle, glfwGetTime() * 16);
+		glUniform1f(Uni_Box_Cycle, FrameTimeCurr * 16);
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
@@ -309,4 +216,3 @@ int main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 }
-#endif

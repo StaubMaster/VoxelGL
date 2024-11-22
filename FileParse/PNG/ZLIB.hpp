@@ -1,8 +1,12 @@
 
 #ifndef ZLIB_HPP
 # define ZLIB_HPP
-# include "uint.hpp"
-# include "BitStream.hpp"
+# include "../DebugManager.hpp"
+# include "../uint.hpp"
+# include "../BitStream.hpp"
+# include "../DataStream.hpp"
+
+# include "DEFLATE.hpp"
 
 class ZLIB
 {
@@ -21,6 +25,8 @@ class ZLIB
 		BitStream	ToBitStream() const;
 
 		std::string	ToString() const;
+
+		static void	decompress(BitStream & bits, DataStream & data);
 };
 
 #endif

@@ -172,11 +172,14 @@ void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
 		}
 		else if (Index3D::Box_exclusive(global_idx, box_min, box_max))
 		{
-			Data[i] = Voxel(1);
+			Data[i] = Voxel::AxisAligned(2, std::rand() % 6, std::rand() % 4);
 		}
 		else
 		{
-			Data[i] = Voxel(std::rand() & 1);
+			if ((std::rand() & 1) == 0)
+				Data[i] = Voxel(0);
+			else
+				Data[i] = Voxel::AxisAligned(2, std::rand() % 6, std::rand() % 4);
 		}
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
@@ -208,7 +211,7 @@ void	VoxelChunk::GenerateVoxelRotationTest()
 			Y = global_idx.y / 4;
 			Z = global_idx.z / 2;
 
-			if (X >= 0 && X <= 5 && Z >= 0 && Z <= 3 && Y >= 0 && Y <= 3)
+			if (X >= 0 && X <= 5 && Z >= 0 && Z <= 3 && Y >= 0 && Y <= 5)
 			{
 				Data[i] = Voxel(Y, X, Z);
 			}

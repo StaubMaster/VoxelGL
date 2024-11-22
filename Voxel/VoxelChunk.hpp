@@ -1,14 +1,17 @@
 
 #ifndef VOXELCHUNK_HPP
 # define VOXELCHUNK_HPP
-# include "openGL/openGL.h"
-# include "openGL/Abstract/math3D.hpp"
-# include "openGL/Abstract/Point.hpp"
+# include <iostream>
+
+# include "../openGL/openGL.h"
+# include "../openGL/Abstract/math3D.hpp"
+# include "../openGL/Abstract/Point.hpp"
+
 # include "Voxel.hpp"
 # include "VoxelRenderData.hpp"
-# include "Box.hpp"
-# include "MemorySize.hpp"
-# include <iostream>
+
+# include "../Box.hpp"
+# include "../MemorySize.hpp"
 
 //	!!!! when changing chunk size make sure to change it in the shader as well
 # define Voxel_per_Side 16

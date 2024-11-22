@@ -2,6 +2,7 @@
 #ifndef DATASTREAM_HPP
 # define DATASTREAM_HPP
 # include "uint.hpp"
+# include <fstream>
 
 class DataStream
 {

@@ -1,11 +1,13 @@
 
 #ifndef VOXELSPACE_HPP
 # define VOXELSPACE_HPP
-# include "openGL/openGL.h"
-# include "openGL/Abstract/math3D.hpp"
-# include "VoxelChunk.hpp"
 # include <iostream>
 # include <vector>
+
+# include "../openGL/openGL.h"
+# include "../openGL/Abstract/math3D.hpp"
+
+# include "VoxelChunk.hpp"
 
 class VoxelSpace
 {

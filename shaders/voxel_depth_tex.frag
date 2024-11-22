@@ -38,5 +38,8 @@ void main()
 	vec4 col;
 	col = texture(texture0, fs_in.Tex_pos);
 
+	if (col.a == 0)
+		discard;
+
 	Pixel = vec4(col * l * dep0 + back * dep1);
 }

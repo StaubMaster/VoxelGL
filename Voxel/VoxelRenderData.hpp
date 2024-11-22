@@ -1,8 +1,10 @@
 
 #ifndef VOXELRENDERDATA_HPP
 # define VOXELRENDERDATA_HPP
-# include "openGL/openGL.h"
-# include "openGL/Abstract/Undex3D.hpp"
+
+# include "../openGL/openGL.h"
+# include "../openGL/Abstract/Undex3D.hpp"
+
 # include "Voxel.hpp"
 # include "VoxelChunk.hpp"
 

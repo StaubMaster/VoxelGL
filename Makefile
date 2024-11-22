@@ -1,38 +1,44 @@
 
-FLAGS = -Wall -Wextra -Werror
-
 NAME = a.exe
 
-FILE_C = main.cpp \
-	Voxel.cpp \
-	VoxelRenderData.cpp \
-	VoxelChunk.cpp \
-	VoxelSpace.cpp \
+FILES_CPP = \
+	main.cpp \
 	Box.cpp \
 	MemorySize.cpp
-FILE_O = $(FILE_C:.cpp=.o)
+
+FILES_VOXEL_CPP = \
+	Voxel/Voxel.cpp \
+	Voxel/VoxelRenderData.cpp \
+	Voxel/VoxelChunk.cpp \
+	Voxel/VoxelSpace.cpp \
+	Voxel/VoxelDataTable.cpp
+
+FILES_O = $(FILES_CPP:.cpp=.o)
+FILES_O += $(FILES_VOXEL_CPP:.cpp=.o)
+
+FLAGS = -Wall -Wextra -Werror
 
 ARC_OPENGL_PATH = ./openGL
 ARC_OPENGL = $(ARC_OPENGL_PATH)/openGL.a
 
-ARC_PNG_PATH = ./png
-ARC_PNG = $(ARC_PNG_PATH)/png.a
+ARC_FILES_PATH = ./FileParse
+ARC_FILES = $(ARC_FILES_PATH)/fileParser.a
 
 
-$(NAME) : $(FILE_O) $(ARC_OPENGL) $(ARC_PNG)
-	c++ $(FLAGS) -o $(NAME) $(FILE_O) $(ARC_OPENGL) $(ARC_PNG) E:/Programmieren/code/glfw-3.4.bin.WIN64/lib-mingw-w64/libglfw3.a -lgdi32
-#	c++ $(FLAGS) -o $(NAME) $(FILE_O) $(ARC_OPENGL) $(ARC_PNG) -lglfw
+$(NAME) : $(FILES_O) $(ARC_OPENGL) $(ARC_FILES)
+	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) E:/Programmieren/code/glfw-3.4.bin.WIN64/lib-mingw-w64/libglfw3.a -lgdi32
+#	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) -lglfw
 
 all:
 	$(MAKE) -C $(ARC_OPENGL_PATH) all
-	$(MAKE) -C $(ARC_PNG_PATH) all
-	$(MAKE) $(FILE_O)
+	$(MAKE) -C $(ARC_FILES_PATH) all
+	$(MAKE) $(FILES_O)
 	$(MAKE) $(NAME)
 
 clean:
-	rm -f $(FILE_O)
+	rm -f $(FILES_O)
 	$(MAKE) -C $(ARC_OPENGL_PATH) fclean
-	$(MAKE) -C $(ARC_PNG_PATH) fclean
+	$(MAKE) -C $(ARC_FILES_PATH) fclean
 
 fclean:
 	$(MAKE) clean
@@ -52,6 +58,6 @@ re:
 $(ARC_OPENGL) :
 	$(MAKE) -C $(ARC_OPENGL_PATH) all
 
-$(ARC_PNG) :
-	$(MAKE) -C $(ARC_PNG_PATH) all
+$(ARC_FILES) :
+	$(MAKE) -C $(ARC_FILES_PATH) all
 

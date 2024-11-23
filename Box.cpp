@@ -26,6 +26,119 @@ Box::~Box()
 	}
 }
 
+
+
+
+Point	Box::IntersektSize(Box & other)
+{
+/*
+	Box with '+' : this
+	Box with '#' : other
+
+			|	|	X Diff
+			|	|
+	+-----------+
+	|			|
+	|			|
+	|		#-------#----
+	|		|	|	|	Y Diff
+	+-------|---+	|----
+			|		|
+			#-------#
+
+other fully inside this :
+	+-----------+
+	|			|
+	|	#---#	|
+	|	|	|	|	no X Intersekt
+	+---|---|---+
+		|	|
+		#---#
+
+this fully inside other:
+		+---+
+		|	|
+	#---|---|---#
+	|	|	|	|	no X Intersekt
+	|	+---+	|
+	|			|
+	#-----------#
+
+no intersection:
+	+---+	#---#
+	|	|	|	|	no X Intersekt
+	+---+	#---#
+*/
+
+/*
+	1	2	3	4
+
+	|		|
+	|	#---|---#
+	|	|	|	|
+	+---|---+	|
+		|		|
+
+	min_intersekt = 2 - 1 = +1
+	max_intersekt = 4 - 3 = +1
+
+	min_intersekt > 0 : no overlap
+	max_intersekt > 0 : overlap
+
+	1	2	3	4
+
+	|	|
+	|	|	#---#
+	|	|	|	|
+	+---+	|	|
+			|	|
+
+	min_intersekt = 3 - 1 = +2
+	max_intersekt = 4 - 2 = +2
+*/
+
+	Point	diff;
+	double	min_intersekt;
+	double	max_intersekt;
+
+	if (Min.x < other.Max.x && other.Min.x < Max.x)
+	{
+		min_intersekt = other.Min.x - Min.x;
+		max_intersekt = other.Max.x - Max.x;
+		if (min_intersekt < 0 && max_intersekt < 0)
+			diff.x = min_intersekt;
+		if (min_intersekt > 0 && max_intersekt > 0)
+		diff.x = max_intersekt;
+	}
+
+	if (Min.y < other.Max.y && other.Min.y < Max.y)
+	{
+		min_intersekt = other.Min.y - Min.y;
+		max_intersekt = other.Max.y - Max.y;
+		if (min_intersekt < 0 && max_intersekt < 0)
+			diff.y = min_intersekt;
+		if (min_intersekt > 0 && max_intersekt > 0)
+			diff.y = max_intersekt;
+	}
+
+	if (Min.z < other.Max.z && other.Min.z < Max.z)
+	{
+		min_intersekt = other.Min.z - Min.z;
+		max_intersekt = other.Max.z - Max.z;
+		if (min_intersekt < 0 && max_intersekt < 0)
+			diff.z = min_intersekt;
+		if (min_intersekt > 0 && max_intersekt > 0)
+			diff.z = max_intersekt;
+	}
+
+	return diff;
+}
+
+
+
+
+
+
 void	Box::CreateBuffer()
 {
 	if (Buffer_Array == 0xFFFFFFFF)

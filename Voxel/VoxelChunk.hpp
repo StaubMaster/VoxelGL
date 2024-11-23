@@ -54,10 +54,13 @@ class VoxelChunk
 		void	GenerateChunkLimit(VoxelDataTable & table, char axis_limit);
 		void	GenerateFuzzyCenterCube(VoxelDataTable & table, int size2);
 		void	GenerateVoxelRotationTest(VoxelDataTable & table);
+		void	GeneratePlane(VoxelDataTable & table);
 
 		int		CheckVoxel(Index3D idx);
 		void	tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth);
 		char	trySub(Undex3D idx);
+
+		Point	CheckBoxCollision(Box & box);
 
 	public:
 		void	UpdateBuffer(

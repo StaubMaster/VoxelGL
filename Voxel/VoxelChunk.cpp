@@ -235,6 +235,36 @@ void	VoxelChunk::GenerateVoxelRotationTest(VoxelDataTable & table)
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
 	(void)table;
 }
+void	VoxelChunk::GeneratePlane(VoxelDataTable & table)
+{
+	Index3D chunk_idx;
+	chunk_idx.x = Index.x * Voxel_per_Side;
+	chunk_idx.y = Index.y * Voxel_per_Side;
+	chunk_idx.z = Index.z * Voxel_per_Side;
+
+	Undex3D voxel_idx;
+	Index3D global_idx;
+	unsigned int i;
+
+	do
+	{
+		global_idx.x = chunk_idx.x + voxel_idx.x;
+		global_idx.y = chunk_idx.y + voxel_idx.y;
+		global_idx.z = chunk_idx.z + voxel_idx.z;
+		i = voxel_idx.ToIndex(Voxel_per_Side);
+
+		//if (global_idx.y >= -16 && global_idx.y < 16)
+		if (global_idx.y >= -1 && global_idx.y < 1)
+		{
+			Data[i] = table.Get(1).ToVoxel(1, 0);
+			continue;
+		}
+		Data[i] = Voxel();
+	}
+	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+}
+
+
 
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {

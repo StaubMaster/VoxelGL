@@ -3,6 +3,8 @@
 # define VOXEL_HPP
 # include <iostream>
 
+# include "../Box.hpp"
+
 # include "../openGL/Abstract/Undex3D.hpp"
 
 # define VOXEL_NO_DRAW_BIT     0b001
@@ -37,6 +39,8 @@ class Voxel
 
 		char	getAxis() const;
 		char	getSpin() const;
+
+		Point	CheckBoxCollision(Box & box);
 
 		static char	Orth_To_Axis(char orth);
 };

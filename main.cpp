@@ -136,9 +136,18 @@ int main(int argc, char **argv)
 
 	View view;
 	//view.pos.z = -(128 + 10);
-	VoxelSpace space;
+	VoxelSpace space(table);
 
 
+	KeyPress test_Box_Key(GLFW_KEY_Q, false);
+	win -> keys.push_back(&test_Box_Key);
+
+	Box box1(Point(-1, 3, -1), Point(1, 4, 1));
+	Box box2(Point(-0.5, 4.5, -0.5), Point(0.5, 5, 0.5));
+	box1.CreateBuffer();
+	box1.UpdateBuffer();
+	box2.CreateBuffer();
+	box2.UpdateBuffer();
 
 
 
@@ -204,13 +213,13 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		space.AddChunksRange(table, chunk_current, 1);
+		space.AddChunksRange(chunk_current, 1);
 		space.SubChunksRange(chunk_current, 1);
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid)
-			space.tryAdd(table, hover, placeID);
+			space.tryAdd(hover, placeID);
 		if (voxel_sub_key.check() && hover.isValid)
 			space.trySub(hover, placeID);
 
@@ -232,6 +241,22 @@ int main(int argc, char **argv)
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
+
+		if (test_Box_Key.check())
+		{
+			box2.Min = Point(-0.5, 3.5, -0.5);
+			box2.Max = Point(0.5, 5, 0.5);
+		}
+
+		{
+			Point diff = box1.IntersektSize(box2);
+			box2.Min = box2.Min + (diff * 0.001);
+			box2.Max = box2.Max + (diff * 0.001);
+			box2.UpdateBuffer();
+		}
+
+		box1.Draw();
+		box2.Draw();
 
 
 

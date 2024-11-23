@@ -8,9 +8,11 @@
 class Box
 {
 	private:
+	public:
 		Point Min;
 		Point Max;
 	
+	private:
 		unsigned int	Buffer_Array;
 		unsigned int	Buffer_MinMax;
 
@@ -21,6 +23,9 @@ class Box
 	private:
 		Box(const Box & other);
 		const Box & operator =(const Box & other);
+
+	public:
+		Point	IntersektSize(Box & other);
 
 	public:
 		void	CreateBuffer();

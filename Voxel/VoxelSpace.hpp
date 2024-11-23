@@ -24,9 +24,10 @@ class VoxelSpace
 
 	private:
 		std::vector<VoxelChunk * > Chunks;
+		VoxelDataTable & Table;
 
 	public:
-		VoxelSpace();
+		VoxelSpace(VoxelDataTable & table);
 		~VoxelSpace();
 
 		VoxelChunk *	FindChunkPtr(Index3D idx);
@@ -34,16 +35,18 @@ class VoxelSpace
 		int				CheckChunk(Index3D idx);
 
 		void	FillRandom();
-		void	AddChunk(VoxelDataTable & table, Index3D idx);
+		void	AddChunk(Index3D idx);
 		void	SubChunk(Index3D idx);
-		void	AddChunksRange(VoxelDataTable & table, Index3D idx, int range);
+		void	AddChunksRange(Index3D idx, int range);
 		void	SubChunksRange(Index3D idx, int range);
 
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
 
-		char	tryAdd(VoxelDataTable & table, Voxel_Hover hover, char id);
+		char	tryAdd(Voxel_Hover hover, char id);
 		char	trySub(Voxel_Hover hover, char id);
+
+		Point	CheckBoxCollision(Box & box);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;

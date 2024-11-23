@@ -1,22 +1,12 @@
 
 #include "VoxelSpace.hpp"
 
-VoxelSpace::VoxelSpace()
+VoxelSpace::VoxelSpace(VoxelDataTable & table) :
+	Table(table)
 {
 	std::cout << "++++ VoxelSpace\n";
 
 	Chunks.clear();
-	/*for (int z = -2; z < +2; z++)
-	{
-		for (int y = -2; y < +2; y++)
-		{
-			for (int x = -2; x < +2; x++)
-			{
-				Chunks.push_back(new VoxelChunk(Index3D(x, y, z)));
-			}
-		}
-	}*/
-	//Chunks.push_back(VoxelChunk(0, 0, 0));
 }
 VoxelSpace::~VoxelSpace()
 {
@@ -70,14 +60,15 @@ int	VoxelSpace::CheckChunk(Index3D idx)
 
 
 
-void	VoxelSpace::AddChunk(VoxelDataTable & table, Index3D idx)
+void	VoxelSpace::AddChunk(Index3D idx)
 {
 	VoxelChunk * ch = new VoxelChunk(idx);
 	Chunks.push_back(ch);
 
 	//ch -> GenerateVoxelRotationTest(table);
-	ch -> GenerateFuzzyCenterCube(table, 16);
+	//ch -> GenerateFuzzyCenterCube(table, 16);
 	//ch -> GenerateChunkLimit(table, 2);
+	ch -> GeneratePlane(Table);
 	UpdateBufferNeighbours(idx);
 }
 void	VoxelSpace::SubChunk(Index3D idx)
@@ -87,7 +78,7 @@ void	VoxelSpace::SubChunk(Index3D idx)
 	delete Chunks[i];
 	Chunks.erase(Chunks.begin() + i);
 }
-void	VoxelSpace::AddChunksRange(VoxelDataTable & table, Index3D idx, int range)
+void	VoxelSpace::AddChunksRange(Index3D idx, int range)
 {
 	Index3D min = idx - Index3D(range);
 	Index3D max = idx + Index3D(range);
@@ -116,7 +107,7 @@ void	VoxelSpace::AddChunksRange(VoxelDataTable & table, Index3D idx, int range)
 	{
 		if (!exists[i.ToIndex(range_per_side)])
 		{
-			AddChunk(table, i + min);
+			AddChunk(i + min);
 		}
 	}
 	while (Index3D::loop_exclusive(i, 0, range_per_side));
@@ -168,7 +159,7 @@ void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 
 
 
-char	VoxelSpace::tryAdd(VoxelDataTable & table, Voxel_Hover hover, char id)
+char	VoxelSpace::tryAdd(Voxel_Hover hover, char id)
 {
 	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
 
@@ -177,7 +168,7 @@ char	VoxelSpace::tryAdd(VoxelDataTable & table, Voxel_Hover hover, char id)
 	if (chunk == NULL)
 		return (0);
 
-	chunk -> tryAdd(table, hover.voxel_idx, id, hover.cardinal);
+	chunk -> tryAdd(Table, hover.voxel_idx, id, hover.cardinal);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 

@@ -28,13 +28,12 @@ float interpolate(float v0, float v1, float t)
 
 int main(int argc, char **argv)
 {
+	std::cout << "window ...\n";
 	Window * win = new Window(1000, 1000, "Voxel", false);
 	std::cout << "window done\n";
 
+	std::cout << "shaders ...\n";
 	Shader voxelShader(
-		//"shaders/chunk_vertex_project.vert",
-		//"shaders/faceNormalNoTex.geom",
-		//"shaders/depthLightNoCol.frag"
 		"shaders/voxel_project_tex.vert",
 		"shaders/voxel_normal_tex.geom",
 		"shaders/voxel_depth_tex.frag"
@@ -52,13 +51,75 @@ int main(int argc, char **argv)
 	int Uni_Box_Depth = boxShader.FindUniform("depthFactor");
 	int Uni_Box_Cycle = boxShader.FindUniform("cycle");
 
+
+	Shader inventoryShader(
+		"shaders/inventory.vert",
+		"shaders/inventory.geom",
+		"shaders/inventory.frag"
+	);
+	int Uni_Inv_Pos = inventoryShader.FindUniform("UPos");
+	int Uni_Inv_Spin = inventoryShader.FindUniform("USpin");
+	int Uni_Inv_TexIdx = inventoryShader.FindUniform("UTex_Idx");
+	std::cout << "shaders done\n";
+
+	Angle Inv_Spin(1, 0.5, 0);
+
+	unsigned int Inv_Buffer_Array;
+	unsigned int Inv_Buffer_Vertex;
+	unsigned int Inv_Render_Data_Count = 36;
+	float Inv_Render_Data[]
 	{
-		std::cout << "General Info\n";
-		std::cout << "  Memory:\n";
-		std::cout << "    per Chunks:\n";
-		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
-		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
-	}
+		-0.1f, -0.1f, -0.1f, 0.25f, 1.0f,
+		-0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
+		-0.1f, +0.1f, -0.1f, 0.00f, 1.0f,
+		-0.1f, +0.1f, -0.1f, 0.00f, 1.0f,
+		-0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
+		-0.1f, +0.1f, +0.1f, 0.00f, 0.5f,
+
+		-0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
+		+0.1f, -0.1f, -0.1f, 0.50f, 0.5f,
+		-0.1f, -0.1f, +0.1f, 0.25f, 1.0f,
+		-0.1f, -0.1f, +0.1f, 0.25f, 1.0f,
+		+0.1f, -0.1f, -0.1f, 0.50f, 0.5f,
+		+0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
+
+		-0.1f, -0.1f, -0.1f, 0.75f, 1.0f,
+		-0.1f, +0.1f, -0.1f, 0.75f, 0.5f,
+		+0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
+		+0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
+		-0.1f, +0.1f, -0.1f, 0.75f, 0.5f,
+		+0.1f, +0.1f, -0.1f, 0.50f, 0.5f,
+
+		+0.1f, -0.1f, -0.1f, 0.25f, 0.5f,
+		+0.1f, +0.1f, -0.1f, 0.00f, 0.5f,
+		+0.1f, -0.1f, +0.1f, 0.25f, 0.0f,
+		+0.1f, -0.1f, +0.1f, 0.25f, 0.0f,
+		+0.1f, +0.1f, -0.1f, 0.00f, 0.5f,
+		+0.1f, +0.1f, +0.1f, 0.00f, 0.0f,
+
+		-0.1f, +0.1f, -0.1f, 0.50f, 0.5f,
+		-0.1f, +0.1f, +0.1f, 0.25f, 0.5f,
+		+0.1f, +0.1f, -0.1f, 0.50f, 0.0f,
+		+0.1f, +0.1f, -0.1f, 0.50f, 0.0f,
+		-0.1f, +0.1f, +0.1f, 0.25f, 0.5f,
+		+0.1f, +0.1f, +0.1f, 0.25f, 0.0f,
+
+		-0.1f, -0.1f, +0.1f, 0.75f, 0.5f,
+		+0.1f, -0.1f, +0.1f, 0.50f, 0.5f,
+		-0.1f, +0.1f, +0.1f, 0.75f, 0.0f,
+		-0.1f, +0.1f, +0.1f, 0.75f, 0.0f,
+		+0.1f, -0.1f, +0.1f, 0.50f, 0.5f,
+		+0.1f, +0.1f, +0.1f, 0.50f, 0.0f,
+	};
+	glGenVertexArrays(1, &Inv_Buffer_Array);
+	glGenBuffers(1, &Inv_Buffer_Vertex);
+	glBindVertexArray(Inv_Buffer_Array);
+	glBindBuffer(GL_ARRAY_BUFFER, Inv_Buffer_Vertex);
+	glBufferData(GL_ARRAY_BUFFER, Inv_Render_Data_Count * sizeof(float) * 5, Inv_Render_Data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 5, (void *)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(float) * 5, (void *)(sizeof(float) * 3));
 
 	std::cout << "table ...\n";
 	VoxelDataTable table;
@@ -69,56 +130,17 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/BlueSpiral.png",       false, false, false, false, false));
 	std::cout << "table done\n";
 
-	std::cout << "texture loading ...\n";
-	unsigned int Texture0 = 0;
-	{
-		glGenTextures(1, &Texture0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
-		glActiveTexture(GL_TEXTURE0);
-
-		int	tex_w = 128;
-		int	tex_h = 64;
-		int	img_count = table.Length();
-
-		PNG_Image ** img = new PNG_Image * [img_count];
-		for (int i = 0; i < img_count; i++)
-		{
-			img[i] = PNG_Image::Load(table.Get(i).fileName);
-		}
-
-		for (int i = 0; i < img_count; i++)
-		{
-			PNG_Image * temp = img[i] -> Scale(tex_w, tex_h);
-			delete img[i];
-			img[i] = temp;
-		}
-
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8,   tex_w, tex_h, img_count, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, NULL);
-		for (int i = 0; i < img_count; i++)
-			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, i, tex_w, tex_h, 1, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, img[i] -> data);
-
-		for (int i = 0; i < img_count; i++)
-			delete img[i];
-		delete [] img;
-
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-	}
-	std::cout << "texture done\n";
+	std::cout << "textures ...\n";
+	unsigned int texture_arr = table.InitTextures();
+	std::cout << "textures done\n";
 
 	View view;
 	//view.pos.z = -(128 + 10);
 	VoxelSpace space;
 
 
-	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
-	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_2, true);
-	win -> keys.push_back(&voxel_add_key);
-	win -> keys.push_back(&voxel_sub_key);
+
+
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -127,6 +149,11 @@ int main(int argc, char **argv)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
+
+	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
+	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_2, true);
+	win -> keys.push_back(&voxel_add_key);
+	win -> keys.push_back(&voxel_sub_key);
 
 	double	FrameTimeLast = glfwGetTime();
 	double	FrameTimeCurr;
@@ -137,6 +164,14 @@ int main(int argc, char **argv)
 	KeyPress place_sub_key(GLFW_MOUSE_BUTTON_5, true);
 	win -> keys.push_back(&place_add_key);
 	win -> keys.push_back(&place_sub_key);
+
+	{
+		std::cout << "General Info\n";
+		std::cout << "  Memory:\n";
+		std::cout << "    per Chunks:\n";
+		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
+		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
+	}
 
 	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
@@ -188,10 +223,8 @@ int main(int argc, char **argv)
 		voxelShader.Use();
 		view.uniform(Uni_Chunk_View);
 		view.uniform_depth(Uni_Chunk_Depth);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE0, Texture0);
-		//glActiveTexture(GL_TEXTURE_2D_ARRAY);
-		//glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
+		glActiveTexture(GL_TEXTURE_2D_ARRAY);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 		space.Draw(Uni_Chunk_Pos);
 
 		boxShader.Use();
@@ -199,15 +232,35 @@ int main(int argc, char **argv)
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
-		//space.DrawBound();
+
+
+
+		Inv_Spin.x += 0.001;
+		Inv_Spin.UpdateSinCos();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(GL_TEXTURE_2D_ARRAY);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
+		glBindVertexArray(Inv_Buffer_Array);
+		inventoryShader.Use();
+		glUniform2f(Uni_Inv_Pos, 0.75, 0.75);
+		glUniform3fv(Uni_Inv_Spin, 2, (float *)&Inv_Spin);
+		glUniform1ui(Uni_Inv_TexIdx, placeID);
+		glDrawArrays(GL_TRIANGLES, 0, Inv_Render_Data_Count);
+
 
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
 
-	glDeleteTextures(1, &Texture0);
+	glDeleteTextures(1, &texture_arr);
 	delete win;
+
+	glBindVertexArray(Inv_Buffer_Array);
+	glDeleteBuffers(1, &Inv_Buffer_Vertex);
+	glDeleteVertexArrays(1, &Inv_Buffer_Array);
+	(void)Uni_Inv_Spin;
+	(void)Uni_Inv_TexIdx;
 
 	(void)Uni_Box_Cycle;
 	(void)Uni_Box_View;

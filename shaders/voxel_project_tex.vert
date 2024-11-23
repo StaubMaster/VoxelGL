@@ -13,8 +13,7 @@ layout(location = 2) in vec2 VTex_pos;
 out Vert_Tex
 {
 	vec3	Absolut;
-	uint	Tex_idx;
-	vec2	Tex_pos;
+	vec3	Tex_pos;
 } vs_out;
 
 
@@ -65,8 +64,7 @@ void main()
 	idx.z = (VIdx >> 16) & uint((0xFF));
 
 	vs_out.Absolut = vec3(idx) + (chunk_pos * 16);
-	vs_out.Tex_idx = VTex_Idx;
-	vs_out.Tex_pos = VTex_pos;
+	vs_out.Tex_pos = vec3(VTex_pos, VTex_Idx);
 
 	gl_Position = proj(vs_out.Absolut);
 }

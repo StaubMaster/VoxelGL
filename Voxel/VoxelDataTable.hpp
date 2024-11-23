@@ -7,6 +7,8 @@
 # include <vector>
 
 # include "Voxel.hpp"
+# include "../openGL/openGL.h"
+# include "../FileParse/PNG/PNG_Image.hpp"
 
 struct VoxelData
 {
@@ -41,6 +43,8 @@ class VoxelDataTable
 		void				Set(VoxelData vox);
 		unsigned int		Length() const;
 		const VoxelData &	Get(unsigned int idx) const;
+
+		unsigned int	InitTextures() const;
 
 		class Exception_IndexOutOfRange : public std::exception { public: const char * what() const throw(); };
 };

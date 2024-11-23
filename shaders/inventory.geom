@@ -5,7 +5,7 @@ layout(triangle_strip, max_vertices = 3) out;
 
 
 
-in Vert_Tex
+in Vert_Inv
 {
 	vec3	Absolut;
 	vec3	Tex_pos;

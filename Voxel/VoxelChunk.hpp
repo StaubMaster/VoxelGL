@@ -8,6 +8,7 @@
 # include "../openGL/Abstract/Point.hpp"
 
 # include "Voxel.hpp"
+# include "VoxelDataTable.hpp"
 # include "VoxelRenderData.hpp"
 
 # include "../Box.hpp"
@@ -50,12 +51,12 @@ class VoxelChunk
 		Index3D	getChunkIndex3D() const;
 		Point	getChunkOffset() const;
 
-		void	GenerateChunkLimit(char axis_limit);
-		void	GenerateFuzzyCenterCube(int size2);
-		void	GenerateVoxelRotationTest();
+		void	GenerateChunkLimit(VoxelDataTable & table, char axis_limit);
+		void	GenerateFuzzyCenterCube(VoxelDataTable & table, int size2);
+		void	GenerateVoxelRotationTest(VoxelDataTable & table);
 
 		int		CheckVoxel(Index3D idx);
-		void	tryAdd(Undex3D idx, char id, char axis);
+		void	tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth);
 		char	trySub(Undex3D idx);
 
 	public:

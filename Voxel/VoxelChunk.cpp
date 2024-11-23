@@ -112,7 +112,7 @@ Point	VoxelChunk::getChunkOffset() const
 	);
 }
 
-void	VoxelChunk::GenerateChunkLimit(char axis_limit)
+void	VoxelChunk::GenerateChunkLimit(VoxelDataTable & table, char axis_limit)
 {
 	Index3D chunk_idx;
 	chunk_idx.x = Index.x * Voxel_per_Side;
@@ -140,12 +140,13 @@ void	VoxelChunk::GenerateChunkLimit(char axis_limit)
 		}
 		else
 		{
-			Data[i] = Voxel(0);
+			Data[i] = Voxel();
 		}
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+	(void)table;
 }
-void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
+void	VoxelChunk::GenerateFuzzyCenterCube(VoxelDataTable & table, int size2)
 {
 	Index3D chunk_idx;
 	chunk_idx.x = Index.x * Voxel_per_Side;
@@ -159,6 +160,8 @@ void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
 	Index3D box_min(-size2);
 	Index3D box_max(+size2);
 
+	char	ori;
+
 	do
 	{
 		global_idx.x = chunk_idx.x + voxel_idx.x;
@@ -168,23 +171,30 @@ void	VoxelChunk::GenerateFuzzyCenterCube(int size2)
 
 		if (!Index3D::Box_inclusive(global_idx, box_min, box_max))
 		{
-			Data[i] = Voxel(0);
+			Data[i] = Voxel();
 		}
 		else if (Index3D::Box_exclusive(global_idx, box_min, box_max))
 		{
-			Data[i] = Voxel::AxisAligned(2, std::rand() % 6, std::rand() % 4);
+			ori = ((std::rand() % 6) + 1) | ((std::rand() % 4) << 3);
+			Data[i] = Voxel(1, 0, ori);
 		}
 		else
 		{
 			if ((std::rand() & 1) == 0)
-				Data[i] = Voxel(0);
+			{
+				Data[i] = Voxel();
+			}
 			else
-				Data[i] = Voxel::AxisAligned(2, std::rand() % 6, std::rand() % 4);
+			{
+				ori = ((std::rand() % 6) + 1) | ((std::rand() % 4) << 3);
+				Data[i] = Voxel(1, 0, ori);
+			}
 		}
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+	(void)table;
 }
-void	VoxelChunk::GenerateVoxelRotationTest()
+void	VoxelChunk::GenerateVoxelRotationTest(VoxelDataTable & table)
 {
 	Index3D chunk_idx;
 	chunk_idx.x = Index.x * Voxel_per_Side;
@@ -196,6 +206,7 @@ void	VoxelChunk::GenerateVoxelRotationTest()
 	unsigned int i;
 
 	int X, Y, Z;
+	char ori;
 
 	do
 	{
@@ -204,20 +215,25 @@ void	VoxelChunk::GenerateVoxelRotationTest()
 		global_idx.z = chunk_idx.z + voxel_idx.z;
 		i = voxel_idx.ToIndex(Voxel_per_Side);
 
-		Data[i] = Voxel(0);
+		Data[i] = Voxel();
 		if (global_idx.x % 2 == 0 && global_idx.y % 4 == 0 && global_idx.z % 2 == 0)
+		//if (global_idx.x % 2 == 0 && global_idx.z % 2 == 0)
 		{
 			X = global_idx.x / 2;
 			Y = global_idx.y / 4;
+			//Y = global_idx.y;
 			Z = global_idx.z / 2;
 
-			if (X >= 0 && X <= 5 && Z >= 0 && Z <= 3 && Y >= 0 && Y <= 5)
+			if (X >= 0 && X < 6 && Z >= 0 && Z < 4 && Y >= 0 && Y < 5)
 			{
-				Data[i] = Voxel(Y, X, Z);
+				ori = (X + 1) | (Z << 3);
+				//Data[i] = Voxel(Y, 0, ori);
+				Data[i] = table.Get(Y).ToVoxelForce(Y, ori);
 			}
 		}
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+	(void)table;
 }
 
 int		VoxelChunk::CheckVoxel(Index3D idx)
@@ -245,12 +261,15 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 
 	return (0);
 }
-void	VoxelChunk::tryAdd(Undex3D idx, char id, char axis)
+void	VoxelChunk::tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth)
 {
 	unsigned int i = idx.ToIndex(Voxel_per_Side);
 
 	if (!Data[i].isSolid())
-		Data[i] = Voxel::AxisAligned(id, axis, std::rand() % 4);
+	{
+		//Data[i] = Voxel(id, 0, (axis | ((std::rand() % 4) << 3)));
+		Data[i] = table.Get(id).ToVoxel(id, Voxel::Orth_To_Axis(orth));
+	}
 }
 char	VoxelChunk::trySub(Undex3D idx)
 {

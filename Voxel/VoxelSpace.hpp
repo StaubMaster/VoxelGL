@@ -34,15 +34,15 @@ class VoxelSpace
 		int				CheckChunk(Index3D idx);
 
 		void	FillRandom();
-		void	AddChunk(Index3D idx);
+		void	AddChunk(VoxelDataTable & table, Index3D idx);
 		void	SubChunk(Index3D idx);
-		void	AddChunksRange(Index3D idx, int range);
+		void	AddChunksRange(VoxelDataTable & table, Index3D idx, int range);
 		void	SubChunksRange(Index3D idx, int range);
 
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
 
-		char	tryAdd(Voxel_Hover hover, char id);
+		char	tryAdd(VoxelDataTable & table, Voxel_Hover hover, char id);
 		char	trySub(Voxel_Hover hover, char id);
 
 		void	Draw(int Uni_Chunk_Pos) const;

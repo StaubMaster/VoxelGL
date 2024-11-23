@@ -5,36 +5,40 @@
 
 # include "../openGL/Abstract/Undex3D.hpp"
 
-# define VOXEL_AXIS_XM 0b000
-# define VOXEL_AXIS_XP 0b000
-# define VOXEL_AXIS_YM 0b000
-# define VOXEL_AXIS_YP 0b000
-# define VOXEL_AXIS_ZM 0b000
-# define VOXEL_AXIS_ZP 0b000
+# define VOXEL_NO_DRAW_BIT     0b001
+# define VOXEL_NOT_SOLID_BIT   0b010
+# define VOXEL_TRANSPARENT_BIT 0b100
+# define VOXEL_AXIS_BITS 0b00111
+# define VOXEL_SPIN_BITS 0b11000
 
 class Voxel
 {
 	protected:
 		char	ID;
-		char	Axis;
-		char	Spin;
 
-	private:
+		char	Category;
+		char	Orientation;
+
 	public:
 		Voxel();
 		Voxel(char id);
-		Voxel(char id, char axis, char spin);
+		Voxel(char idx, char category, char orientation);
 		~Voxel();
 
+		Voxel(const Voxel & other);
+		const Voxel & operator =(const Voxel & other);
+
 	public:
-		bool	isSolid() const;
 		char	getID() const;
+
+		bool	isDraw() const;
+		bool	isSolid() const;
+		bool	isTransparent() const;
+
 		char	getAxis() const;
 		char	getSpin() const;
 
-		static	Voxel	Aligned(char id);
-		static	Voxel	UnAligned(char id);
-		static	Voxel	AxisAligned(char id, char axis, char spin);
+		static char	Orth_To_Axis(char orth);
 };
 
 #endif

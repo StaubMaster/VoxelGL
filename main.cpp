@@ -60,6 +60,15 @@ int main(int argc, char **argv)
 		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
 	}
 
+	std::cout << "table ...\n";
+	VoxelDataTable table;
+	table.Set(VoxelData("images/TextureAlign.png",     false, false, false, true , false));
+	table.Set(VoxelData("images/fancy_GreenDirt.png",  false, false, false, false, false));
+	table.Set(VoxelData("images/fancy_RedWood.png",    false, false, false, true , false));
+	table.Set(VoxelData("images/fancy_BlueSpiral.png", false, false, true , false, false));
+	table.Set(VoxelData("images/BlueSpiral.png",       false, false, false, false, false));
+	std::cout << "table done\n";
+
 	std::cout << "texture loading ...\n";
 	unsigned int Texture0 = 0;
 	{
@@ -67,22 +76,14 @@ int main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture0);
 		glActiveTexture(GL_TEXTURE0);
 
-		const char * file_names[] = {
-			"images/TextureAlign.png",
-			"images/fancy_GreenDirt.png",
-			"images/fancy_RedWood.png",
-			"images/fancy_BlueSpiral.png",
-			"images/BlueSpiral.png",
-		};
-
 		int	tex_w = 128;
 		int	tex_h = 64;
-		int	img_count = 5;
+		int	img_count = table.Length();
 
 		PNG_Image ** img = new PNG_Image * [img_count];
 		for (int i = 0; i < img_count; i++)
 		{
-			img[i] = PNG_Image::Load(file_names[i]);
+			img[i] = PNG_Image::Load(table.Get(i).fileName);
 		}
 
 		for (int i = 0; i < img_count; i++)
@@ -168,13 +169,13 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		space.AddChunksRange(chunk_current, 1);
+		space.AddChunksRange(table, chunk_current, 1);
 		space.SubChunksRange(chunk_current, 1);
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid)
-			space.tryAdd(hover, placeID);
+			space.tryAdd(table, hover, placeID);
 		if (voxel_sub_key.check() && hover.isValid)
 			space.trySub(hover, placeID);
 

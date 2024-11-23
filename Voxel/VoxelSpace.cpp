@@ -70,14 +70,14 @@ int	VoxelSpace::CheckChunk(Index3D idx)
 
 
 
-void	VoxelSpace::AddChunk(Index3D idx)
+void	VoxelSpace::AddChunk(VoxelDataTable & table, Index3D idx)
 {
 	VoxelChunk * ch = new VoxelChunk(idx);
 	Chunks.push_back(ch);
 
-	ch -> GenerateVoxelRotationTest();
-	//ch -> GenerateFuzzyCenterCube(16);
-	//ch -> GenerateChunkLimit(2);
+	//ch -> GenerateVoxelRotationTest(table);
+	ch -> GenerateFuzzyCenterCube(table, 16);
+	//ch -> GenerateChunkLimit(table, 2);
 	UpdateBufferNeighbours(idx);
 }
 void	VoxelSpace::SubChunk(Index3D idx)
@@ -87,7 +87,7 @@ void	VoxelSpace::SubChunk(Index3D idx)
 	delete Chunks[i];
 	Chunks.erase(Chunks.begin() + i);
 }
-void	VoxelSpace::AddChunksRange(Index3D idx, int range)
+void	VoxelSpace::AddChunksRange(VoxelDataTable & table, Index3D idx, int range)
 {
 	Index3D min = idx - Index3D(range);
 	Index3D max = idx + Index3D(range);
@@ -116,7 +116,7 @@ void	VoxelSpace::AddChunksRange(Index3D idx, int range)
 	{
 		if (!exists[i.ToIndex(range_per_side)])
 		{
-			AddChunk(i + min);
+			AddChunk(table, i + min);
 		}
 	}
 	while (Index3D::loop_exclusive(i, 0, range_per_side));
@@ -168,7 +168,7 @@ void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 
 
 
-char	VoxelSpace::tryAdd(Voxel_Hover hover, char id)
+char	VoxelSpace::tryAdd(VoxelDataTable & table, Voxel_Hover hover, char id)
 {
 	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
 
@@ -177,8 +177,7 @@ char	VoxelSpace::tryAdd(Voxel_Hover hover, char id)
 	if (chunk == NULL)
 		return (0);
 
-
-	chunk -> tryAdd(hover.voxel_idx, id, hover.cardinal);
+	chunk -> tryAdd(table, hover.voxel_idx, id, hover.cardinal);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 

@@ -25,7 +25,8 @@ class Box
 		const Box & operator =(const Box & other);
 
 	public:
-		Point	IntersektSize(Box & other);
+		static bool		IntersektBool(const Box & b1, const Box & b2);
+		static Point	IntersektDiff(const Box & b1, const Box & b2);
 
 	public:
 		void	CreateBuffer();

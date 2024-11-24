@@ -40,8 +40,6 @@ class Voxel
 		char	getAxis() const;
 		char	getSpin() const;
 
-		Point	CheckBoxCollision(Box & box);
-
 		static char	Orth_To_Axis(char orth);
 };
 

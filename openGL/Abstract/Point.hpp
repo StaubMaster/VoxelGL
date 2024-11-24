@@ -2,6 +2,7 @@
 #ifndef POINT_HPP
 # define POINT_HPP
 # include <math.h>
+# include <iostream>
 
 class Point
 {
@@ -28,6 +29,11 @@ class Point
 		float operator %(const Point & other) const;	//	scalar Product
 		Point operator ^(const Point & other) const;	//	cross Product
 		float length() const;
+
+		Point	Sign() const;
+		Point	Magnitude_Min() const;
 };
+
+std::ostream & operator <<(std::ostream & o, const Point & idx);
 
 #endif

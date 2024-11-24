@@ -39,6 +39,8 @@ class Index3D
 		static bool	loop_exclusive(Index3D & idx, Index3D min, Index3D max);
 		static bool	loop_inclusive(Index3D & idx, int min, int max);
 		static bool	loop_exclusive(Index3D & idx, int min, int max);
+
+		void	Clamp(int min, int max);
 };
 
 std::ostream & operator <<(std::ostream & o, const Index3D & idx);

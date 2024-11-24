@@ -189,6 +189,39 @@ char	VoxelSpace::trySub(Voxel_Hover hover, char id)
 	(void)id;
 }
 
+
+
+Point	VoxelSpace::CheckBoxCollision(Box & box)
+{
+	Index3D chunk_min(
+		floorf(box.Min.x / Voxel_per_Side),
+		floorf(box.Min.y / Voxel_per_Side),
+		floorf(box.Min.z / Voxel_per_Side)
+	);
+	Index3D chunk_max(
+		ceilf(box.Max.x / Voxel_per_Side),
+		ceilf(box.Max.y / Voxel_per_Side),
+		ceilf(box.Max.z / Voxel_per_Side)
+	);
+
+	Point diff;
+
+	Index3D i = chunk_min;
+	do
+	{
+		VoxelChunk * chunk = FindChunkPtr(i);
+		if (chunk != NULL)
+		{
+			diff = diff + chunk -> CheckBoxCollision(box);
+		}
+	}
+	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
+
+	return (diff);
+}
+
+
+
 void	VoxelSpace::Draw(int Uni_Chunk_Pos) const
 {
 	for (size_t i = 0; i < Chunks.size(); i++)

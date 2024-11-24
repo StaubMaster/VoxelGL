@@ -85,3 +85,45 @@ float Point::length() const
 		(z * z)
 	);
 }
+
+
+
+Point	Point::Sign() const
+{
+	Point p;
+
+	if (x > 0) { p.x = +1; }
+	if (x < 0) { p.x = -1; }
+
+	if (y > 0) { p.y = +1; }
+	if (y < 0) { p.y = -1; }
+
+	if (z > 0) { p.z = +1; }
+	if (z < 0) { p.z = -1; }
+
+	return (p);
+}
+
+Point	Point::Magnitude_Min() const
+{
+	Point mag(abs(x), abs(y), abs(z));
+
+	if (mag.x <= mag.y && mag.x <= mag.z)
+		return (Point(x, 0, 0));
+	if (mag.y <= mag.z && mag.y <= mag.x)
+		return (Point(0, y, 0));
+	if (mag.z <= mag.x && mag.z <= mag.y)
+		return (Point(0, 0, z));
+
+	return (Point());
+}
+
+
+
+
+
+std::ostream & operator <<(std::ostream & o, const Point & p)
+{
+	o << p.x << ":" << p.y << ":" << p.z;
+	return o;
+}

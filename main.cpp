@@ -182,6 +182,8 @@ int main(int argc, char **argv)
 		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
 	}
 
+	Point vel;
+
 	std::cout << "loop\n\n\n\n\n\n\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
@@ -244,15 +246,30 @@ int main(int argc, char **argv)
 
 		if (test_Box_Key.check())
 		{
-			box2.Min = Point(-0.5, 3.5, -0.5);
-			box2.Max = Point(0.5, 5, 0.5);
+			//box2.Min = Point(0, 3.5, 0);
+			//box2.Max = Point(1.5, 5.0, 1.5);
+			box2.Min = view.pos + Point(-0.4, -1.2, -0.4);
+			box2.Max = view.pos + Point(+0.4, +0.4, +0.4);
+			vel = Point();
 		}
 
 		{
-			Point diff = box1.IntersektSize(box2);
-			box2.Min = box2.Min + (diff * 0.001);
-			box2.Max = box2.Max + (diff * 0.001);
+			//Point diff = Box::IntersektDiff(box1, box2);
+			Point diff = space.CheckBoxCollision(box2);
+			diff = diff.Sign();
+
+			vel = vel * 0.9999f;
+			diff.y -= 0.01f;
+			diff = diff * 0.001f;
+			vel = vel + diff;
+			if (vel.length() > 0.5f)
+				vel = vel * (0.5 / vel.length());
+
+			box2.Min = box2.Min + vel;
+			box2.Max = box2.Max + vel;
 			box2.UpdateBuffer();
+
+			//view.pos = view.pos + diff;
 		}
 
 		box1.Draw();

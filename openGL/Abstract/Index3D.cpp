@@ -186,6 +186,20 @@ bool Index3D::loop_exclusive(Index3D & idx, int min, int max)
 
 
 
+void	Index3D::Clamp(int min, int max)
+{
+	if (x < min) { x = min; }
+	if (x > max) { x = max; }
+	if (y < min) { y = min; }
+	if (y > max) { y = max; }
+	if (z < min) { z = min; }
+	if (z > max) { z = max; }
+}
+
+
+
+
+
 std::ostream & operator <<(std::ostream & o, const Index3D & idx)
 {
 	o << idx.x << ":" << idx.y << ":" << idx.z;

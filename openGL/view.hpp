@@ -32,6 +32,8 @@ class View
 		~View();
 
 	public:
+		Point	RelToAbs(Point rel);
+
 		void	move(Point rel);
 		void	turn(Angle rel);
 

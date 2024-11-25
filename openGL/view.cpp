@@ -39,6 +39,10 @@ View::~View()
 {
 
 }
+Point	View::RelToAbs(Point rel)
+{
+	return (ang.rotate_back(rel));
+}
 void	View::move(Point rel)
 {
 	//Angle::rotate(rel.z, rel.x, ang.cos_x, ang.sin_x);

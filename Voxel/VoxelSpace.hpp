@@ -49,7 +49,7 @@ class VoxelSpace
 		float	CheckBoxCollision(Box & box, Point & vel);
 		Point	IntersektDiff(Box & box);
 		bool	IntersektBool(Box & box);
-		char	IntersektBits(Box & box);
+		char	TouchNeighbour(Box & box, float size);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;

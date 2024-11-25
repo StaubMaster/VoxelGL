@@ -63,7 +63,7 @@ class VoxelChunk
 		float	CheckBoxCollision(Box & box, Point & vel);
 		Point	IntersektDiff(Box & box);
 		bool	IntersektBool(Box & box);
-		char	IntersektBits(Box & box);
+		char	TouchNeighbour(Box & box, float size);
 
 	public:
 		void	UpdateBuffer(

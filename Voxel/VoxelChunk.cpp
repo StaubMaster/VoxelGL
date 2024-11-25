@@ -447,19 +447,19 @@ bool	VoxelChunk::IntersektBool(Box & box)
 
 	return (false);
 }
-char	VoxelChunk::IntersektBits(Box & box)
+char	VoxelChunk::TouchNeighbour(Box & box, float size)
 {
 	Point offset = getChunkOffset();
 
 	Index3D voxel_min(
-		floorf(box.Min.x - offset.x),
-		floorf(box.Min.y - offset.y),
-		floorf(box.Min.z - offset.z)
+		(box.Min.x - offset.x - size),
+		(box.Min.y - offset.y - size),
+		(box.Min.z - offset.z - size)
 	);
 	Index3D voxel_max(
-		ceilf(box.Max.x - offset.x),
-		ceilf(box.Max.y - offset.y),
-		ceilf(box.Max.z - offset.z)
+		(box.Max.x - offset.x + size),
+		(box.Max.y - offset.y + size),
+		(box.Max.z - offset.z + size)
 	);
 
 	voxel_min.Clamp(0, Voxel_per_Side - 1);
@@ -478,14 +478,14 @@ char	VoxelChunk::IntersektBits(Box & box)
 				Point(i.x + 1, i.y + 1, i.z + 1) + offset
 				);
 
-			//vox_box.CreateBuffer();
-			//vox_box.UpdateBuffer();
-			//vox_box.Draw();
+			vox_box.CreateBuffer();
+			vox_box.UpdateBuffer();
+			vox_box.Draw();
 
-			bits |= Box::IntersektBits(vox_box, box);
+			bits |= Box::TouchNeighbour(vox_box, box, size);
 		}
 	}
-	while (Index3D::loop_exclusive(i, voxel_min, voxel_max));
+	while (Index3D::loop_inclusive(i, voxel_min, voxel_max));
 
 	return (bits);
 }

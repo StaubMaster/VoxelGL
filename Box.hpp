@@ -40,10 +40,11 @@ class Box
 		static bool		IntersektBoolZ(const Box & b1, const Box & b2);
 	public:
 		static bool		IntersektBool(const Box & b1, const Box & b2);
-		static char		IntersektBits(const Box & b1, const Box & b2);
 
 		static Point	IntersektDiff(const Box & b1, const Box & b2);
 		static double	IntersektT(const Box & b1, const Box & b2, const Point v2);
+
+		static char		TouchNeighbour(const Box & b1, const Box & b2, float d2);
 
 	public:
 		void	CreateBuffer();

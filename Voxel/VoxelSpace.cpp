@@ -282,7 +282,7 @@ bool	VoxelSpace::IntersektBool(Box & box)
 
 	return (false);
 }
-char	VoxelSpace::IntersektBits(Box & box)
+char	VoxelSpace::TouchNeighbour(Box & box, float size)
 {
 	Index3D chunk_min(
 		floorf(box.Min.x / Voxel_per_Side),
@@ -303,7 +303,7 @@ char	VoxelSpace::IntersektBits(Box & box)
 		VoxelChunk * chunk = FindChunkPtr(i);
 		if (chunk != NULL)
 		{
-			bits |= chunk -> IntersektBool(box);
+			bits |= chunk -> TouchNeighbour(box, size);
 		}
 	}
 	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));

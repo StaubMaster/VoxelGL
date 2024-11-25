@@ -195,7 +195,8 @@ int main(int argc, char **argv)
 		FrameTimeLast = FrameTimeCurr;
 
 
-		view.move(win -> GetKeyMovement(5.0f * FrameTimeDelta));
+		//view.move(win -> GetKeyMovement(5.0f * FrameTimeDelta));
+		vel = vel + (view.RelToAbs(win -> GetKeyMovement(5.0f * FrameTimeDelta)) * 0.01f);
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
 
@@ -274,16 +275,63 @@ problem: moving diagonal
 solution:
 	use outer to degermin which if touching surface
 	when touching surface, dont move calcle all movement toward that surface
+*/
+/*
+problem:
+
+	Y
+	|
+	#---X
+
+inner			|-------|
+outer		|---------------|
+
+			|	|		|	|
+			|	#-------#	|
+	+-------|---+			|
+	|		|	|			|
+	|		#---|-----------#
+	|			|
+
+this is considered touching on the bottom Y face AND the left X face
+but it should only be bottom Y
+
+solution
+
+		|	|		|	|
+		#---#-------#---#
+	+-------|---+	|
+	|		|	|	|
+	|		#-------#
+	|			|
+
+instead of a single outer box
 
 */
 
 		if (test_Box_Key.check())
 		{
-			//view.pos = view.pos + vel;
+			view.pos = Point(0, 10, 0);
+			vel = Point();
+		}
+
+		//if (test_Box_Key.check())
+		{
 			//box2.Min = Point(0, 3.5, 0);
 			//box2.Max = Point(1.5, 5.0, 1.5);
-			box2.Min = view.pos + Point(-0.3, -1.0, -0.3);
-			box2.Max = view.pos + Point(+0.3, +0.3, +0.3);
+
+			box2.Min = view.pos + Point(-0.6, -3.6, -0.6);
+			box2.Max = view.pos + Point(+0.6, +0.2, +0.6);
+
+			//box2.Min = Point(0.8, 1.8, 0.8);
+			//box2.Max = Point(2.2, 3.2, 2.2);
+
+			//box2.Min = Point(1.2, 1.2, 1.2);
+			//box2.Max = Point(1.8, 2.8, 1.8);
+
+			//box2.Min = Point(0.8, 1.2, 0.8);
+			//box2.Max = Point(1.2, 2.8, 1.2);
+
 			//vel = Point();
 			//vel.y = 0.001f;
 		}
@@ -301,7 +349,8 @@ solution:
 			box3.Min = box2.Min - Point(0.1f, 0.1f, 0.1f);
 			box3.Max = box2.Max + Point(0.1f, 0.1f, 0.1f);
 
-			char	bits = space.IntersektBits(box3);
+			char	bits = space.TouchNeighbour(box2, 0.1f);
+
 			std::string bits_str = "bits: ";
 			if (bits & AXIS_BIT_ZP) { bits_str += "Z"; } else { bits_str += "."; }
 			if (bits & AXIS_BIT_ZN) { bits_str += "Z"; } else { bits_str += "."; }
@@ -310,6 +359,22 @@ solution:
 			if (bits & AXIS_BIT_XP) { bits_str += "X"; } else { bits_str += "."; }
 			if (bits & AXIS_BIT_XN) { bits_str += "X"; } else { bits_str += "."; }
 			std::cout << bits_str << "\n";
+
+			if (!(bits & AXIS_BIT_YN))
+			{
+				vel.y -= 0.00001f;
+			}
+			else
+			{
+				vel = vel * 0.999f;
+			}
+
+			if ((bits & AXIS_BIT_XN) && vel.x < 0) { vel.x = 0; }
+			if ((bits & AXIS_BIT_XP) && vel.x > 0) { vel.x = 0; }
+			if ((bits & AXIS_BIT_YN) && vel.y < 0) { vel.y = 0; }
+			if ((bits & AXIS_BIT_YP) && vel.y > 0) { vel.y = 0; }
+			if ((bits & AXIS_BIT_ZN) && vel.z < 0) { vel.z = 0; }
+			if ((bits & AXIS_BIT_ZP) && vel.z > 0) { vel.z = 0; }
 
 			/*
 			Point diff = space.IntersektDiff(box3);
@@ -367,8 +432,9 @@ solution:
 			//diff = diff * 0.001f;
 			//vel = vel + diff;
 
-			if (vel.length() > 0.5f)
-				vel = vel * (0.5 / vel.length());
+			if (vel.length() > 0.001f)
+				vel = vel * (0.001f / vel.length());
+			//std::cout << "vel.length() " << vel.length() << "\n";
 
 			box2.UpdateBuffer();
 			box3.UpdateBuffer();
@@ -393,9 +459,10 @@ solution:
 		glDrawArrays(GL_TRIANGLES, 0, Inv_Render_Data_Count);
 
 
-
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
+
+		view.pos = view.pos + vel;
 	}
 
 	glDeleteTextures(1, &texture_arr);

@@ -191,7 +191,43 @@ char	VoxelSpace::trySub(Voxel_Hover hover, char id)
 
 
 
-Point	VoxelSpace::CheckBoxCollision(Box & box)
+float	VoxelSpace::CheckBoxCollision(Box & box, Point & vel)
+{
+	Index3D chunk_min(
+		floorf((box.Min.x + vel.x) / Voxel_per_Side),
+		floorf((box.Min.y + vel.y) / Voxel_per_Side),
+		floorf((box.Min.z + vel.z) / Voxel_per_Side)
+	);
+	Index3D chunk_max(
+		ceilf((box.Max.x + vel.x) / Voxel_per_Side),
+		ceilf((box.Max.y + vel.y) / Voxel_per_Side),
+		ceilf((box.Max.z + vel.z) / Voxel_per_Side)
+	);
+
+	//Point diff;
+	float	t = FP_INFINITE;
+	float	t_temp;
+
+	Index3D i = chunk_min;
+	do
+	{
+		VoxelChunk * chunk = FindChunkPtr(i);
+		if (chunk != NULL)
+		{
+			//diff = diff + chunk -> CheckBoxCollision(box);
+			t_temp = chunk -> CheckBoxCollision(box, vel);
+			if (t_temp < t)
+				t = t_temp;
+		}
+	}
+	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
+
+	//return (diff);
+	if (t != FP_INFINITE)
+		return (t);
+	return (NAN);
+}
+Point	VoxelSpace::IntersektDiff(Box & box)
 {
 	Index3D chunk_min(
 		floorf(box.Min.x / Voxel_per_Side),
@@ -212,12 +248,39 @@ Point	VoxelSpace::CheckBoxCollision(Box & box)
 		VoxelChunk * chunk = FindChunkPtr(i);
 		if (chunk != NULL)
 		{
-			diff = diff + chunk -> CheckBoxCollision(box);
+			diff = diff + chunk -> IntersektDiff(box);
 		}
 	}
 	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
 
 	return (diff);
+}
+bool	VoxelSpace::IntersektBool(Box & box)
+{
+	Index3D chunk_min(
+		floorf(box.Min.x / Voxel_per_Side),
+		floorf(box.Min.y / Voxel_per_Side),
+		floorf(box.Min.z / Voxel_per_Side)
+	);
+	Index3D chunk_max(
+		ceilf(box.Max.x / Voxel_per_Side),
+		ceilf(box.Max.y / Voxel_per_Side),
+		ceilf(box.Max.z / Voxel_per_Side)
+	);
+
+	Index3D i = chunk_min;
+	do
+	{
+		VoxelChunk * chunk = FindChunkPtr(i);
+		if (chunk != NULL)
+		{
+			if (chunk -> IntersektBool(box))
+				return (true);
+		}
+	}
+	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
+
+	return (false);
 }
 
 

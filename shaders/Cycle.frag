@@ -14,6 +14,7 @@ void main()
 	vec3 col2 = vec3(1, 1, 1);
 
 	float t = (sin(cycle) + 1) / 2;
+	t = 0.0;
 
 	vec3 col = col1 * t + col2 * (1 - t);
 

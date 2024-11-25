@@ -46,7 +46,9 @@ class VoxelSpace
 		char	tryAdd(Voxel_Hover hover, char id);
 		char	trySub(Voxel_Hover hover, char id);
 
-		Point	CheckBoxCollision(Box & box);
+		float	CheckBoxCollision(Box & box, Point & vel);
+		Point	IntersektDiff(Box & box);
+		bool	IntersektBool(Box & box);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;

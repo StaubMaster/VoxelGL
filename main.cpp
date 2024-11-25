@@ -51,7 +51,6 @@ int main(int argc, char **argv)
 	int Uni_Box_Depth = boxShader.FindUniform("depthFactor");
 	int Uni_Box_Cycle = boxShader.FindUniform("cycle");
 
-
 	Shader inventoryShader(
 		"shaders/inventory.vert",
 		"shaders/inventory.geom",
@@ -67,7 +66,7 @@ int main(int argc, char **argv)
 	unsigned int Inv_Buffer_Array;
 	unsigned int Inv_Buffer_Vertex;
 	unsigned int Inv_Render_Data_Count = 36;
-	float Inv_Render_Data[]
+	float Inv_Render_Data[] =
 	{
 		-0.1f, -0.1f, -0.1f, 0.25f, 1.0f,
 		-0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
@@ -144,10 +143,12 @@ int main(int argc, char **argv)
 
 	Box box1(Point(-1, 3, -1), Point(1, 4, 1));
 	Box box2(Point(-0.5, 4.5, -0.5), Point(0.5, 5, 0.5));
+	Box box3;
 	box1.CreateBuffer();
 	box1.UpdateBuffer();
 	box2.CreateBuffer();
 	box2.UpdateBuffer();
+	box3.CreateBuffer();
 
 
 
@@ -244,40 +245,130 @@ int main(int argc, char **argv)
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
 
+/*
+	+---------------+
+	| +-----------+ |
+	| | +-------+ | |
+	| | |       | | |
+	| | |       | | |
+	| | +-------+ | |
+	| +-----------+ |
+	+---------------+
+
+	outer : determin on what sides surfaces are being touched
+	middle : collision target
+	inner : determin if stuch
+
+	if outer collides with voxel on bottom
+		on ground, no gravity
+
+	if inner collides with voxel at all
+		stuck, no gravity, (push to unstuck ?)
+
+	for movement
+		check how far middle can move until collide
+		move middle
+
+problem: moving diagonal
+	should slide off surface
+solution:
+	use outer to degermin which if touching surface
+	when touching surface, dont move calcle all movement toward that surface
+
+*/
+
 		if (test_Box_Key.check())
 		{
+			//view.pos = view.pos + vel;
 			//box2.Min = Point(0, 3.5, 0);
 			//box2.Max = Point(1.5, 5.0, 1.5);
-			box2.Min = view.pos + Point(-0.4, -1.2, -0.4);
-			box2.Max = view.pos + Point(+0.4, +0.4, +0.4);
-			vel = Point();
+			box2.Min = view.pos + Point(-0.3, -1.0, -0.3);
+			box2.Max = view.pos + Point(+0.3, +0.3, +0.3);
+			//vel = Point();
+			//vel.y = 0.001f;
 		}
 
 		{
-			//Point diff = Box::IntersektDiff(box1, box2);
-			Point diff = space.CheckBoxCollision(box2);
-			diff = diff.Sign();
+			box2.Min = box2.Min + vel;
+			box2.Max = box2.Max + vel;
 
 			vel = vel * 0.9999f;
-			diff.y -= 0.01f;
-			diff = diff * 0.001f;
-			vel = vel + diff;
+			vel.y -= 0.0001f;
+			//Point diff = Box::IntersektDiff(box1, box2);
+			//Point diff = space.CheckBoxCollision(box2);
+			//diff = diff.Sign();
+
+			box3.Min = box2.Min - Point(0.1f, 0.1f, 0.1f);
+			box3.Max = box2.Max + Point(0.1f, 0.1f, 0.1f);
+
+			Point diff = space.IntersektDiff(box3);
+			std::cout << "diff " << diff << "\n";
+			std::cout << "vel " << vel << "\n";
+
+			if (abs(diff.x) >= 0.1f)
+				vel.x = 0;
+			else if (abs(diff.x) > 0)
+			{
+				std::cout << "X\n";
+				vel.x += diff.x;
+			}
+			if (abs(diff.y) >= 0.1f)
+				vel.y = 0;
+			else if (abs(diff.y) > 0)
+			{
+				if (diff.y < 0 && vel.y > 0)
+				{
+					std::cout << "Y--\n";
+					vel.y += diff.y;
+					if (vel.y < 0)
+						vel.y = 0;
+				}
+				else if (diff.y > 0 && vel.y < 0)
+				{
+					std::cout << "Y++\n";
+					vel.y += diff.y;
+					if (vel.y > 0)
+						vel.y = 0;
+				}
+			}
+			if (abs(diff.z) >= 0.1f)
+				vel.z = 0;
+			else if (abs(diff.z) > 0)
+			{
+				std::cout << "Z\n";
+				vel.z += diff.z;
+			}
+
+			//float t = space.CheckBoxCollision(box2, vel);
+			//std::cout << "t: " << t << "\n";
+			//if (t > 0 && t < 1)
+			//{
+			//	vel = vel * (t - 0.001f);
+			//}
+			//if (!space.IntersektBool(box3))
+			//{
+			//	std::cout << "not on ground\n";
+			//	vel.y -= 0.0001f;
+			//}
+
+			//diff.y -= 0.01f;
+			//diff = diff * 0.001f;
+			//vel = vel + diff;
+
 			if (vel.length() > 0.5f)
 				vel = vel * (0.5 / vel.length());
 
-			box2.Min = box2.Min + vel;
-			box2.Max = box2.Max + vel;
 			box2.UpdateBuffer();
-
-			//view.pos = view.pos + diff;
+			box3.UpdateBuffer();
 		}
 
 		box1.Draw();
 		box2.Draw();
+		box3.Draw();
 
 
 
-		Inv_Spin.x += 0.001;
+		Inv_Spin.x += FrameTimeDelta * 1;
 		Inv_Spin.UpdateSinCos();
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);

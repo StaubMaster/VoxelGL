@@ -60,7 +60,9 @@ class VoxelChunk
 		void	tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth);
 		char	trySub(Undex3D idx);
 
-		Point	CheckBoxCollision(Box & box);
+		float	CheckBoxCollision(Box & box, Point & vel);
+		Point	IntersektDiff(Box & box);
+		bool	IntersektBool(Box & box);
 
 	public:
 		void	UpdateBuffer(

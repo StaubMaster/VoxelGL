@@ -26,8 +26,8 @@ ARC_FILES = $(ARC_FILES_PATH)/fileParser.a
 
 
 $(NAME) : $(FILES_O) $(ARC_OPENGL) $(ARC_FILES)
-	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) E:/Programmieren/code/glfw-3.4.bin.WIN64/lib-mingw-w64/libglfw3.a -lgdi32
-#	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) -lglfw
+#	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) E:/Programmieren/code/glfw-3.4.bin.WIN64/lib-mingw-w64/libglfw3.a -lgdi32
+	c++ $(FLAGS) -o $(NAME) $(FILES_O) $(ARC_OPENGL) $(ARC_FILES) -lglfw
 
 all:
 	$(MAKE) -C $(ARC_OPENGL_PATH) all

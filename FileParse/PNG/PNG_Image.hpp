@@ -9,7 +9,7 @@
 # include "../uint.hpp"
 # include "../BitStream.hpp"
 
-struct PNG_Image
+class PNG_Image
 {
 	public:
 		const uint32	w;

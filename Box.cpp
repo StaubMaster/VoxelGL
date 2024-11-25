@@ -74,73 +74,117 @@ bool	Box::IntersektBool(const Box & b1, const Box & b2)
 }
 
 /*
+	check on which sides b1 is intersekting b2
+	being fully inside is not an intersektion
+*/
+/*
+	Y
+	|
+	#---X
+statements are from the # box perspective
++ boxes are voxels
+
+		#-------#
+		|		|
+	+---|-------|---+
+	|	|		|	|
+	|	#-------#	|
+	|				|
+	+---------------+
+	this is an Intersektion on the Y side
+
+		#-----------#
+		|			|
+	+---|-------+	|
+	|	|		|	|
+	|	#-------|---#
+	|			|
+	+-----------+
+	this is an Intersektion on the Y side and the X side
+
+		#-------#
+		|		|
+	+---|---+---|---+
+	|	|	|	|	|
+	|	#-------#	|
+	|		|		|
+	+-------+-------+
+	this is an Intersektion on the Y side and both X sides
+	this should be an Intersektion on the Y side only
+
+I neen t 'collect' where something is colliding with something
+//if I get a Intersektion on a X side and then the other, they cancel out
+or everything together, if anything is double, ignore
+
+	+-------+
+	|		|
+	|	#-------#
+	|	|	|	|
+	+---|---+---|---+
+		|	|	|	|
+		#-------#	|
+			|		|
+			+-------+
+	intersektion on no side
+	the stuck mechanic should handle this
+
+	+-------+
+	|		|
+	|	#-------#
+	|	|	|	|
+	+---|---+---|---+
+	|	|	|	|	|
+	|	#-------#	|
+	|		|		|
+	+-------+-------+
+	intersektion on no side
+	the stuck mechanic should handle this
+*/
+char	Box::IntersektBits(const Box & b1, const Box & b2)
+{
+	char	x_partial = 0;
+	char	y_partial = 0;
+	char	z_partial = 0;
+
+	char	inter = 0;
+	if (b1.Min.x < b2.Max.x) { inter |= AXIS_BIT_XN; x_partial++; }
+	if (b1.Max.x > b2.Min.x) { inter |= AXIS_BIT_XP; x_partial++; }
+	if (b1.Min.y < b2.Max.y) { inter |= AXIS_BIT_YN; y_partial++; }
+	if (b1.Max.y > b2.Min.y) { inter |= AXIS_BIT_YP; y_partial++; }
+	if (b1.Min.z < b2.Max.z) { inter |= AXIS_BIT_ZN; z_partial++; }
+	if (b1.Max.z > b2.Min.z) { inter |= AXIS_BIT_ZP; z_partial++; }
+
+	//char	x_partial = ((inter & AXIS_BIT_XN) != 0) + ((inter & AXIS_BIT_XP) != 0);
+	//char	y_partial = ((inter & AXIS_BIT_YN) != 0) + ((inter & AXIS_BIT_YP) != 0);
+	//char	z_partial = ((inter & AXIS_BIT_ZN) != 0) + ((inter & AXIS_BIT_ZP) != 0);
+
+	char	bits = 0;
+
+	if ((x_partial == 1) && (y_partial != 0) && (z_partial != 0))
+	{
+		if (inter & AXIS_BIT_XN) { bits |= AXIS_BIT_XN; }
+		if (inter & AXIS_BIT_XP) { bits |= AXIS_BIT_XP; }
+	}
+	if ((x_partial != 0) && (y_partial == 1) && (z_partial != 0))
+	{
+		if (inter & AXIS_BIT_YN) { bits |= AXIS_BIT_YN; }
+		if (inter & AXIS_BIT_YP) { bits |= AXIS_BIT_YP; }
+	}
+	if ((x_partial != 0) && (y_partial != 0) && (z_partial == 1))
+	{
+		if (inter & AXIS_BIT_ZN) { bits |= AXIS_BIT_ZN; }
+		if (inter & AXIS_BIT_ZP) { bits |= AXIS_BIT_ZP; }
+	}
+
+	return (bits);
+}
+
+
+
+/*
 	used for pushing 2 boxes apart
 	b1 should be the static box
 	b2 should be the box that moves
-*/
-/*
-	1	2	3	4
-
-	|	b1	|
-
-		|	b2	|
-
-		|---|		diff_min = b1.max - b2.min
-	|-----------|	diff_max = b2.max - b1.min
-					diff = diff_max - diff_min
-
-	diff_min = 3 - 2 = +1
-	diff_max = 4 - 1 = +3
-	diff = 3 - 1 = +2
-
-	1	2	3	4
-
-		|	b1	|
-
-	|	b2	|
-
-	|-----------|	diff_min = b1.max - b2.min
-		|---|		diff_max = b2.max - b1.min
-					diff = diff_max - diff_min
-
-	diff_min = 4 - 1 = +3
-	diff_max = 3 - 2 = +1
-	diff = 1 - 3 = -2
-*/
-
-/*
-	1	2	3	4	5	6
-	|-----------|
-			|-----------|
-	should return +1
-
-	1	2	3	4	5	6
-	|-----------|
-		|-----------|
-	should return +2
-
-	1	2	3	4	5	6
-	|-----------|
-	|-----------|
-	should return +-3
-
-	1	2	3	4	5	6
-		|-----------|
-	|-----------|
-	should return -2
-
-	1	2	3	4	5	6
-			|-----------|
-	|-----------|
-	should return -3
-
-	3 - 4 = -1	:	1.min - 2.max
-	6 - 1 = +5	:	1.max - 2.min
-	abs(-1) < abs(+5) : return (-1)
-
-	1 - 6 = -5
-	4 - 3 = +1
-	abs(+1) < abs(-5) : return (+1)
 */
 Point	Box::IntersektDiff(const Box & b1, const Box & b2)
 {
@@ -148,10 +192,6 @@ Point	Box::IntersektDiff(const Box & b1, const Box & b2)
 	{
 		return Point();
 	}
-
-	//Point	diff;
-	//Point	diff_min = b2.Min - b1.Min;
-	//Point	diff_max = b2.Max - b1.Max;
 
 	Point	diff_min = b1.Min - b2.Max;
 	Point	diff_max = b1.Max - b2.Min;
@@ -173,44 +213,8 @@ Point	Box::IntersektDiff(const Box & b1, const Box & b2)
 		diff.z = diff_max.z;
 
 	return (diff);
-
-	//if (diff_min.x < 0 && diff_max.x < 0)
-	//	diff.x = diff_min.x;
-	//if (diff_min.x > 0 && diff_max.x > 0)
-	//	diff.x = diff_max.x;
-
-	//if (diff_min.y < 0 && diff_max.y < 0)
-	//	diff.y = diff_min.y;
-	//if (diff_min.y > 0 && diff_max.y > 0)
-	//	diff.y = diff_max.y;
-
-	//if (diff_min.z < 0 && diff_max.z < 0)
-	//	diff.z = diff_min.z;
-	//if (diff_min.z > 0 && diff_max.z > 0)
-	//	diff.z = diff_max.z;
-
-	//return diff;
 }
 
-/*
-	find out how far box2 needs to move along v2 to touch box1
-	if never : return NAN
-
-	t is expected to be above 0
-	if no t above 0 is found : return NAN
-*/
-/*
-	-------- b2.max.y
-	 \
-	  \ v2.y
-	   \
-	-------- b1.min.y
-
-	b1.min.y = b2.max.y + v2.y * t
-	t = (b1.min.y - b2.max.y) / v2.y
-
-	check if at t the other 2 coord intersekt
-*/
 double	Box::IntersektT(const Box & b1, const Box & b2, const Point v2)
 {
 	float	t = FP_INFINITE;

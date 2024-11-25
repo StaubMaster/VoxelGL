@@ -447,6 +447,48 @@ bool	VoxelChunk::IntersektBool(Box & box)
 
 	return (false);
 }
+char	VoxelChunk::IntersektBits(Box & box)
+{
+	Point offset = getChunkOffset();
+
+	Index3D voxel_min(
+		floorf(box.Min.x - offset.x),
+		floorf(box.Min.y - offset.y),
+		floorf(box.Min.z - offset.z)
+	);
+	Index3D voxel_max(
+		ceilf(box.Max.x - offset.x),
+		ceilf(box.Max.y - offset.y),
+		ceilf(box.Max.z - offset.z)
+	);
+
+	voxel_min.Clamp(0, Voxel_per_Side - 1);
+	voxel_max.Clamp(0, Voxel_per_Side - 1);
+
+	char	bits = 0;
+
+	Index3D i = voxel_min;
+	do
+	{
+		Voxel & vox = Data[i.ToIndex(Voxel_per_Side)];
+		if (vox.isDraw())
+		{
+			Box vox_box(
+				Point(i.x + 0, i.y + 0, i.z + 0) + offset,
+				Point(i.x + 1, i.y + 1, i.z + 1) + offset
+				);
+
+			//vox_box.CreateBuffer();
+			//vox_box.UpdateBuffer();
+			//vox_box.Draw();
+
+			bits |= Box::IntersektBits(vox_box, box);
+		}
+	}
+	while (Index3D::loop_exclusive(i, voxel_min, voxel_max));
+
+	return (bits);
+}
 
 
 

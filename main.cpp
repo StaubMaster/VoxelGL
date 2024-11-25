@@ -289,11 +289,11 @@ solution:
 		}
 
 		{
-			box2.Min = box2.Min + vel;
-			box2.Max = box2.Max + vel;
+			//box2.Min = box2.Min + vel;
+			//box2.Max = box2.Max + vel;
 
-			vel = vel * 0.9999f;
-			vel.y -= 0.0001f;
+			//vel = vel * 0.9999f;
+			//vel.y -= 0.0001f;
 			//Point diff = Box::IntersektDiff(box1, box2);
 			//Point diff = space.CheckBoxCollision(box2);
 			//diff = diff.Sign();
@@ -301,6 +301,17 @@ solution:
 			box3.Min = box2.Min - Point(0.1f, 0.1f, 0.1f);
 			box3.Max = box2.Max + Point(0.1f, 0.1f, 0.1f);
 
+			char	bits = space.IntersektBits(box3);
+			std::string bits_str = "bits: ";
+			if (bits & AXIS_BIT_ZP) { bits_str += "Z"; } else { bits_str += "."; }
+			if (bits & AXIS_BIT_ZN) { bits_str += "Z"; } else { bits_str += "."; }
+			if (bits & AXIS_BIT_YP) { bits_str += "Y"; } else { bits_str += "."; }
+			if (bits & AXIS_BIT_YN) { bits_str += "Y"; } else { bits_str += "."; }
+			if (bits & AXIS_BIT_XP) { bits_str += "X"; } else { bits_str += "."; }
+			if (bits & AXIS_BIT_XN) { bits_str += "X"; } else { bits_str += "."; }
+			std::cout << bits_str << "\n";
+
+			/*
 			Point diff = space.IntersektDiff(box3);
 			std::cout << "diff " << diff << "\n";
 			std::cout << "vel " << vel << "\n";
@@ -338,6 +349,7 @@ solution:
 				std::cout << "Z\n";
 				vel.z += diff.z;
 			}
+			*/
 
 			//float t = space.CheckBoxCollision(box2, vel);
 			//std::cout << "t: " << t << "\n";

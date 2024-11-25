@@ -6,6 +6,13 @@
 # include <iostream>
 # include <math.h>
 
+# define AXIS_BIT_XN 0b000001
+# define AXIS_BIT_YN 0b000010
+# define AXIS_BIT_ZN 0b000100
+# define AXIS_BIT_XP 0b001000
+# define AXIS_BIT_YP 0b010000
+# define AXIS_BIT_ZP 0b100000
+
 class Box
 {
 	private:
@@ -33,6 +40,8 @@ class Box
 		static bool		IntersektBoolZ(const Box & b1, const Box & b2);
 	public:
 		static bool		IntersektBool(const Box & b1, const Box & b2);
+		static char		IntersektBits(const Box & b1, const Box & b2);
+
 		static Point	IntersektDiff(const Box & b1, const Box & b2);
 		static double	IntersektT(const Box & b1, const Box & b2, const Point v2);
 

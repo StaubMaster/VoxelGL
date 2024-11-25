@@ -282,6 +282,34 @@ bool	VoxelSpace::IntersektBool(Box & box)
 
 	return (false);
 }
+char	VoxelSpace::IntersektBits(Box & box)
+{
+	Index3D chunk_min(
+		floorf(box.Min.x / Voxel_per_Side),
+		floorf(box.Min.y / Voxel_per_Side),
+		floorf(box.Min.z / Voxel_per_Side)
+	);
+	Index3D chunk_max(
+		ceilf(box.Max.x / Voxel_per_Side),
+		ceilf(box.Max.y / Voxel_per_Side),
+		ceilf(box.Max.z / Voxel_per_Side)
+	);
+
+	char	bits = 0;
+
+	Index3D i = chunk_min;
+	do
+	{
+		VoxelChunk * chunk = FindChunkPtr(i);
+		if (chunk != NULL)
+		{
+			bits |= chunk -> IntersektBool(box);
+		}
+	}
+	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
+
+	return (bits);
+}
 
 
 

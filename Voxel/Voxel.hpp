@@ -3,7 +3,7 @@
 # define VOXEL_HPP
 # include <iostream>
 
-# include "../Box.hpp"
+# include "../AxisBox.hpp"
 
 # include "../openGL/Abstract/Undex3D.hpp"
 

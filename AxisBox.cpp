@@ -1,19 +1,19 @@
 
-#include "Box.hpp"
+#include "AxisBox.hpp"
 
-Box::Box()
+AxisBox::AxisBox()
 {
 	Buffer_Array = 0xFFFFFFFF;
 	Buffer_MinMax = 0xFFFFFFFF;
 }
-Box::Box(Point a, Point b) :
+AxisBox::AxisBox(Point a, Point b) :
 	Min(std::min(a.x, b.x), std::min(a.y, b.y), std::min(a.z, b.z)),
 	Max(std::max(a.x, b.x), std::max(a.y, b.y), std::max(a.z, b.z))
 {
 	Buffer_Array = 0xFFFFFFFF;
 	Buffer_MinMax = 0xFFFFFFFF;
 }
-Box::~Box()
+AxisBox::~AxisBox()
 {
 	if (Buffer_Array != 0xFFFFFFFF)
 	{
@@ -26,14 +26,14 @@ Box::~Box()
 	}
 }
 
-Box::Box(const Box & other)
+AxisBox::AxisBox(const AxisBox & other)
 {
 	Min = other.Min;
 	Max = other.Max;
 	Buffer_Array = 0xFFFFFFFF;
 	Buffer_MinMax = 0xFFFFFFFF;
 }
-const Box & Box::operator =(const Box & other)
+const AxisBox & AxisBox::operator =(const AxisBox & other)
 {
 	Min = other.Min;
 	Max = other.Max;
@@ -46,26 +46,26 @@ const Box & Box::operator =(const Box & other)
 
 
 
-Box	Box::Move(Point rel) const
+AxisBox	AxisBox::Move(Point rel) const
 {
-	return Box(Min + rel, Max + rel);
+	return AxisBox(Min + rel, Max + rel);
 }
 
 
 
-bool	Box::IntersektBoolX(const Box & b1, const Box & b2)
+bool	AxisBox::IntersektBoolX(const AxisBox & b1, const AxisBox & b2)
 {
 	return (b1.Min.x < b2.Max.x && b1.Max.x > b2.Min.x);
 }
-bool	Box::IntersektBoolY(const Box & b1, const Box & b2)
+bool	AxisBox::IntersektBoolY(const AxisBox & b1, const AxisBox & b2)
 {
 	return (b1.Min.y < b2.Max.y && b1.Max.y > b2.Min.y);
 }
-bool	Box::IntersektBoolZ(const Box & b1, const Box & b2)
+bool	AxisBox::IntersektBoolZ(const AxisBox & b1, const AxisBox & b2)
 {
 	return (b1.Min.z < b2.Max.z && b1.Max.z > b2.Min.z);
 }
-bool	Box::IntersektBool(const Box & b1, const Box & b2)
+bool	AxisBox::IntersektBool(const AxisBox & b1, const AxisBox & b2)
 {
 	return (
 		b1.Min.x < b2.Max.x && b1.Max.x > b2.Min.x &&
@@ -83,8 +83,8 @@ bool	Box::IntersektBool(const Box & b1, const Box & b2)
 	Y
 	|
 	#---X
-statements are from the # box perspective
-+ boxes are voxels
+statements are from the # Axisbox perspective
++ Axisboxes are voxels
 
 		#-------#
 		|		|
@@ -142,7 +142,7 @@ or everything together, if anything is double, ignore
 	intersektion on no side
 	the stuck mechanic should handle this
 */
-char	Box::TouchNeighbour(const Box & b1, const Box & b2, float s2)
+char	AxisBox::TouchBits(const AxisBox & b1, const AxisBox & b2, float s2)
 {
 	//if (!IntersektBool(b1, b2))
 	//	return (0);
@@ -247,11 +247,11 @@ char	Box::TouchNeighbour(const Box & b1, const Box & b2, float s2)
 
 
 /*
-	used for pushing 2 boxes apart
-	b1 should be the static box
-	b2 should be the box that moves
+	used for pushing 2 Axisboxes apart
+	b1 should be the static Axisbox
+	b2 should be the Axisbox that moves
 */
-Point	Box::IntersektDiff(const Box & b1, const Box & b2)
+Point	AxisBox::IntersektDiff(const AxisBox & b1, const AxisBox & b2)
 {
 	if (!IntersektBool(b1, b2))
 	{
@@ -280,11 +280,11 @@ Point	Box::IntersektDiff(const Box & b1, const Box & b2)
 	return (diff);
 }
 
-double	Box::IntersektT(const Box & b1, const Box & b2, const Point v2)
+double	AxisBox::IntersektT(const AxisBox & b1, const AxisBox & b2, const Point v2)
 {
 	float	t = FP_INFINITE;
 	float	t_temp;
-	Box	b2_at_t;
+	AxisBox	b2_at_t;
 
 	if (v2.x != 0)
 	{
@@ -349,7 +349,7 @@ double	Box::IntersektT(const Box & b1, const Box & b2, const Point v2)
 
 
 
-void	Box::CreateBuffer()
+void	AxisBox::CreateBuffer()
 {
 	if (Buffer_Array == 0xFFFFFFFF)
 	{
@@ -357,7 +357,7 @@ void	Box::CreateBuffer()
 		glGenBuffers(1, &Buffer_MinMax);
 	}
 }
-void	Box::UpdateBuffer()
+void	AxisBox::UpdateBuffer()
 {
 	glBindVertexArray(Buffer_Array);
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_MinMax);
@@ -368,7 +368,7 @@ void	Box::UpdateBuffer()
 	glEnableVertexAttribArray(1);
 	glVertexAttribIPointer(1, 3, GL_UNSIGNED_INT, 6 * sizeof(unsigned int), (void *)(3 * sizeof(float)));
 }
-void	Box::Draw()
+void	AxisBox::Draw()
 {
 	glBindVertexArray(Buffer_Array);
 	glDrawArrays(GL_POINTS, 0, 1);

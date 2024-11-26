@@ -312,101 +312,7 @@ char	VoxelChunk::trySub(Undex3D idx)
 
 
 
-float	VoxelChunk::CheckBoxCollision(Box & box, Point & vel)
-{
-	//Point diff;
-	float	t = FP_INFINITE;
-	float	t_temp;
-
-	Point offset = getChunkOffset();
-
-	Index3D voxel_min(
-		floorf(box.Min.x - offset.x + vel.x),
-		floorf(box.Min.y - offset.y + vel.y),
-		floorf(box.Min.z - offset.z + vel.z)
-	);
-	Index3D voxel_max(
-		ceilf(box.Max.x - offset.x + vel.x),
-		ceilf(box.Max.y - offset.y + vel.y),
-		ceilf(box.Max.z - offset.z + vel.z)
-	);
-
-	voxel_min.Clamp(0, Voxel_per_Side - 1);
-	voxel_max.Clamp(0, Voxel_per_Side - 1);
-
-	Index3D i = voxel_min;
-	do
-	{
-		Voxel & vox = Data[i.ToIndex(Voxel_per_Side)];
-		if (vox.isDraw())
-		{
-			Box vox_box(
-				Point(i.x + 0, i.y + 0, i.z + 0) + offset,
-				Point(i.x + 1, i.y + 1, i.z + 1) + offset
-				);
-
-			vox_box.CreateBuffer();
-			vox_box.UpdateBuffer();
-			vox_box.Draw();
-
-			//diff = diff + Box::IntersektDiff(vox_box, box).Magnitude_Min().Sign();
-			//diff = diff + Box::IntersektDiff(vox_box, box).Sign();
-			//diff = diff + Box::IntersektDiff(vox_box, box);
-			t_temp = Box::IntersektT(vox_box, box, vel);
-			if (t_temp < t)
-				t = t_temp;
-		}
-	}
-	while (Index3D::loop_exclusive(i, voxel_min, voxel_max));
-
-	if (t != FP_INFINITE)
-		return (t);
-	return (NAN);
-	//return (diff);
-}
-Point	VoxelChunk::IntersektDiff(Box & box)
-{
-	Point offset = getChunkOffset();
-
-	Index3D voxel_min(
-		floorf(box.Min.x - offset.x),
-		floorf(box.Min.y - offset.y),
-		floorf(box.Min.z - offset.z)
-	);
-	Index3D voxel_max(
-		ceilf(box.Max.x - offset.x),
-		ceilf(box.Max.y - offset.y),
-		ceilf(box.Max.z - offset.z)
-	);
-
-	voxel_min.Clamp(0, Voxel_per_Side - 1);
-	voxel_max.Clamp(0, Voxel_per_Side - 1);
-
-	Point diff;
-
-	Index3D i = voxel_min;
-	do
-	{
-		Voxel & vox = Data[i.ToIndex(Voxel_per_Side)];
-		if (vox.isDraw())
-		{
-			Box vox_box(
-				Point(i.x + 0, i.y + 0, i.z + 0) + offset,
-				Point(i.x + 1, i.y + 1, i.z + 1) + offset
-				);
-
-			vox_box.CreateBuffer();
-			vox_box.UpdateBuffer();
-			vox_box.Draw();
-
-			diff = diff + Box::IntersektDiff(vox_box, box);
-		}
-	}
-	while (Index3D::loop_exclusive(i, voxel_min, voxel_max));
-
-	return (diff);
-}
-bool	VoxelChunk::IntersektBool(Box & box)
+bool	VoxelChunk::IntersektBool(AxisBox & box)
 {
 	Point offset = getChunkOffset();
 
@@ -430,7 +336,7 @@ bool	VoxelChunk::IntersektBool(Box & box)
 		Voxel & vox = Data[i.ToIndex(Voxel_per_Side)];
 		if (vox.isDraw())
 		{
-			Box vox_box(
+			AxisBox vox_box(
 				Point(i.x + 0, i.y + 0, i.z + 0) + offset,
 				Point(i.x + 1, i.y + 1, i.z + 1) + offset
 				);
@@ -439,7 +345,7 @@ bool	VoxelChunk::IntersektBool(Box & box)
 			//vox_box.UpdateBuffer();
 			//vox_box.Draw();
 
-			if (Box::IntersektBool(vox_box, box))
+			if (AxisBox::IntersektBool(vox_box, box))
 				return (true);
 		}
 	}
@@ -447,7 +353,7 @@ bool	VoxelChunk::IntersektBool(Box & box)
 
 	return (false);
 }
-char	VoxelChunk::TouchNeighbour(Box & box, float size)
+char	VoxelChunk::TouchVoxel(AxisBox & box, float size)
 {
 	Point offset = getChunkOffset();
 
@@ -473,7 +379,7 @@ char	VoxelChunk::TouchNeighbour(Box & box, float size)
 		Voxel & vox = Data[i.ToIndex(Voxel_per_Side)];
 		if (vox.isDraw())
 		{
-			Box vox_box(
+			AxisBox vox_box(
 				Point(i.x + 0, i.y + 0, i.z + 0) + offset,
 				Point(i.x + 1, i.y + 1, i.z + 1) + offset
 				);
@@ -482,7 +388,7 @@ char	VoxelChunk::TouchNeighbour(Box & box, float size)
 			vox_box.UpdateBuffer();
 			vox_box.Draw();
 
-			bits |= Box::TouchNeighbour(vox_box, box, size);
+			bits |= AxisBox::TouchBits(vox_box, box, size);
 		}
 	}
 	while (Index3D::loop_inclusive(i, voxel_min, voxel_max));
@@ -524,4 +430,14 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 
 	glBindVertexArray(Buffer_Array);
 	glDrawArrays(GL_TRIANGLES, 0, Vertex_Count);
+}
+
+
+unsigned int	VoxelChunk::GeneralInfoMemData()
+{
+	return (Voxel_per_Chunk * sizeof(Voxel));
+}
+unsigned int	VoxelChunk::GeneralInfoMemBuff()
+{
+	return (Vertex_Count * sizeof(VoxelRenderData));
 }

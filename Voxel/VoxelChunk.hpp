@@ -11,7 +11,7 @@
 # include "VoxelDataTable.hpp"
 # include "VoxelRenderData.hpp"
 
-# include "../Box.hpp"
+# include "../AxisBox.hpp"
 # include "../MemorySize.hpp"
 
 //	!!!! when changing chunk size make sure to change it in the shader as well
@@ -60,10 +60,8 @@ class VoxelChunk
 		void	tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth);
 		char	trySub(Undex3D idx);
 
-		float	CheckBoxCollision(Box & box, Point & vel);
-		Point	IntersektDiff(Box & box);
-		bool	IntersektBool(Box & box);
-		char	TouchNeighbour(Box & box, float size);
+		bool	IntersektBool(AxisBox & box);
+		char	TouchVoxel(AxisBox & box, float size);
 
 	public:
 		void	UpdateBuffer(
@@ -71,6 +69,9 @@ class VoxelChunk
 					const VoxelChunk * Yn, const VoxelChunk * Yp,
 					const VoxelChunk * Zn, const VoxelChunk * Zp);
 		void	Draw(int Uni_Chunk_Pos) const;
+
+		unsigned int	GeneralInfoMemData();
+		unsigned int	GeneralInfoMemBuff();
 };
 
 #endif

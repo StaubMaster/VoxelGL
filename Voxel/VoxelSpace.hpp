@@ -46,14 +46,16 @@ class VoxelSpace
 		char	tryAdd(Voxel_Hover hover, char id);
 		char	trySub(Voxel_Hover hover, char id);
 
-		float	CheckBoxCollision(Box & box, Point & vel);
-		Point	IntersektDiff(Box & box);
-		bool	IntersektBool(Box & box);
-		char	TouchNeighbour(Box & box, float size);
+		bool	IntersektBool(AxisBox & box);
+		char	TouchVoxel(AxisBox & box, float size);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;
 		void	DrawHover(Voxel_Hover hover) const;
+
+		unsigned int	GeneralInfoChunksCount();
+		unsigned int	GeneralInfoMemSumChunksData();
+		unsigned int	GeneralInfoMemSumChunksBuff();
 
 		Voxel_Hover		Cross(Point pos, Point dir);
 };

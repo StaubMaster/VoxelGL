@@ -191,71 +191,7 @@ char	VoxelSpace::trySub(Voxel_Hover hover, char id)
 
 
 
-float	VoxelSpace::CheckBoxCollision(Box & box, Point & vel)
-{
-	Index3D chunk_min(
-		floorf((box.Min.x + vel.x) / Voxel_per_Side),
-		floorf((box.Min.y + vel.y) / Voxel_per_Side),
-		floorf((box.Min.z + vel.z) / Voxel_per_Side)
-	);
-	Index3D chunk_max(
-		ceilf((box.Max.x + vel.x) / Voxel_per_Side),
-		ceilf((box.Max.y + vel.y) / Voxel_per_Side),
-		ceilf((box.Max.z + vel.z) / Voxel_per_Side)
-	);
-
-	//Point diff;
-	float	t = FP_INFINITE;
-	float	t_temp;
-
-	Index3D i = chunk_min;
-	do
-	{
-		VoxelChunk * chunk = FindChunkPtr(i);
-		if (chunk != NULL)
-		{
-			//diff = diff + chunk -> CheckBoxCollision(box);
-			t_temp = chunk -> CheckBoxCollision(box, vel);
-			if (t_temp < t)
-				t = t_temp;
-		}
-	}
-	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
-
-	//return (diff);
-	if (t != FP_INFINITE)
-		return (t);
-	return (NAN);
-}
-Point	VoxelSpace::IntersektDiff(Box & box)
-{
-	Index3D chunk_min(
-		floorf(box.Min.x / Voxel_per_Side),
-		floorf(box.Min.y / Voxel_per_Side),
-		floorf(box.Min.z / Voxel_per_Side)
-	);
-	Index3D chunk_max(
-		ceilf(box.Max.x / Voxel_per_Side),
-		ceilf(box.Max.y / Voxel_per_Side),
-		ceilf(box.Max.z / Voxel_per_Side)
-	);
-
-	Point diff;
-
-	Index3D i = chunk_min;
-	do
-	{
-		VoxelChunk * chunk = FindChunkPtr(i);
-		if (chunk != NULL)
-		{
-			diff = diff + chunk -> IntersektDiff(box);
-		}
-	}
-	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
-
-	return (diff);
-}
-bool	VoxelSpace::IntersektBool(Box & box)
+bool	VoxelSpace::IntersektBool(AxisBox & box)
 {
 	Index3D chunk_min(
 		floorf(box.Min.x / Voxel_per_Side),
@@ -282,7 +218,7 @@ bool	VoxelSpace::IntersektBool(Box & box)
 
 	return (false);
 }
-char	VoxelSpace::TouchNeighbour(Box & box, float size)
+char	VoxelSpace::TouchVoxel(AxisBox & box, float size)
 {
 	Index3D chunk_min(
 		floorf(box.Min.x / Voxel_per_Side),
@@ -303,7 +239,7 @@ char	VoxelSpace::TouchNeighbour(Box & box, float size)
 		VoxelChunk * chunk = FindChunkPtr(i);
 		if (chunk != NULL)
 		{
-			bits |= chunk -> TouchNeighbour(box, size);
+			bits |= chunk -> TouchVoxel(box, size);
 		}
 	}
 	while (Index3D::loop_exclusive(i, chunk_min, chunk_max));
@@ -332,7 +268,7 @@ void	VoxelSpace::DrawBound() const
 		max.y = min.y + (int)(Voxel_per_Side);
 		max.z = min.z + (int)(Voxel_per_Side);
 
-		Box box(min, max);
+		AxisBox box(min, max);
 		box.CreateBuffer();
 		box.UpdateBuffer();
 		box.Draw();
@@ -418,7 +354,7 @@ void	VoxelSpace::DrawHover(Voxel_Hover hover) const
 		Point voxel_pos(hover.voxel_idx.x, hover.voxel_idx.y, hover.voxel_idx.z);
 		voxel_pos = voxel_pos + chunk_off;
 		voxel_pos = voxel_pos - hover.dir / 128;
-		Box box_voxel(
+		AxisBox box_voxel(
 			voxel_pos + Point(0, 0, 0),
 			voxel_pos + Point(1, 1, 1)
 		);
@@ -426,4 +362,29 @@ void	VoxelSpace::DrawHover(Voxel_Hover hover) const
 		box_voxel.UpdateBuffer();
 		box_voxel.Draw();
 	}
+}
+
+
+
+unsigned int	VoxelSpace::GeneralInfoChunksCount()
+{
+	return (Chunks.size());
+}
+unsigned int	VoxelSpace::GeneralInfoMemSumChunksData()
+{
+	unsigned int sum = 0;
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		sum += Chunks[i] -> GeneralInfoMemData();
+	}
+	return (sum);
+}
+unsigned int	VoxelSpace::GeneralInfoMemSumChunksBuff()
+{
+	unsigned int sum = 0;
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		sum += Chunks[i] -> GeneralInfoMemBuff();
+	}
+	return (sum);
 }

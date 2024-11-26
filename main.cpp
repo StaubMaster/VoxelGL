@@ -1,4 +1,5 @@
 
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 
@@ -17,7 +18,8 @@
 #include "Voxel/VoxelChunk.hpp"
 #include "Voxel/VoxelSpace.hpp"
 
-#include "Box.hpp"
+#include "AxisBox.hpp"
+#include "EntityBox.hpp"
 
 #include "FileParse/PNG/PNG_Image.hpp"
 
@@ -127,6 +129,8 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/fancy_RedWood.png",    false, false, false, true , false));
 	table.Set(VoxelData("images/fancy_BlueSpiral.png", false, false, true , false, false));
 	table.Set(VoxelData("images/BlueSpiral.png",       false, false, false, false, false));
+	table.Set(VoxelData("images/Window.png",           false, false, true , false, false));
+	table.Set(VoxelData("images/BlueBlock.png",        false, false, false, false, false));
 	std::cout << "table done\n";
 
 	std::cout << "textures ...\n";
@@ -140,16 +144,6 @@ int main(int argc, char **argv)
 
 	KeyPress test_Box_Key(GLFW_KEY_Q, false);
 	win -> keys.push_back(&test_Box_Key);
-
-	Box box1(Point(-1, 3, -1), Point(1, 4, 1));
-	Box box2(Point(-0.5, 4.5, -0.5), Point(0.5, 5, 0.5));
-	Box box3;
-	box1.CreateBuffer();
-	box1.UpdateBuffer();
-	box2.CreateBuffer();
-	box2.UpdateBuffer();
-	box3.CreateBuffer();
-
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -175,40 +169,78 @@ int main(int argc, char **argv)
 	win -> keys.push_back(&place_add_key);
 	win -> keys.push_back(&place_sub_key);
 
-	{
-		std::cout << "General Info\n";
-		std::cout << "  Memory:\n";
-		std::cout << "    per Chunks:\n";
-		std::cout << "      Voxels: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
-		std::cout << "      Buffer: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
-	}
+	Point move;
+	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
 
-	Point vel;
-
-	std::cout << "loop\n\n\n\n\n\n\n";
+	std::cout << "loop\n";
+	for (int i = 0; i < 20; i++)
+		std::cout << "\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
+		/*{
+			std::stringstream ss;
+			ss << "\e[18A\n";
+			ss << "General Info\n";
+			ss << "+-Memory:\n";
+			ss << "  +-Static:\n";
+			ss << "  | +-per Voxel:\n";
+			ss << "  | | +-Memory: " << mem_size_1000_original(sizeof(Voxel)) << "\n";
+			ss << "  | | +-Render: " << mem_size_1000_original(6 * 6 * sizeof(VoxelRenderData)) << "\n";
+			ss << "  | +-per Chunks:\n";
+			ss << "  |   +-Memory: " << mem_size_1000_original(Voxel_per_Chunk * sizeof(Voxel)) << "\n";
+			ss << "  |   +-Render: " << mem_size_1000_original(Vertex_per_Chunk * 6 * 6 * sizeof(VoxelRenderData)) << "\n";
+			ss << "  +-Dynamic:\n";
+			ss << "    +-Space:\n";
+			unsigned int count = space.GeneralInfoChunksCount();
+			unsigned int mem_sum_data = space.GeneralInfoMemSumChunksData();
+			unsigned int mem_sum_buff = space.GeneralInfoMemSumChunksBuff();
+			ss << "      +-Chunks Count: " << count << "\n";
+			ss << "      +-Chunks Memory Sum: " << mem_size_1000_original(mem_sum_data) << "\n";
+			ss << "      +-Chunks Render Sum: " << mem_size_1000_original(mem_sum_buff) << "\n";
+			if (count != 0)
+			{
+				ss << "      +-Chunks Memory Avg: " << mem_size_1000_original(mem_sum_data / count) << "\n";
+				ss << "      +-Chunks Render Avg: " << mem_size_1000_original(mem_sum_buff / count) << "\n";
+			}
+			else
+			{
+				ss << "      +-Chunks Memory Avg: NaN\n";
+				ss << "      +-Chunks Render Avg: NaN\n";
+			}
+			std::cout << ss.str();
+		}*/
+
 		win -> Update();
 
 		FrameTimeCurr = glfwGetTime();
 		FrameTimeDelta = FrameTimeCurr - FrameTimeLast;
 		FrameTimeLast = FrameTimeCurr;
+		//std::cout << "Delta: " << (FrameTimeDelta * 60) << "\n";
 
 
-		//view.move(win -> GetKeyMovement(5.0f * FrameTimeDelta));
-		vel = vel + (view.RelToAbs(win -> GetKeyMovement(5.0f * FrameTimeDelta)) * 0.01f);
+		move = view.RelToAbs(win -> GetKeyMovement(10.0f));
 		//view.turn(win -> GetKeyTurning(0.03f));
 		view.turn(win -> GetMouseTurning());
+
+		if (test_Box_Key.check())
+		{
+			entity.pos = Point(0, 10, 0);
+			entity.vel = Point();
+		}
+		entity.Update(space, FrameTimeDelta, move);
+		view.pos = entity.pos;
+
+
 
 		if (place_add_key.check())
 		{
 			placeID++;
-			if (placeID > 4) { placeID = 0; }
+			if (placeID >= (int)table.Length()) { placeID = 0; }
 		}
 		if (place_sub_key.check())
 		{
 			placeID--;
-			if (placeID < 0) { placeID = 4; }
+			if (placeID < 0) { placeID = table.Length() - 1; }
 		}
 
 
@@ -218,7 +250,7 @@ int main(int argc, char **argv)
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
 		space.AddChunksRange(chunk_current, 1);
-		space.SubChunksRange(chunk_current, 1);
+		space.SubChunksRange(chunk_current, 2);
 
 		VoxelSpace::Voxel_Hover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
@@ -246,204 +278,8 @@ int main(int argc, char **argv)
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
 
-/*
-	+---------------+
-	| +-----------+ |
-	| | +-------+ | |
-	| | |       | | |
-	| | |       | | |
-	| | +-------+ | |
-	| +-----------+ |
-	+---------------+
 
-	outer : determin on what sides surfaces are being touched
-	middle : collision target
-	inner : determin if stuch
-
-	if outer collides with voxel on bottom
-		on ground, no gravity
-
-	if inner collides with voxel at all
-		stuck, no gravity, (push to unstuck ?)
-
-	for movement
-		check how far middle can move until collide
-		move middle
-
-problem: moving diagonal
-	should slide off surface
-solution:
-	use outer to degermin which if touching surface
-	when touching surface, dont move calcle all movement toward that surface
-*/
-/*
-problem:
-
-	Y
-	|
-	#---X
-
-inner			|-------|
-outer		|---------------|
-
-			|	|		|	|
-			|	#-------#	|
-	+-------|---+			|
-	|		|	|			|
-	|		#---|-----------#
-	|			|
-
-this is considered touching on the bottom Y face AND the left X face
-but it should only be bottom Y
-
-solution
-
-		|	|		|	|
-		#---#-------#---#
-	+-------|---+	|
-	|		|	|	|
-	|		#-------#
-	|			|
-
-instead of a single outer box
-
-*/
-
-		if (test_Box_Key.check())
-		{
-			view.pos = Point(0, 10, 0);
-			vel = Point();
-		}
-
-		//if (test_Box_Key.check())
-		{
-			//box2.Min = Point(0, 3.5, 0);
-			//box2.Max = Point(1.5, 5.0, 1.5);
-
-			box2.Min = view.pos + Point(-0.6, -3.6, -0.6);
-			box2.Max = view.pos + Point(+0.6, +0.2, +0.6);
-
-			//box2.Min = Point(0.8, 1.8, 0.8);
-			//box2.Max = Point(2.2, 3.2, 2.2);
-
-			//box2.Min = Point(1.2, 1.2, 1.2);
-			//box2.Max = Point(1.8, 2.8, 1.8);
-
-			//box2.Min = Point(0.8, 1.2, 0.8);
-			//box2.Max = Point(1.2, 2.8, 1.2);
-
-			//vel = Point();
-			//vel.y = 0.001f;
-		}
-
-		{
-			//box2.Min = box2.Min + vel;
-			//box2.Max = box2.Max + vel;
-
-			//vel = vel * 0.9999f;
-			//vel.y -= 0.0001f;
-			//Point diff = Box::IntersektDiff(box1, box2);
-			//Point diff = space.CheckBoxCollision(box2);
-			//diff = diff.Sign();
-
-			box3.Min = box2.Min - Point(0.1f, 0.1f, 0.1f);
-			box3.Max = box2.Max + Point(0.1f, 0.1f, 0.1f);
-
-			char	bits = space.TouchNeighbour(box2, 0.1f);
-
-			std::string bits_str = "bits: ";
-			if (bits & AXIS_BIT_ZP) { bits_str += "Z"; } else { bits_str += "."; }
-			if (bits & AXIS_BIT_ZN) { bits_str += "Z"; } else { bits_str += "."; }
-			if (bits & AXIS_BIT_YP) { bits_str += "Y"; } else { bits_str += "."; }
-			if (bits & AXIS_BIT_YN) { bits_str += "Y"; } else { bits_str += "."; }
-			if (bits & AXIS_BIT_XP) { bits_str += "X"; } else { bits_str += "."; }
-			if (bits & AXIS_BIT_XN) { bits_str += "X"; } else { bits_str += "."; }
-			std::cout << bits_str << "\n";
-
-			if (!(bits & AXIS_BIT_YN))
-			{
-				vel.y -= 0.00001f;
-			}
-			else
-			{
-				vel = vel * 0.999f;
-			}
-
-			if ((bits & AXIS_BIT_XN) && vel.x < 0) { vel.x = 0; }
-			if ((bits & AXIS_BIT_XP) && vel.x > 0) { vel.x = 0; }
-			if ((bits & AXIS_BIT_YN) && vel.y < 0) { vel.y = 0; }
-			if ((bits & AXIS_BIT_YP) && vel.y > 0) { vel.y = 0; }
-			if ((bits & AXIS_BIT_ZN) && vel.z < 0) { vel.z = 0; }
-			if ((bits & AXIS_BIT_ZP) && vel.z > 0) { vel.z = 0; }
-
-			/*
-			Point diff = space.IntersektDiff(box3);
-			std::cout << "diff " << diff << "\n";
-			std::cout << "vel " << vel << "\n";
-
-			if (abs(diff.x) >= 0.1f)
-				vel.x = 0;
-			else if (abs(diff.x) > 0)
-			{
-				std::cout << "X\n";
-				vel.x += diff.x;
-			}
-			if (abs(diff.y) >= 0.1f)
-				vel.y = 0;
-			else if (abs(diff.y) > 0)
-			{
-				if (diff.y < 0 && vel.y > 0)
-				{
-					std::cout << "Y--\n";
-					vel.y += diff.y;
-					if (vel.y < 0)
-						vel.y = 0;
-				}
-				else if (diff.y > 0 && vel.y < 0)
-				{
-					std::cout << "Y++\n";
-					vel.y += diff.y;
-					if (vel.y > 0)
-						vel.y = 0;
-				}
-			}
-			if (abs(diff.z) >= 0.1f)
-				vel.z = 0;
-			else if (abs(diff.z) > 0)
-			{
-				std::cout << "Z\n";
-				vel.z += diff.z;
-			}
-			*/
-
-			//float t = space.CheckBoxCollision(box2, vel);
-			//std::cout << "t: " << t << "\n";
-			//if (t > 0 && t < 1)
-			//{
-			//	vel = vel * (t - 0.001f);
-			//}
-			//if (!space.IntersektBool(box3))
-			//{
-			//	std::cout << "not on ground\n";
-			//	vel.y -= 0.0001f;
-			//}
-
-			//diff.y -= 0.01f;
-			//diff = diff * 0.001f;
-			//vel = vel + diff;
-
-			if (vel.length() > 0.001f)
-				vel = vel * (0.001f / vel.length());
-			//std::cout << "vel.length() " << vel.length() << "\n";
-
-			box2.UpdateBuffer();
-			box3.UpdateBuffer();
-		}
-
-		box1.Draw();
-		box2.Draw();
-		box3.Draw();
-
+		entity.DrawBox();
 
 
 		Inv_Spin.x += FrameTimeDelta * 1;
@@ -461,8 +297,6 @@ instead of a single outer box
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
-
-		view.pos = view.pos + vel;
 	}
 
 	glDeleteTextures(1, &texture_arr);

@@ -3,7 +3,8 @@ NAME = a.exe
 
 FILES_CPP = \
 	main.cpp \
-	Box.cpp \
+	AxisBox.cpp \
+	EntityBox.cpp \
 	MemorySize.cpp
 
 FILES_VOXEL_CPP = \

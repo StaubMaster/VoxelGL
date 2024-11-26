@@ -39,8 +39,6 @@ class Voxel
 
 		char	getAxis() const;
 		char	getSpin() const;
-
-		static char	Orth_To_Axis(char orth);
 };
 
 #endif

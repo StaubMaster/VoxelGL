@@ -8,20 +8,10 @@
 # include "../openGL/Abstract/math3D.hpp"
 
 # include "VoxelChunk.hpp"
+# include "VoxelHover.hpp"
 
 class VoxelSpace
 {
-	public:
-		struct Voxel_Hover
-		{
-			bool			isValid;
-			unsigned int	chunk_vec_idx;
-			Index3D			chunk_idx;
-			Undex3D			voxel_idx;
-			char			cardinal;
-			Point			dir;
-		};
-
 	private:
 		std::vector<VoxelChunk * > Chunks;
 		VoxelDataTable & Table;
@@ -43,21 +33,21 @@ class VoxelSpace
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
 
-		char	tryAdd(Voxel_Hover hover, char id);
-		char	trySub(Voxel_Hover hover, char id);
+		char	tryAdd(VoxelHover hover, char id);
+		char	trySub(VoxelHover hover, char id);
 
 		bool	IntersektBool(AxisBox & box);
 		char	TouchVoxel(AxisBox & box, float size);
 
 		void	Draw(int Uni_Chunk_Pos) const;
 		void	DrawBound() const;
-		void	DrawHover(Voxel_Hover hover) const;
+		void	DrawHover(VoxelHover hover) const;
 
 		unsigned int	GeneralInfoChunksCount();
 		unsigned int	GeneralInfoMemSumChunksData();
 		unsigned int	GeneralInfoMemSumChunksBuff();
 
-		Voxel_Hover		Cross(Point pos, Point dir);
+		VoxelHover		Cross(Point pos, Point dir);
 };
 
 #endif

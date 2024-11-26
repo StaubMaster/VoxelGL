@@ -72,22 +72,3 @@ char	Voxel::getSpin() const
 {
 	return (Orientation & VOXEL_SPIN_BITS) >> 3;
 }
-
-
-
-char	Voxel::Orth_To_Axis(char orth)
-{
-	if (orth == CARDINAL_X_NEGATIVE)
-		return (0b001);
-	else if (orth == CARDINAL_X_POSITIVE)
-		return (0b110);
-	else if (orth == CARDINAL_Y_NEGATIVE)
-		return (0b010);
-	else if (orth == CARDINAL_Y_POSITIVE)
-		return (0b101);
-	else if (orth == CARDINAL_Z_NEGATIVE)
-		return (0b100);
-	else if (orth == CARDINAL_Z_POSITIVE)
-		return (0b011);
-	return (0);
-}

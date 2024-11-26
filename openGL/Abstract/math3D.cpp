@@ -1,61 +1,6 @@
 
 #include "math3D.hpp"
 
-/*bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max)
-{
-	idx.z++;
-	if (idx.z >= max.z)
-	{
-		idx.z = min.z,
-		idx.y++;
-		if (idx.y >= max.y)
-		{
-			idx.y = min.y;
-			idx.x++;
-			if (idx.x >= max.x)
-			{
-				idx.x = min.x;
-				return (false);
-			}
-		}
-	}
-	return (true);
-}
-bool Undex3D_loop(Undex3D & idx, unsigned int min, unsigned int max)
-{
-	idx.z++;
-	if (idx.z >= max)
-	{
-		idx.z = min,
-		idx.y++;
-		if (idx.y >= max)
-		{
-			idx.y = min;
-			idx.x++;
-			if (idx.x >= max)
-			{
-				idx.x = min;
-				return (false);
-			}
-		}
-	}
-	return (true);
-}*/
-/*bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max)
-{
-	return	(idx.x >= min.x && idx.x <= max.x) &&
-			(idx.y >= min.y && idx.y <= max.y) &&
-			(idx.z >= min.z && idx.z <= max.z);
-}
-bool Index3D_box_exlusive(Index3D idx, Index3D min, Index3D max)
-{
-	return	(idx.x > min.x && idx.x < max.x) &&
-			(idx.y > min.y && idx.y < max.y) &&
-			(idx.z > min.z && idx.z < max.z);
-}*/
-
-
-
 RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 {
 	RayCast3D_Data	data;
@@ -83,39 +28,39 @@ RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale)
 	{
 		data.grid_dir.x = +1;
 		data.side_sum.x = ((data.grid_idx.x + 1) - data.norm_pos.x) * data.side_len.x;
-		data.cardinal_x = CARDINAL_X_NEGATIVE;
+		data.cardinal_x = AXIS_BITS_XN;
 	}
 	else
 	{
 		data.grid_dir.x = -1;
 		data.side_sum.x = (data.norm_pos.x - data.grid_idx.x) * data.side_len.x;
-		data.cardinal_x = CARDINAL_X_POSITIVE;
+		data.cardinal_x = AXIS_BITS_XP;
 	}
 
 	if (data.norm_dir.y > 0)
 	{
 		data.grid_dir.y = +1;
 		data.side_sum.y = ((data.grid_idx.y + 1) - data.norm_pos.y) * data.side_len.y;
-		data.cardinal_y = CARDINAL_Y_NEGATIVE;
+		data.cardinal_y = AXIS_BITS_YN;
 	}
 	else
 	{
 		data.grid_dir.y = -1;
 		data.side_sum.y = (data.norm_pos.y - data.grid_idx.y) * data.side_len.y;
-		data.cardinal_y = CARDINAL_Y_POSITIVE;
+		data.cardinal_y = AXIS_BITS_YP;
 	}
 
 	if (data.norm_dir.z > 0)
 	{
 		data.grid_dir.z = +1;
 		data.side_sum.z = ((data.grid_idx.z + 1) - data.norm_pos.z) * data.side_len.z;
-		data.cardinal_z = CARDINAL_Z_NEGATIVE;
+		data.cardinal_z = AXIS_BITS_ZN;
 	}
 	else
 	{
 		data.grid_dir.z = -1;
 		data.side_sum.z = (data.norm_pos.z - data.grid_idx.z) * data.side_len.z;
-		data.cardinal_z = CARDINAL_Z_POSITIVE;
+		data.cardinal_z = AXIS_BITS_ZP;
 	}
 
 	return (data);
@@ -130,21 +75,21 @@ RayCast3D_Hit	RayCast3D_continue(RayCast3D_Data & data)
 		hit.t = data.side_sum.x;
 		data.side_sum.x += data.side_len.x;
 		data.grid_idx.x += data.grid_dir.x;
-		hit.cardinal = data.cardinal_x;
+		hit.from_axis = data.cardinal_x;
 	}
 	else if (data.side_sum.y < data.side_sum.z && data.side_sum.y < data.side_sum.z)
 	{
 		hit.t = data.side_sum.y;
 		data.side_sum.y += data.side_len.y;
 		data.grid_idx.y += data.grid_dir.y;
-		hit.cardinal = data.cardinal_y;
+		hit.from_axis = data.cardinal_y;
 	}
 	else
 	{
 		hit.t = data.side_sum.z;
 		data.side_sum.z += data.side_len.z;
 		data.grid_idx.z += data.grid_dir.z;
-		hit.cardinal = data.cardinal_z;
+		hit.from_axis = data.cardinal_z;
 	}
 
 	return (hit);
@@ -156,6 +101,54 @@ RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data)
 	hit.idx.y = data.grid_idx.y;
 	hit.idx.z = data.grid_idx.z;
 	hit.pos = data.ray_pos + (data.ray_dir * (hit.t * data.scale));
+	hit.dir = data.ray_dir;
+
+	Point & dir = data.ray_dir;
+	Point abs_d(abs(dir.x), abs(dir.y), abs(dir.z));
+
+	if (abs_d.x >= abs_d.y && abs_d.x >= abs_d.z)
+	{
+		if (dir.x < 0) { hit.dir1 = AXIS_BITS_XN; } else { hit.dir1 = AXIS_BITS_XP; }
+		if (abs_d.y >= abs_d.z)
+		{
+			if (dir.y < 0) { hit.dir2 = AXIS_BITS_YN; } else { hit.dir2 = AXIS_BITS_YP; }
+			if (dir.z < 0) { hit.dir3 = AXIS_BITS_ZN; } else { hit.dir3 = AXIS_BITS_ZP; }
+		}
+		else
+		{
+			if (dir.z < 0) { hit.dir2 = AXIS_BITS_ZN; } else { hit.dir2 = AXIS_BITS_ZP; }
+			if (dir.y < 0) { hit.dir3 = AXIS_BITS_YN; } else { hit.dir3 = AXIS_BITS_YP; }
+		}
+	}
+	else if (abs_d.y >= abs_d.x && abs_d.y >= abs_d.z)
+	{
+		if (dir.y < 0) { hit.dir1 = AXIS_BITS_YN; } else { hit.dir1 = AXIS_BITS_YP; }
+		if (abs_d.x >= abs_d.z)
+		{
+			if (dir.x < 0) { hit.dir2 = AXIS_BITS_XN; } else { hit.dir2 = AXIS_BITS_XP; }
+			if (dir.z < 0) { hit.dir3 = AXIS_BITS_ZN; } else { hit.dir3 = AXIS_BITS_ZP; }
+		}
+		else
+		{
+			if (dir.z < 0) { hit.dir2 = AXIS_BITS_ZN; } else { hit.dir2 = AXIS_BITS_ZP; }
+			if (dir.x < 0) { hit.dir3 = AXIS_BITS_XN; } else { hit.dir3 = AXIS_BITS_XP; }
+		}
+	}
+	else
+	{
+		if (dir.z < 0) { hit.dir1 = AXIS_BITS_ZN; } else { hit.dir2 = AXIS_BITS_ZP; }
+		if (abs_d.x >= abs_d.y)
+		{
+			if (dir.x < 0) { hit.dir2 = AXIS_BITS_XN; } else { hit.dir2 = AXIS_BITS_XP; }
+			if (dir.y < 0) { hit.dir3 = AXIS_BITS_YN; } else { hit.dir3 = AXIS_BITS_YP; }
+		}
+		else
+		{
+			if (dir.y < 0) { hit.dir2 = AXIS_BITS_YN; } else { hit.dir2 = AXIS_BITS_YP; }
+			if (dir.x < 0) { hit.dir3 = AXIS_BITS_XN; } else { hit.dir3 = AXIS_BITS_XP; }
+		}
+	}
+
 	return (hit);
 }
 
@@ -168,7 +161,7 @@ RayCast3D_Hit	RayCast3D(
 	int(* hit_func)(const void *, Index3D))
 {
 	RayCast3D_Hit hit;
-	hit.cardinal = 0;
+	hit.from_axis = 0;
 	hit.t = 0;
 
 	RayCast3D_Data data = RayCast3D_init(pos, dir, scale);
@@ -194,44 +187,3 @@ RayCast3D_Hit	RayCast3D(
 	hit.isHit = false;
 	return hit;
 }
-
-/*RayCast3D_Hit	RayCast3D_Recursive(
-	Point pos, Point dir,
-	int max_dist,
-	const void * obj,
-	void * obj_hit,
-	int(* hit_func)(const void *, void *, Index3D, Point, Point))
-{
-	RayCast3D_Hit hit;
-	hit.cardinal = 0;
-	hit.t = 0;
-
-	dir.x = -dir.x;
-	dir.y = -dir.y;
-
-	Point ray_pos = pos;
-	Point ray_dir = dir;
-
-	RayCast3D_Data data = RayCast3D_init(pos, dir);
-
-	while (hit.t < max_dist)
-	{
-		hit.pos = ray_pos + (ray_dir * hit.t);
-		int check = hit_func(obj, obj_hit, data.grid_idx, hit.pos, ray_dir);
-		if (check < 0)
-		{
-			hit.isHit = false;
-			return hit;
-		}
-		if (check > 0)
-		{
-			hit = RayCast3D_hit(hit, data);
-			return hit;
-		}
-
-		hit = RayCast3D_continue(data);
-	}
-
-	hit.isHit = false;
-	return hit;
-}*/

@@ -130,7 +130,8 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/fancy_BlueSpiral.png", false, false, true , false, false));
 	table.Set(VoxelData("images/BlueSpiral.png",       false, false, false, false, false));
 	table.Set(VoxelData("images/Window.png",           false, false, true , false, false));
-	table.Set(VoxelData("images/BlueBlock.png",        false, false, false, false, false));
+	table.Set(VoxelData("images/fancy_RedPlank.png",   false, false, false, true , true ));
+	table.Set(VoxelData("images/Brick.png",            false, false, false, true , false));
 	std::cout << "table done\n";
 
 	std::cout << "textures ...\n";
@@ -252,7 +253,7 @@ int main(int argc, char **argv)
 		space.AddChunksRange(chunk_current, 1);
 		space.SubChunksRange(chunk_current, 2);
 
-		VoxelSpace::Voxel_Hover hover;
+		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid)
 			space.tryAdd(hover, placeID);

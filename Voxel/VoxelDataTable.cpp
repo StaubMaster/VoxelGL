@@ -47,7 +47,20 @@ Voxel	VoxelData::ToVoxelForce(char idx, char ori) const
 
 	return Voxel(idx, category, axis | spin);
 }
+Voxel	VoxelData::ToVoxel(char idx, VoxelHover hover) const
+{
+	char category = 0;
+	if (isNoDraw)      { category |= VOXEL_NO_DRAW_BIT; }
+	if (isNotSolid)    { category |= VOXEL_NOT_SOLID_BIT; }
+	if (isTransparent) { category |= VOXEL_TRANSPARENT_BIT; }
 
+	char axis;
+	if (isFixedAxis) { axis = hover.hit.from_axis; } else { axis = (std::rand() % 6) + 1; }
+	char spin;
+	if (isFixedSpin) { spin = (hover.hit.dir2 << 3) & VOXEL_SPIN_BITS; } else { spin = (std::rand() % 4) << 3; }
+
+	return Voxel(idx, category, axis | spin);
+}
 
 
 

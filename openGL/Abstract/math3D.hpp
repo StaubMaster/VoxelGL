@@ -1,42 +1,19 @@
 
 #ifndef MATH3D_H
 # define MATH3D_H
+# include <math.h>
+
 # include "Point.hpp"
 # include "Angle.hpp"
 # include "Index3D.hpp"
 # include "Undex3D.hpp"
 
-# define CARDINAL_X_NEGATIVE 1
-# define CARDINAL_X_POSITIVE 2
-# define CARDINAL_Y_NEGATIVE 3
-# define CARDINAL_Y_POSITIVE 4
-# define CARDINAL_Z_NEGATIVE 5
-# define CARDINAL_Z_POSITIVE 6
-//# define CARDINAL_X_NEGATIVE 0b001
-//# define CARDINAL_X_POSITIVE 0b110
-//# define CARDINAL_Y_NEGATIVE 0b010
-//# define CARDINAL_Y_POSITIVE 0b101
-//# define CARDINAL_Z_NEGATIVE 0b100
-//# define CARDINAL_Z_POSITIVE 0b011
-
-/*struct	Index3D
-{
-	int	x;
-	int	y;
-	int	z;
-};*/
-/*struct	Undex3D
-{
-	unsigned int	x;
-	unsigned int	y;
-	unsigned int	z;
-};*/
-
-//bool Undex3D_loop(Undex3D & idx, Undex3D min, Undex3D max);
-//bool Undex3D_loop(Undex3D & idx, unsigned int min, unsigned int max);
-
-//bool Index3D_box_inlusive(Index3D idx, Index3D min, Index3D max);
-//bool Index3D_box_exlusive(Index3D idx, Index3D min, Index3D max);
+# define AXIS_BITS_XN 0b001
+# define AXIS_BITS_XP 0b110
+# define AXIS_BITS_YN 0b010
+# define AXIS_BITS_YP 0b101
+# define AXIS_BITS_ZN 0b100
+# define AXIS_BITS_ZP 0b011
 
 struct	RayCast3D_Data
 {
@@ -63,7 +40,13 @@ struct	RayCast3D_Hit
 	bool	isHit;
 
 	Index3D	idx;
-	char	cardinal;
+
+	char	from_axis;
+
+	Point	dir;
+	char	dir1;
+	char	dir2;
+	char	dir3;
 
 	float	t;
 	Point	pos;
@@ -72,25 +55,6 @@ struct	RayCast3D_Hit
 RayCast3D_Data	RayCast3D_init(Point pos, Point dir, float scale);
 RayCast3D_Hit	RayCast3D_continue(RayCast3D_Data & data);
 RayCast3D_Hit	RayCast3D_hit(RayCast3D_Hit hit, RayCast3D_Data data);
-
-/*
-	pos, dir				: for th ray
-	max_dist				: as a upper limit
-
-	obj						: the object that should be raycast
-	hit						: a pointer to a seperate hit object
-	hitfunc					: a function what takes obj and xyz to determin weather to stop or continue searching
-
-	return hit				: return a hit to indicate where / how far something was hit
-*/
-
-/*
-	hit func needs:
-		pointer to the object to check
-		pointer to seperate hit object
-		xyz
-		pos and dir of ray
-*/
 
 RayCast3D_Hit	RayCast3D(
 	Point pos, Point dir,

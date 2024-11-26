@@ -10,6 +10,7 @@
 # include "Voxel.hpp"
 # include "VoxelDataTable.hpp"
 # include "VoxelRenderData.hpp"
+# include "VoxelHover.hpp"
 
 # include "../AxisBox.hpp"
 # include "../MemorySize.hpp"
@@ -57,8 +58,8 @@ class VoxelChunk
 		void	GeneratePlane(VoxelDataTable & table);
 
 		int		CheckVoxel(Index3D idx);
-		void	tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth);
-		char	trySub(Undex3D idx);
+		void	tryAdd(VoxelDataTable & table, VoxelHover hover, char id);
+		char	trySub(VoxelHover hover);
 
 		bool	IntersektBool(AxisBox & box);
 		char	TouchVoxel(AxisBox & box, float size);

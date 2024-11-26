@@ -32,12 +32,13 @@ void	EntityBox::Update(VoxelSpace & space, float time, Point move)
 
 	if (!(touchBits & AXIS_BIT_YN))
 	{
-		vel.y -= 0.01f;
+		//vel.y -= 0.01f;
 	}
 	else
 	{
-		vel = vel * 0.999f;
+		//vel = vel * 0.999f;
 	}
+	vel = vel * 0.999f;
 
 	float vel_len = vel.length();
 	if (vel_len > 8.0f)

@@ -159,29 +159,27 @@ void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 
 
 
-char	VoxelSpace::tryAdd(Voxel_Hover hover, char id)
+char	VoxelSpace::tryAdd(VoxelHover hover, char id)
 {
-	VoxelChunk::Voxel_Neighbour(hover.cardinal, hover.voxel_idx, hover.chunk_idx);
-
+	VoxelChunk::Voxel_Neighbour(hover.hit.from_axis, hover.voxel_idx, hover.chunk_idx);
 
 	VoxelChunk * chunk = FindChunkPtr(hover.chunk_idx);
 	if (chunk == NULL)
 		return (0);
 
-	chunk -> tryAdd(Table, hover.voxel_idx, id, hover.cardinal);
+	chunk -> tryAdd(Table, hover, id);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
 	return 0;
 }
-char	VoxelSpace::trySub(Voxel_Hover hover, char id)
+char	VoxelSpace::trySub(VoxelHover hover, char id)
 {
-	VoxelChunk * chunk = Chunks[hover.chunk_vec_idx];
+	VoxelChunk * chunk = Chunks[hover.chunk_vector_idx];
 	if (!chunk -> isChunkIndex(hover.chunk_idx))
 		chunk = FindChunkPtr(hover.chunk_idx);
 
-
-	char t = chunk -> trySub(hover.voxel_idx);
+	char t = chunk -> trySub(hover);
 
 	UpdateBufferNeighbours(chunk -> getChunkIndex3D());
 
@@ -276,13 +274,13 @@ void	VoxelSpace::DrawBound() const
 }
 
 
-VoxelSpace::Voxel_Hover	VoxelSpace::Cross(Point pos, Point dir)
+VoxelHover	VoxelSpace::Cross(Point pos, Point dir)
 {
 	RayCast3D_Hit hit_chunk;
 	RayCast3D_Hit hit_voxel;
 
 	hit_chunk.t = 0;
-	hit_chunk.cardinal = 0;
+	hit_chunk.from_axis = 0;
 	hit_chunk.isHit = false;
 	RayCast3D_Data data_chunk = RayCast3D_init(pos, dir, Voxel_per_Side);
 
@@ -300,9 +298,9 @@ VoxelSpace::Voxel_Hover	VoxelSpace::Cross(Point pos, Point dir)
 			VoxelChunk * chunk = FindChunkPtr(hit_chunk.idx);
 
 			hit_voxel.t = 0;
-			hit_voxel.cardinal = 0;
+			hit_voxel.from_axis = 0;
 			hit_voxel.isHit = false;
-			hit_voxel.cardinal = hit_chunk.cardinal;
+			hit_voxel.from_axis = hit_chunk.from_axis;
 			RayCast3D_Data data_voxel = RayCast3D_init(hit_chunk.pos - (chunk -> getChunkOffset()), dir, 1);
 
 			while (hit_voxel.t < 128)
@@ -330,30 +328,31 @@ VoxelSpace::Voxel_Hover	VoxelSpace::Cross(Point pos, Point dir)
 		hit_chunk = RayCast3D_continue(data_chunk);
 	}
 
-	Voxel_Hover hover;
+	VoxelHover hover;
 	hover.isValid = false;
 	if (hit_chunk.isHit && hit_voxel.isHit)
 	{
 		hover.isValid = true;
-		hover.chunk_vec_idx = FindChunkIdx(hit_chunk.idx);
+		hover.chunk_vector_idx = FindChunkIdx(hit_chunk.idx);
+
 		hover.chunk_idx = hit_chunk.idx;
 		hover.voxel_idx.x = hit_voxel.idx.x;
 		hover.voxel_idx.y = hit_voxel.idx.y;
 		hover.voxel_idx.z = hit_voxel.idx.z;
-		hover.cardinal = hit_voxel.cardinal;
-		hover.dir = dir;
+
+		hover.hit = hit_voxel;
 	}
 	return hover;
 }
-void	VoxelSpace::DrawHover(Voxel_Hover hover) const
+void	VoxelSpace::DrawHover(VoxelHover hover) const
 {
 	if (hover.isValid)
 	{
-		Point chunk_off = Chunks[hover.chunk_vec_idx] -> getChunkOffset();
+		Point chunk_off = Chunks[hover.chunk_vector_idx] -> getChunkOffset();
 
 		Point voxel_pos(hover.voxel_idx.x, hover.voxel_idx.y, hover.voxel_idx.z);
 		voxel_pos = voxel_pos + chunk_off;
-		voxel_pos = voxel_pos - hover.dir / 128;
+		voxel_pos = voxel_pos - hover.hit.dir / 128;
 		AxisBox box_voxel(
 			voxel_pos + Point(0, 0, 0),
 			voxel_pos + Point(1, 1, 1)

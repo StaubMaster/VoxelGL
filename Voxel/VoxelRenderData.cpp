@@ -249,14 +249,14 @@ VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, char tex_info, const Voxel
 
 	TextureCoordCube coords;
 
-	if (vox_axis == 0)          { coords = Default_Texture_Same; }
-	else if (vox_axis == 0b001) { coords = Default_Texture_Cube_XM; }
-	else if (vox_axis == 0b010) { coords = Default_Texture_Cube_ZM; }
-	else if (vox_axis == 0b100) { coords = Default_Texture_Cube_YM; }
-	else if (vox_axis == 0b110) { coords = Default_Texture_Cube_XP; }
-	else if (vox_axis == 0b101) { coords = Default_Texture_Cube_ZP; }
-	else if (vox_axis == 0b011) { coords = Default_Texture_Cube_YP; }
-	else                        { coords = Default_Texture_Same; }
+	if (vox_axis == 0)                 { coords = Default_Texture_Same; }
+	else if (vox_axis == AXIS_BITS_XN) { coords = Default_Texture_Cube_XM; }
+	else if (vox_axis == AXIS_BITS_YN) { coords = Default_Texture_Cube_ZM; }
+	else if (vox_axis == AXIS_BITS_ZN) { coords = Default_Texture_Cube_YM; }
+	else if (vox_axis == AXIS_BITS_XP) { coords = Default_Texture_Cube_XP; }
+	else if (vox_axis == AXIS_BITS_YP) { coords = Default_Texture_Cube_ZP; }
+	else if (vox_axis == AXIS_BITS_ZP) { coords = Default_Texture_Cube_YP; }
+	else                               { coords = Default_Texture_Same; }
 
 	if (vox_axis == 0b001 || vox_axis == 0b110)
 	{

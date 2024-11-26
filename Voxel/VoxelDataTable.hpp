@@ -7,6 +7,8 @@
 # include <vector>
 
 # include "Voxel.hpp"
+# include "VoxelHover.hpp"
+
 # include "../openGL/openGL.h"
 # include "../FileParse/PNG/PNG_Image.hpp"
 
@@ -29,6 +31,7 @@ struct VoxelData
 
 	Voxel	ToVoxel(char idx, char ori) const;
 	Voxel	ToVoxelForce(char idx, char ori) const;
+	Voxel	ToVoxel(char idx, VoxelHover hover) const;
 };
 
 class VoxelDataTable

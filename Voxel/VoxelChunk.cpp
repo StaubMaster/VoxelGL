@@ -24,17 +24,17 @@ void	VoxelChunk::Loop_Index(Undex3D & vox, Index3D & ch)
 }
 void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
 {
-	if (cardinal == CARDINAL_X_NEGATIVE)
+	if (cardinal == AXIS_BITS_XN)
 		vox.x--;
-	if (cardinal == CARDINAL_X_POSITIVE)
+	if (cardinal == AXIS_BITS_XP)
 		vox.x++;
-	if (cardinal == CARDINAL_Y_NEGATIVE)
+	if (cardinal == AXIS_BITS_YN)
 		vox.y--;
-	if (cardinal == CARDINAL_Y_POSITIVE)
+	if (cardinal == AXIS_BITS_YP)
 		vox.y++;
-	if (cardinal == CARDINAL_Z_NEGATIVE)
+	if (cardinal == AXIS_BITS_ZN)
 		vox.z--;
-	if (cardinal == CARDINAL_Z_POSITIVE)
+	if (cardinal == AXIS_BITS_ZP)
 		vox.z++;
 
 	Loop_Index(vox, ch);
@@ -291,19 +291,19 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 
 	return (0);
 }
-void	VoxelChunk::tryAdd(VoxelDataTable & table, Undex3D idx, char id, char orth)
+void	VoxelChunk::tryAdd(VoxelDataTable & table, VoxelHover hover, char id)
 {
-	unsigned int i = idx.ToIndex(Voxel_per_Side);
+	unsigned int i = hover.voxel_idx.ToIndex(Voxel_per_Side);
 
 	if (!Data[i].isSolid())
 	{
 		//Data[i] = Voxel(id, 0, (axis | ((std::rand() % 4) << 3)));
-		Data[i] = table.Get(id).ToVoxel(id, Voxel::Orth_To_Axis(orth));
+		Data[i] = table.Get(id).ToVoxel(id, hover);
 	}
 }
-char	VoxelChunk::trySub(Undex3D idx)
+char	VoxelChunk::trySub(VoxelHover hover)
 {
-	unsigned int i = idx.ToIndex(Voxel_per_Side);
+	unsigned int i = hover.voxel_idx.ToIndex(Voxel_per_Side);
 
 	char t = Data[i].isSolid();
 	Data[i] = Voxel(0);

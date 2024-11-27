@@ -57,7 +57,8 @@ Voxel	VoxelData::ToVoxel(char idx, VoxelHover hover) const
 	char axis;
 	if (isFixedAxis) { axis = hover.hit.from_axis; } else { axis = (std::rand() % 6) + 1; }
 	char spin;
-	if (isFixedSpin) { spin = (hover.hit.dir2 << 3) & VOXEL_SPIN_BITS; } else { spin = (std::rand() % 4) << 3; }
+	//if (isFixedSpin) { spin = (hover.hit.dir2 << 3) & VOXEL_SPIN_BITS; } else { spin = (std::rand() % 4) << 3; }
+	spin = 0;
 
 	return Voxel(idx, category, axis | spin);
 }

@@ -129,9 +129,10 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/fancy_RedWood.png",    false, false, false, true , false));
 	table.Set(VoxelData("images/fancy_BlueSpiral.png", false, false, true , false, false));
 	table.Set(VoxelData("images/BlueSpiral.png",       false, false, false, false, false));
-	table.Set(VoxelData("images/Window.png",           false, false, true , false, false));
-	table.Set(VoxelData("images/fancy_RedPlank.png",   false, false, false, true , true ));
 	table.Set(VoxelData("images/Brick.png",            false, false, false, true , false));
+	table.Set(VoxelData("images/Window.png",           false, false, true , false, false));
+	table.Set(VoxelData("images/RedPlank.png",         false, false, false, true , true ));
+	table.Set(VoxelData("images/WoodPlank.png",        false, false, false, true , true ));
 	std::cout << "table done\n";
 
 	std::cout << "textures ...\n";

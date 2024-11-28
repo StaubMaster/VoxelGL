@@ -90,48 +90,54 @@ static void	main_init()
 	Inv_Render_Data_Count = 36;
 	float Inv_Render_Data[] =
 	{
-		-0.1f, -0.1f, -0.1f, 0.25f, 1.0f,
-		-0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
-		-0.1f, +0.1f, -0.1f, 0.00f, 1.0f,
-		-0.1f, +0.1f, -0.1f, 0.00f, 1.0f,
-		-0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
-		-0.1f, +0.1f, +0.1f, 0.00f, 0.5f,
+		-1.0f, -1.0f, -1.0f, 0.25f, 1.0f,
+		-1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
+		-1.0f, +1.0f, -1.0f, 0.00f, 1.0f,
+		-1.0f, +1.0f, -1.0f, 0.00f, 1.0f,
+		-1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
+		-1.0f, +1.0f, +1.0f, 0.00f, 0.5f,
 
-		-0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
-		+0.1f, -0.1f, -0.1f, 0.50f, 0.5f,
-		-0.1f, -0.1f, +0.1f, 0.25f, 1.0f,
-		-0.1f, -0.1f, +0.1f, 0.25f, 1.0f,
-		+0.1f, -0.1f, -0.1f, 0.50f, 0.5f,
-		+0.1f, -0.1f, +0.1f, 0.25f, 0.5f,
+		-1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
+		+1.0f, -1.0f, -1.0f, 0.50f, 0.5f,
+		-1.0f, -1.0f, +1.0f, 0.25f, 1.0f,
+		-1.0f, -1.0f, +1.0f, 0.25f, 1.0f,
+		+1.0f, -1.0f, -1.0f, 0.50f, 0.5f,
+		+1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
 
-		-0.1f, -0.1f, -0.1f, 0.75f, 1.0f,
-		-0.1f, +0.1f, -0.1f, 0.75f, 0.5f,
-		+0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
-		+0.1f, -0.1f, -0.1f, 0.50f, 1.0f,
-		-0.1f, +0.1f, -0.1f, 0.75f, 0.5f,
-		+0.1f, +0.1f, -0.1f, 0.50f, 0.5f,
+		-1.0f, -1.0f, -1.0f, 0.75f, 1.0f,
+		-1.0f, +1.0f, -1.0f, 0.75f, 0.5f,
+		+1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
+		+1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
+		-1.0f, +1.0f, -1.0f, 0.75f, 0.5f,
+		+1.0f, +1.0f, -1.0f, 0.50f, 0.5f,
 
-		+0.1f, -0.1f, -0.1f, 0.25f, 0.5f,
-		+0.1f, +0.1f, -0.1f, 0.00f, 0.5f,
-		+0.1f, -0.1f, +0.1f, 0.25f, 0.0f,
-		+0.1f, -0.1f, +0.1f, 0.25f, 0.0f,
-		+0.1f, +0.1f, -0.1f, 0.00f, 0.5f,
-		+0.1f, +0.1f, +0.1f, 0.00f, 0.0f,
+		+1.0f, -1.0f, -1.0f, 0.25f, 0.5f,
+		+1.0f, +1.0f, -1.0f, 0.00f, 0.5f,
+		+1.0f, -1.0f, +1.0f, 0.25f, 0.0f,
+		+1.0f, -1.0f, +1.0f, 0.25f, 0.0f,
+		+1.0f, +1.0f, -1.0f, 0.00f, 0.5f,
+		+1.0f, +1.0f, +1.0f, 0.00f, 0.0f,
 
-		-0.1f, +0.1f, -0.1f, 0.50f, 0.5f,
-		-0.1f, +0.1f, +0.1f, 0.25f, 0.5f,
-		+0.1f, +0.1f, -0.1f, 0.50f, 0.0f,
-		+0.1f, +0.1f, -0.1f, 0.50f, 0.0f,
-		-0.1f, +0.1f, +0.1f, 0.25f, 0.5f,
-		+0.1f, +0.1f, +0.1f, 0.25f, 0.0f,
+		-1.0f, +1.0f, -1.0f, 0.50f, 0.5f,
+		-1.0f, +1.0f, +1.0f, 0.25f, 0.5f,
+		+1.0f, +1.0f, -1.0f, 0.50f, 0.0f,
+		+1.0f, +1.0f, -1.0f, 0.50f, 0.0f,
+		-1.0f, +1.0f, +1.0f, 0.25f, 0.5f,
+		+1.0f, +1.0f, +1.0f, 0.25f, 0.0f,
 
-		-0.1f, -0.1f, +0.1f, 0.75f, 0.5f,
-		+0.1f, -0.1f, +0.1f, 0.50f, 0.5f,
-		-0.1f, +0.1f, +0.1f, 0.75f, 0.0f,
-		-0.1f, +0.1f, +0.1f, 0.75f, 0.0f,
-		+0.1f, -0.1f, +0.1f, 0.50f, 0.5f,
-		+0.1f, +0.1f, +0.1f, 0.50f, 0.0f,
+		-1.0f, -1.0f, +1.0f, 0.75f, 0.5f,
+		+1.0f, -1.0f, +1.0f, 0.50f, 0.5f,
+		-1.0f, +1.0f, +1.0f, 0.75f, 0.0f,
+		-1.0f, +1.0f, +1.0f, 0.75f, 0.0f,
+		+1.0f, -1.0f, +1.0f, 0.50f, 0.5f,
+		+1.0f, +1.0f, +1.0f, 0.50f, 0.0f,
 	};
+	for (int i = 0; i < 36 * 5; i += 5)
+	{
+		Inv_Render_Data[i + 0] *= 0.02f;
+		Inv_Render_Data[i + 1] *= 0.02f;
+		Inv_Render_Data[i + 2] *= 0.02f;
+	}
 	glGenVertexArrays(1, &Inv_Buffer_Array);
 	glBindVertexArray(Inv_Buffer_Array);
 	glGenBuffers(1, &Inv_Buffer_Vertex);
@@ -218,6 +224,8 @@ int main(int argc, char **argv)
 	formList.Insert(slot2);
 	formList.Insert(slot3);
 	formList.UpdateBuffer();
+
+	int	item_slot_idx = 0;
 
 
 	double	FrameTimeLast = glfwGetTime();
@@ -338,9 +346,53 @@ int main(int argc, char **argv)
 		view.uniform_depth(Uni_Box_Depth);
 		space.DrawHover(hover);
 
-
 		entity.DrawBox();
 
+
+
+		Point2D mouse;
+		{
+			double	mouse_x_dbl;
+			double	mouse_y_dbl;
+			glfwGetCursorPos(win -> win, &mouse_x_dbl, &mouse_y_dbl);
+			mouse.X = (mouse_x_dbl / 500) - 1;
+			mouse.Y = 1 - (mouse_y_dbl / 500);
+		}
+
+		if (voxel_add_key.check())
+		{
+			if (item_slot_idx == 0)
+			{
+				if (slot1.isHover(mouse))
+					item_slot_idx = 1;
+				else if (slot2.isHover(mouse))
+					item_slot_idx = 2;
+				else if (slot3.isHover(mouse))
+					item_slot_idx = 3;
+			}
+			else
+			{
+				if (item_slot_idx == 1 && slot1.isHover(mouse))
+					item_slot_idx = 0;
+				if (item_slot_idx == 2 && slot2.isHover(mouse))
+					item_slot_idx = 0;
+				if (item_slot_idx == 3 && slot3.isHover(mouse))
+					item_slot_idx = 0;
+			}
+		}
+
+		formList.Update(win);
+		formList.Draw();
+
+		Point2D	item;
+		if (item_slot_idx == 0)
+			item = mouse;
+		else if (item_slot_idx == 1)
+			item = slot1.getCenter();
+		else if (item_slot_idx == 2)
+			item = slot2.getCenter();
+		else if (item_slot_idx == 3)
+			item = slot3.getCenter();
 
 		Inv_Spin.x += FrameTimeDelta * 1;
 		Inv_Spin.UpdateSinCos();
@@ -349,14 +401,10 @@ int main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 		glBindVertexArray(Inv_Buffer_Array);
 		inventoryShader -> Use();
-		glUniform2f(Uni_Inv_Pos, 0.75, 0.75);
+		glUniform2f(Uni_Inv_Pos, item.X, item.Y);
 		glUniform3fv(Uni_Inv_Spin, 2, (float *)&Inv_Spin);
 		glUniform1ui(Uni_Inv_TexIdx, placeID);
 		glDrawArrays(GL_TRIANGLES, 0, Inv_Render_Data_Count);
-
-
-		formList.Update(win);
-		formList.Draw();
 
 
 		glfwSwapBuffers(win -> win);

@@ -1,9 +1,17 @@
 #include "FormControl.hpp"
 
 
+Point2D::Point2D() : X(0), Y(0) { }
+Point2D::Point2D(float x, float y) : X(x), Y(y) { }
+
+Color::Color(float r, float g, float b) : R(r), G(g), B(b) { }
+
+
+
+
 
 FormControl::FormControl(float min_x, float min_y, float max_x, float max_y) :
-	MinX(min_x), MinY(min_y), MaxX(max_x), MaxY(max_y),
+	Min(min_x, min_y), Max(max_x, max_y),
 	render(NULL)
 {
 
@@ -13,31 +21,27 @@ FormControl::~FormControl()
 
 }
 FormControl::FormControl(const FormControl & other) :
-	MinX(other.MinX), MinY(other.MinY), MaxX(other.MaxX), MaxY(other.MaxY),
-	render(other.render)
+	Min(other.Min), Max(other.Max), render(other.render)
 {
 
 }
 const FormControl & FormControl::operator =(const FormControl & other)
 {
-	MinX = other.MinX;
-	MinY = other.MinY;
-	MaxX = other.MaxX;
-	MaxY = other.MaxY;
+	Min = other.Min;
+	Max = other.Max;
 	render = other.render;
 	return *this;
 }
 
-bool	FormControl::isHover(float mouse_x, float mouse_y) const
+bool	FormControl::isHover(Point2D Mouse) const
 {
-	return (MinX < mouse_x && mouse_x < MaxX && 
-			MinY < mouse_y && mouse_y < MaxY
+	return (Min.X < Mouse.X && Mouse.X < Max.X && 
+			Min.Y < Mouse.Y && Mouse.Y < Max.Y
 	);
 }
-void	FormControl::Update(float mouse_x, float mouse_y)
+void	FormControl::Update(Point2D Mouse)
 {
-	(void)mouse_x;
-	(void)mouse_y;
+	(void)Mouse;
 }
 
 void	FormControl::UpdateRender()
@@ -48,8 +52,8 @@ void	FormControl::UpdateRender()
 FormControlRenderData	FormControl::getRenderData() const
 {
 	return (FormControlRenderData) {
-		MinX, MinY, MaxX, MaxY,
-		0.5f, 0.5f, 0.5f,
+		Min, Max,
+		Color(0.5f, 0.5f, 0.5f),
 		0.99f
 	};
 }
@@ -72,19 +76,19 @@ FormButton::~FormButton()
 
 }
 
-void	FormButton::Update(float mouse_x, float mouse_y)
+void	FormButton::Update(Point2D Mouse)
 {
-	if (isHover(mouse_x, mouse_y))
+	if (isHover(Mouse))
 	{
-		render -> ColR = 0.25;
-		render -> ColG = 0.75;
-		render -> ColB = 0.25;
+		render -> Col.R = 0.25;
+		render -> Col.G = 0.75;
+		render -> Col.B = 0.25;
 	}
 	else
 	{
-		render -> ColR = 0.25;
-		render -> ColG = 0.25;
-		render -> ColB = 0.25;
+		render -> Col.R = 0.25;
+		render -> Col.G = 0.25;
+		render -> Col.B = 0.25;
 	}
 }
 
@@ -92,9 +96,9 @@ void	FormButton::UpdateRender()
 {
 	if (render == NULL)
 		return;
-	render -> ColR = 0.25;
-	render -> ColG = 0.25;
-	render -> ColB = 0.25;
+	render -> Col.R = 0.25;
+	render -> Col.G = 0.25;
+	render -> Col.B = 0.25;
 	render -> Depth = 0.5f;
 }
 
@@ -111,20 +115,26 @@ FormSlot::~FormSlot()
 {
 
 }
-
-void	FormSlot::Update(float mouse_x, float mouse_y)
+Point2D	FormSlot::getCenter() const
 {
-	if (isHover(mouse_x, mouse_y))
+	return Point2D(
+		(Min.X + Max.X) / 2,
+		(Min.Y + Max.Y) / 2
+	);
+}
+void	FormSlot::Update(Point2D Mouse)
+{
+	if (isHover(Mouse))
 	{
-		render -> ColR = 0.85;
-		render -> ColG = 0.85;
-		render -> ColB = 0.85;
+		render -> Col.R = 0.85;
+		render -> Col.G = 0.85;
+		render -> Col.B = 0.85;
 	}
 	else
 	{
-		render -> ColR = 0.75;
-		render -> ColG = 0.75;
-		render -> ColB = 0.75;
+		render -> Col.R = 0.75;
+		render -> Col.G = 0.75;
+		render -> Col.B = 0.75;
 	}
 }
 
@@ -132,9 +142,9 @@ void	FormSlot::UpdateRender()
 {
 	if (render == NULL)
 		return;
-	render -> ColR = 0.75;
-	render -> ColG = 0.75;
-	render -> ColB = 0.75;
+	render -> Col.R = 0.75;
+	render -> Col.G = 0.75;
+	render -> Col.B = 0.75;
 	render -> Depth = 0.5f;
 }
 
@@ -167,16 +177,15 @@ void	FormControlList::Update(Window * win)
 {
 	double	mouse_x_dbl;
 	double	mouse_y_dbl;
-	float	mouse_x;
-	float	mouse_y;
+	Point2D	mouse;
 
 	glfwGetCursorPos(win -> win, &mouse_x_dbl, &mouse_y_dbl);
-	mouse_x = (mouse_x_dbl / 500) - 1;
-	mouse_y = 1 - (mouse_y_dbl / 500);
+	mouse.X = (mouse_x_dbl / 500) - 1;
+	mouse.Y = 1 - (mouse_y_dbl / 500);
 
 	for (size_t i = 0; i < controls.size(); i++)
 	{
-		controls[i] -> Update(mouse_x, mouse_y);
+		controls[i] -> Update(mouse);
 	}
 	UpdateBuffer();
 }

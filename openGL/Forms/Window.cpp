@@ -97,7 +97,7 @@ void Window::Update()
 		tabbed_pressed = false;
 	}
 
-	if (tabbed)
+	//if (tabbed)
 	{
 		for (size_t i = 0; i < keys.size(); i++)
 		{

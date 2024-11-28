@@ -6,29 +6,37 @@
 # include "../Shader.hpp"
 # include "Window.hpp"
 
+struct	Point2D
+{
+	float	X;
+	float	Y;
+
+	Point2D();
+	Point2D(float x, float y);
+};
+
+struct	Color
+{
+	float	R;
+	float	G;
+	float	B;
+
+	Color(float r, float g, float b);
+};
+
 struct FormControlRenderData
 {
-	float	MinX;
-	float	MinY;
-
-	float	MaxX;
-	float	MaxY;
-
-	float	ColR;
-	float	ColG;
-	float	ColB;
-
+	Point2D	Min;
+	Point2D	Max;
+	Color	Col;
 	float	Depth;
 };
 
 class FormControl
 {
 	protected:
-		float	MinX;
-		float	MinY;
-
-		float	MaxX;
-		float	MaxY;
+		Point2D	Min;
+		Point2D	Max;
 
 		FormControlRenderData * render;
 
@@ -39,8 +47,8 @@ class FormControl
 		FormControl(const FormControl & other);
 		const FormControl & operator =(const FormControl & other);
 
-		bool			isHover(float mouse_x, float mouse_y) const;
-		virtual void	Update(float mouse_x, float mouse_y);
+		bool			isHover(Point2D Mouse) const;
+		virtual void	Update(Point2D Mouse);
 
 		virtual void			UpdateRender();
 		FormControlRenderData	getRenderData() const;
@@ -53,7 +61,7 @@ class FormButton : public FormControl
 		FormButton(float min_x, float min_y, float max_x, float max_y);
 		~FormButton();
 
-		void	Update(float mouse_x, float mouse_y);
+		void	Update(Point2D Mouse);
 
 		void	UpdateRender();
 };
@@ -64,7 +72,8 @@ class FormSlot : public FormControl
 		FormSlot(float min_x, float min_y, float max_x, float max_y);
 		~FormSlot();
 
-		void	Update(float mouse_x, float mouse_y);
+		Point2D	getCenter() const;
+		void	Update(Point2D Mouse);
 
 		void	UpdateRender();
 };

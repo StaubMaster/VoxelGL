@@ -15,8 +15,9 @@ class Shader
 		Shader(const std::string vert, const std::string frag);
 		Shader(const std::string vert, const std::string geom, const std::string frag);
 		~Shader();
+
 	private:
-		void operator = (Shader shader);
+		void operator = (const Shader & shader);
 
 	public:
 		void	Use() const;

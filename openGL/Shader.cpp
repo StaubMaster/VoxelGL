@@ -98,7 +98,7 @@ Shader::~Shader()
 	glDeleteProgram(Program_ID);
 //	std::cout << Program_ID << "\n";
 }
-void Shader::operator = (Shader shader)
+void Shader::operator = (const Shader & shader)
 {
 //	std::cout << "==== Shader\n";
 	std::cout << shader.Program_ID << "\n";

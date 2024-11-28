@@ -6,6 +6,7 @@ FLAGS = -Wall -Wextra -Werror
 FILE_C = stringHelp.cpp Shader.cpp \
 	Forms/Window.cpp \
 	Forms/KeyCheck.cpp \
+	Forms/FormControl.cpp \
 	textureLoadSave.cpp \
 	Abstract/math3D.cpp \
 	Abstract/Point.cpp \

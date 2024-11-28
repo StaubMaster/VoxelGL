@@ -12,6 +12,7 @@
 #include "openGL/textureLoadSave.h"
 #include "openGL/Abstract/Angle.hpp"
 #include "openGL/Forms/Window.hpp"
+#include "openGL/Forms/FormControl.hpp"
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
 
@@ -23,51 +24,70 @@
 
 #include "FileParse/PNG/PNG_Image.hpp"
 
-float interpolate(float v0, float v1, float t)
-{
-	return (v0 * (t - 0)) + (v1 * (1 - t));
-}
+Window * win = NULL;
 
-int main(int argc, char **argv)
+Shader * voxelShader = NULL;
+int Uni_Voxel_View;
+int Uni_Voxel_Depth;
+int Uni_Voxel_ChunkPos;
+
+Shader * boxShader = NULL;
+int Uni_Box_View;
+int Uni_Box_Depth;
+int Uni_Box_Cycle;
+
+Shader * inventoryShader = NULL;
+int Uni_Inv_Pos;
+int Uni_Inv_Spin;
+int Uni_Inv_TexIdx;
+
+unsigned int Inv_Buffer_Array;
+unsigned int Inv_Buffer_Vertex;
+unsigned int Inv_Render_Data_Count;
+
+static void	main_init()
 {
 	std::cout << "window ...\n";
-	Window * win = new Window(1000, 1000, "Voxel", false);
+	win = new Window(1000, 1000, "Voxel", false);
 	std::cout << "window done\n";
 
+
+
 	std::cout << "shaders ...\n";
-	Shader voxelShader(
+
+	voxelShader = new Shader(
 		"shaders/voxel_project_tex.vert",
 		"shaders/voxel_normal_tex.geom",
 		"shaders/voxel_depth_tex.frag"
 	);
-	int Uni_Chunk_View = voxelShader.FindUniform("viewTrans");
-	int Uni_Chunk_Depth = voxelShader.FindUniform("depthFactor");
-	int Uni_Chunk_Pos = voxelShader.FindUniform("chunk_pos");
+	Uni_Voxel_View = voxelShader -> FindUniform("viewTrans");
+	Uni_Voxel_Depth = voxelShader -> FindUniform("depthFactor");
+	Uni_Voxel_ChunkPos = voxelShader -> FindUniform("chunk_pos");
 
-	Shader boxShader(
+	boxShader = new Shader(
 		"shaders/Box.vert",
 		"shaders/Box.geom",
 		"shaders/Cycle.frag"
 	);
-	int Uni_Box_View = boxShader.FindUniform("viewTrans");
-	int Uni_Box_Depth = boxShader.FindUniform("depthFactor");
-	int Uni_Box_Cycle = boxShader.FindUniform("cycle");
+	Uni_Box_View = boxShader -> FindUniform("viewTrans");
+	Uni_Box_Depth = boxShader -> FindUniform("depthFactor");
+	Uni_Box_Cycle = boxShader -> FindUniform("cycle");
 
-	Shader inventoryShader(
+
+	inventoryShader = new Shader(
 		"shaders/inventory.vert",
 		"shaders/inventory.geom",
 		"shaders/inventory.frag"
 	);
-	int Uni_Inv_Pos = inventoryShader.FindUniform("UPos");
-	int Uni_Inv_Spin = inventoryShader.FindUniform("USpin");
-	int Uni_Inv_TexIdx = inventoryShader.FindUniform("UTex_Idx");
+	Uni_Inv_Pos = inventoryShader -> FindUniform("UPos");
+	Uni_Inv_Spin = inventoryShader -> FindUniform("USpin");
+	Uni_Inv_TexIdx = inventoryShader -> FindUniform("UTex_Idx");
+
 	std::cout << "shaders done\n";
 
-	Angle Inv_Spin(1, 0.5, 0);
 
-	unsigned int Inv_Buffer_Array;
-	unsigned int Inv_Buffer_Vertex;
-	unsigned int Inv_Render_Data_Count = 36;
+
+	Inv_Render_Data_Count = 36;
 	float Inv_Render_Data[] =
 	{
 		-0.1f, -0.1f, -0.1f, 0.25f, 1.0f,
@@ -113,14 +133,35 @@ int main(int argc, char **argv)
 		+0.1f, +0.1f, +0.1f, 0.50f, 0.0f,
 	};
 	glGenVertexArrays(1, &Inv_Buffer_Array);
-	glGenBuffers(1, &Inv_Buffer_Vertex);
 	glBindVertexArray(Inv_Buffer_Array);
+	glGenBuffers(1, &Inv_Buffer_Vertex);
 	glBindBuffer(GL_ARRAY_BUFFER, Inv_Buffer_Vertex);
 	glBufferData(GL_ARRAY_BUFFER, Inv_Render_Data_Count * sizeof(float) * 5, Inv_Render_Data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 5, (void *)0);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(float) * 5, (void *)(sizeof(float) * 3));
+}
+static void	main_free()
+{
+	glBindVertexArray(Inv_Buffer_Array);
+	glDeleteBuffers(1, &Inv_Buffer_Vertex);
+	glDeleteVertexArrays(1, &Inv_Buffer_Array);
+
+	delete voxelShader;
+	delete boxShader;
+	delete inventoryShader;
+
+	delete win;
+}
+
+
+
+int main(int argc, char **argv)
+{
+	main_init();
+
+	Angle Inv_Spin(1, 0.5, 0);
 
 	std::cout << "table ...\n";
 	VoxelDataTable table;
@@ -139,14 +180,49 @@ int main(int argc, char **argv)
 	unsigned int texture_arr = table.InitTextures();
 	std::cout << "textures done\n";
 
+
 	View view;
-	//view.pos.z = -(128 + 10);
 	VoxelSpace space(table);
 
 
 	KeyPress test_Box_Key(GLFW_KEY_Q, false);
 	win -> keys.push_back(&test_Box_Key);
 
+	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
+	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_2, true);
+	win -> keys.push_back(&voxel_add_key);
+	win -> keys.push_back(&voxel_sub_key);
+
+	char	placeID = 0;
+	KeyPress place_add_key(GLFW_MOUSE_BUTTON_4, true);
+	KeyPress place_sub_key(GLFW_MOUSE_BUTTON_5, true);
+	win -> keys.push_back(&place_add_key);
+	win -> keys.push_back(&place_sub_key);
+
+
+	Point move;
+	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
+
+
+	FormControlList formList;
+	FormControl form1(-0.50f, -0.25f, +0.50f, +0.25f);
+	FormButton button1(-0.45f, -0.20f, -0.15f, -0.10f);
+	FormButton button2(-0.10f, -0.20f, +0.20f, -0.10f);
+	FormSlot slot1(-0.45f, +0.10f, -0.35f, +0.20f);
+	FormSlot slot2(-0.30f, +0.10f, -0.20f, +0.20f);
+	FormSlot slot3(-0.15f, +0.10f, -0.05f, +0.20f);
+	formList.Insert(form1);
+	formList.Insert(button1);
+	formList.Insert(button2);
+	formList.Insert(slot1);
+	formList.Insert(slot2);
+	formList.Insert(slot3);
+	formList.UpdateBuffer();
+
+
+	double	FrameTimeLast = glfwGetTime();
+	double	FrameTimeCurr;
+	double	FrameTimeDelta;
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
@@ -155,24 +231,6 @@ int main(int argc, char **argv)
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
-
-	KeyPress voxel_add_key(GLFW_MOUSE_BUTTON_1, true);
-	KeyPress voxel_sub_key(GLFW_MOUSE_BUTTON_2, true);
-	win -> keys.push_back(&voxel_add_key);
-	win -> keys.push_back(&voxel_sub_key);
-
-	double	FrameTimeLast = glfwGetTime();
-	double	FrameTimeCurr;
-	double	FrameTimeDelta;
-
-	char	placeID = 0;
-	KeyPress place_add_key(GLFW_MOUSE_BUTTON_4, true);
-	KeyPress place_sub_key(GLFW_MOUSE_BUTTON_5, true);
-	win -> keys.push_back(&place_add_key);
-	win -> keys.push_back(&place_sub_key);
-
-	Point move;
-	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
 
 	std::cout << "loop\n";
 	for (int i = 0; i < 20; i++)
@@ -267,14 +325,14 @@ int main(int argc, char **argv)
 		glClearColor(0.5f, 0.5f, 0.5f, 1);
 
 
-		voxelShader.Use();
-		view.uniform(Uni_Chunk_View);
-		view.uniform_depth(Uni_Chunk_Depth);
+		voxelShader -> Use();
+		view.uniform(Uni_Voxel_View);
+		view.uniform_depth(Uni_Voxel_Depth);
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
-		space.Draw(Uni_Chunk_Pos);
+		space.Draw(Uni_Voxel_ChunkPos);
 
-		boxShader.Use();
+		boxShader -> Use();
 		glUniform1f(Uni_Box_Cycle, FrameTimeCurr * 16);
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
@@ -290,29 +348,24 @@ int main(int argc, char **argv)
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 		glBindVertexArray(Inv_Buffer_Array);
-		inventoryShader.Use();
+		inventoryShader -> Use();
 		glUniform2f(Uni_Inv_Pos, 0.75, 0.75);
 		glUniform3fv(Uni_Inv_Spin, 2, (float *)&Inv_Spin);
 		glUniform1ui(Uni_Inv_TexIdx, placeID);
 		glDrawArrays(GL_TRIANGLES, 0, Inv_Render_Data_Count);
 
 
+		formList.Update(win);
+		formList.Draw();
+
+
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
 
+	main_free();
+
 	glDeleteTextures(1, &texture_arr);
-	delete win;
-
-	glBindVertexArray(Inv_Buffer_Array);
-	glDeleteBuffers(1, &Inv_Buffer_Vertex);
-	glDeleteVertexArrays(1, &Inv_Buffer_Array);
-	(void)Uni_Inv_Spin;
-	(void)Uni_Inv_TexIdx;
-
-	(void)Uni_Box_Cycle;
-	(void)Uni_Box_View;
-	(void)Uni_Box_Depth;
 
 	return (0);
 	(void)argc;

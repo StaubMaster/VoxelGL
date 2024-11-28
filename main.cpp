@@ -13,6 +13,7 @@
 #include "openGL/Abstract/Angle.hpp"
 #include "openGL/Forms/Window.hpp"
 #include "openGL/Forms/FormControl.hpp"
+#include "openGL/Forms/ItemVoxel.hpp"
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
 
@@ -36,14 +37,6 @@ int Uni_Box_View;
 int Uni_Box_Depth;
 int Uni_Box_Cycle;
 
-Shader * inventoryShader = NULL;
-int Uni_Inv_Pos;
-int Uni_Inv_Spin;
-int Uni_Inv_TexIdx;
-
-unsigned int Inv_Buffer_Array;
-unsigned int Inv_Buffer_Vertex;
-unsigned int Inv_Render_Data_Count;
 
 static void	main_init()
 {
@@ -73,90 +66,17 @@ static void	main_init()
 	Uni_Box_Depth = boxShader -> FindUniform("depthFactor");
 	Uni_Box_Cycle = boxShader -> FindUniform("cycle");
 
-
-	inventoryShader = new Shader(
-		"shaders/inventory.vert",
-		"shaders/inventory.geom",
-		"shaders/inventory.frag"
-	);
-	Uni_Inv_Pos = inventoryShader -> FindUniform("UPos");
-	Uni_Inv_Spin = inventoryShader -> FindUniform("USpin");
-	Uni_Inv_TexIdx = inventoryShader -> FindUniform("UTex_Idx");
-
 	std::cout << "shaders done\n";
 
 
-
-	Inv_Render_Data_Count = 36;
-	float Inv_Render_Data[] =
-	{
-		-1.0f, -1.0f, -1.0f, 0.25f, 1.0f,
-		-1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
-		-1.0f, +1.0f, -1.0f, 0.00f, 1.0f,
-		-1.0f, +1.0f, -1.0f, 0.00f, 1.0f,
-		-1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
-		-1.0f, +1.0f, +1.0f, 0.00f, 0.5f,
-
-		-1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
-		+1.0f, -1.0f, -1.0f, 0.50f, 0.5f,
-		-1.0f, -1.0f, +1.0f, 0.25f, 1.0f,
-		-1.0f, -1.0f, +1.0f, 0.25f, 1.0f,
-		+1.0f, -1.0f, -1.0f, 0.50f, 0.5f,
-		+1.0f, -1.0f, +1.0f, 0.25f, 0.5f,
-
-		-1.0f, -1.0f, -1.0f, 0.75f, 1.0f,
-		-1.0f, +1.0f, -1.0f, 0.75f, 0.5f,
-		+1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
-		+1.0f, -1.0f, -1.0f, 0.50f, 1.0f,
-		-1.0f, +1.0f, -1.0f, 0.75f, 0.5f,
-		+1.0f, +1.0f, -1.0f, 0.50f, 0.5f,
-
-		+1.0f, -1.0f, -1.0f, 0.25f, 0.5f,
-		+1.0f, +1.0f, -1.0f, 0.00f, 0.5f,
-		+1.0f, -1.0f, +1.0f, 0.25f, 0.0f,
-		+1.0f, -1.0f, +1.0f, 0.25f, 0.0f,
-		+1.0f, +1.0f, -1.0f, 0.00f, 0.5f,
-		+1.0f, +1.0f, +1.0f, 0.00f, 0.0f,
-
-		-1.0f, +1.0f, -1.0f, 0.50f, 0.5f,
-		-1.0f, +1.0f, +1.0f, 0.25f, 0.5f,
-		+1.0f, +1.0f, -1.0f, 0.50f, 0.0f,
-		+1.0f, +1.0f, -1.0f, 0.50f, 0.0f,
-		-1.0f, +1.0f, +1.0f, 0.25f, 0.5f,
-		+1.0f, +1.0f, +1.0f, 0.25f, 0.0f,
-
-		-1.0f, -1.0f, +1.0f, 0.75f, 0.5f,
-		+1.0f, -1.0f, +1.0f, 0.50f, 0.5f,
-		-1.0f, +1.0f, +1.0f, 0.75f, 0.0f,
-		-1.0f, +1.0f, +1.0f, 0.75f, 0.0f,
-		+1.0f, -1.0f, +1.0f, 0.50f, 0.5f,
-		+1.0f, +1.0f, +1.0f, 0.50f, 0.0f,
-	};
-	for (int i = 0; i < 36 * 5; i += 5)
-	{
-		Inv_Render_Data[i + 0] *= 0.02f;
-		Inv_Render_Data[i + 1] *= 0.02f;
-		Inv_Render_Data[i + 2] *= 0.02f;
-	}
-	glGenVertexArrays(1, &Inv_Buffer_Array);
-	glBindVertexArray(Inv_Buffer_Array);
-	glGenBuffers(1, &Inv_Buffer_Vertex);
-	glBindBuffer(GL_ARRAY_BUFFER, Inv_Buffer_Vertex);
-	glBufferData(GL_ARRAY_BUFFER, Inv_Render_Data_Count * sizeof(float) * 5, Inv_Render_Data, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 5, (void *)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, false, sizeof(float) * 5, (void *)(sizeof(float) * 3));
+	ItemVoxel::Create();
 }
 static void	main_free()
 {
-	glBindVertexArray(Inv_Buffer_Array);
-	glDeleteBuffers(1, &Inv_Buffer_Vertex);
-	glDeleteVertexArrays(1, &Inv_Buffer_Array);
+	ItemVoxel::Delete();
 
 	delete voxelShader;
 	delete boxShader;
-	delete inventoryShader;
 
 	delete win;
 }
@@ -166,8 +86,6 @@ static void	main_free()
 int main(int argc, char **argv)
 {
 	main_init();
-
-	Angle Inv_Spin(1, 0.5, 0);
 
 	std::cout << "table ...\n";
 	VoxelDataTable table;
@@ -214,18 +132,30 @@ int main(int argc, char **argv)
 	FormControl form1(-0.50f, -0.25f, +0.50f, +0.25f);
 	FormButton button1(-0.45f, -0.20f, -0.15f, -0.10f);
 	FormButton button2(-0.10f, -0.20f, +0.20f, -0.10f);
-	FormSlot slot1(-0.45f, +0.10f, -0.35f, +0.20f);
-	FormSlot slot2(-0.30f, +0.10f, -0.20f, +0.20f);
-	FormSlot slot3(-0.15f, +0.10f, -0.05f, +0.20f);
+
+	float x = -0.6f;
+	float y = +0.3f - 0.2f;
+	int slots_count = 6;
+	FormSlot slots[]
+	{
+		FormSlot(x + 0 * 0.2f, y, x + 1 * 0.2f, y + 0.2f),
+		FormSlot(x + 1 * 0.2f, y, x + 2 * 0.2f, y + 0.2f),
+		FormSlot(x + 2 * 0.2f, y, x + 3 * 0.2f, y + 0.2f),
+		FormSlot(x + 3 * 0.2f, y, x + 4 * 0.2f, y + 0.2f),
+		FormSlot(x + 4 * 0.2f, y, x + 5 * 0.2f, y + 0.2f),
+		FormSlot(x + 5 * 0.2f, y, x + 6 * 0.2f, y + 0.2f),
+	};
 	formList.Insert(form1);
 	formList.Insert(button1);
 	formList.Insert(button2);
-	formList.Insert(slot1);
-	formList.Insert(slot2);
-	formList.Insert(slot3);
+	for (int i = 0; i < slots_count; i++)
+		formList.Insert(slots[i]);
 	formList.UpdateBuffer();
 
-	int	item_slot_idx = 0;
+	int	mouse_itemID = 0;
+	mouse_itemID = 0; slots[0].SwapItem(mouse_itemID);
+	mouse_itemID = 1; slots[1].SwapItem(mouse_itemID);
+	mouse_itemID = 2; slots[2].SwapItem(mouse_itemID);
 
 
 	double	FrameTimeLast = glfwGetTime();
@@ -284,7 +214,6 @@ int main(int argc, char **argv)
 		FrameTimeDelta = FrameTimeCurr - FrameTimeLast;
 		FrameTimeLast = FrameTimeCurr;
 		//std::cout << "Delta: " << (FrameTimeDelta * 60) << "\n";
-
 
 		move = view.RelToAbs(win -> GetKeyMovement(10.0f));
 		//view.turn(win -> GetKeyTurning(0.03f));
@@ -361,50 +290,27 @@ int main(int argc, char **argv)
 
 		if (voxel_add_key.check())
 		{
-			if (item_slot_idx == 0)
+			for (int i = 0; i < slots_count; i++)
 			{
-				if (slot1.isHover(mouse))
-					item_slot_idx = 1;
-				else if (slot2.isHover(mouse))
-					item_slot_idx = 2;
-				else if (slot3.isHover(mouse))
-					item_slot_idx = 3;
-			}
-			else
-			{
-				if (item_slot_idx == 1 && slot1.isHover(mouse))
-					item_slot_idx = 0;
-				if (item_slot_idx == 2 && slot2.isHover(mouse))
-					item_slot_idx = 0;
-				if (item_slot_idx == 3 && slot3.isHover(mouse))
-					item_slot_idx = 0;
+				if (slots[i].isHover(mouse))
+				{
+					slots[i].SwapItem(mouse_itemID);
+					break;
+				}
 			}
 		}
 
 		formList.Update(win);
 		formList.Draw();
 
-		Point2D	item;
-		if (item_slot_idx == 0)
-			item = mouse;
-		else if (item_slot_idx == 1)
-			item = slot1.getCenter();
-		else if (item_slot_idx == 2)
-			item = slot2.getCenter();
-		else if (item_slot_idx == 3)
-			item = slot3.getCenter();
-
-		Inv_Spin.x += FrameTimeDelta * 1;
-		Inv_Spin.UpdateSinCos();
-		glClear(GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
-		glBindVertexArray(Inv_Buffer_Array);
-		inventoryShader -> Use();
-		glUniform2f(Uni_Inv_Pos, item.X, item.Y);
-		glUniform3fv(Uni_Inv_Spin, 2, (float *)&Inv_Spin);
-		glUniform1ui(Uni_Inv_TexIdx, placeID);
-		glDrawArrays(GL_TRIANGLES, 0, Inv_Render_Data_Count);
+		ItemVoxel::Update(FrameTimeDelta);
+		if (mouse_itemID != -1)
+			ItemVoxel::Draw(mouse.X, mouse.Y, mouse_itemID);
+		for (int i = 0; i < slots_count; i++)
+			slots[i].DrawItem();
+
 
 
 		glfwSwapBuffers(win -> win);

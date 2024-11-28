@@ -5,6 +5,7 @@
 # include "../openGL.h"
 # include "../Shader.hpp"
 # include "Window.hpp"
+# include "ItemVoxel.hpp"
 
 struct	Point2D
 {
@@ -24,10 +25,19 @@ struct	Color
 	Color(float r, float g, float b);
 };
 
-struct FormControlRenderData
+struct	Box2D
 {
 	Point2D	Min;
 	Point2D	Max;
+
+	Box2D();
+	Box2D(float x1, float y1, float x2, float y2);
+	Box2D(Point2D p1, Point2D p2);
+};
+
+struct FormControlRenderData
+{
+	Box2D	Box;
 	Color	Col;
 	float	Depth;
 };
@@ -35,8 +45,7 @@ struct FormControlRenderData
 class FormControl
 {
 	protected:
-		Point2D	Min;
-		Point2D	Max;
+		Box2D	Box;
 
 		FormControlRenderData * render;
 
@@ -68,6 +77,9 @@ class FormButton : public FormControl
 
 class FormSlot : public FormControl
 {
+	private:
+		int	itemID;
+
 	public:
 		FormSlot(float min_x, float min_y, float max_x, float max_y);
 		~FormSlot();
@@ -76,6 +88,9 @@ class FormSlot : public FormControl
 		void	Update(Point2D Mouse);
 
 		void	UpdateRender();
+
+		void	SwapItem(int & ID);
+		void	DrawItem();
 };
 
 class FormControlList

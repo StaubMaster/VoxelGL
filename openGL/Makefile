@@ -3,25 +3,27 @@ NAME = openGL.a
 
 FLAGS = -Wall -Wextra -Werror
 
-FILE_C = stringHelp.cpp Shader.cpp \
+FILES_CPP = stringHelp.cpp \
+	Shader.cpp \
+	View.cpp \
 	Forms/Window.cpp \
 	Forms/KeyCheck.cpp \
 	Forms/FormControl.cpp \
-	textureLoadSave.cpp \
+	Forms/ItemVoxel.cpp \
 	Abstract/math3D.cpp \
 	Abstract/Point.cpp \
 	Abstract/Angle.cpp \
 	Abstract/Index3D.cpp \
 	Abstract/Undex3D.cpp \
-	View.cpp
-FILE_O = glad.o $(FILE_C:.cpp=.o)
+	textureLoadSave.cpp
+FILES_O = glad.o $(FILES_CPP:.cpp=.o)
 
 
-all: $(FILE_O)
-	ar -rcs $(NAME) $(FILE_O)
+all: $(FILES_O)
+	ar -rcs $(NAME) $(FILES_O)
 
 clean:
-	rm -f $(FILE_O)
+	rm -f $(FILES_O)
 
 fclean:
 	$(MAKE) clean

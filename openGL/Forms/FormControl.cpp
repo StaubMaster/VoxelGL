@@ -6,12 +6,28 @@ Point2D::Point2D(float x, float y) : X(x), Y(y) { }
 
 Color::Color(float r, float g, float b) : R(r), G(g), B(b) { }
 
+Box2D::Box2D() : Min(), Max() { }
+Box2D::Box2D(float x1, float y1, float x2, float y2)
+{
+	Min.X = std::min(x1, x2);
+	Min.Y = std::min(y1, y2);
+	Max.X = std::max(x1, x2);
+	Max.Y = std::max(y1, y2);
+}
+Box2D::Box2D(Point2D p1, Point2D p2)
+{
+	Min.X = std::min(p1.X, p2.X);
+	Min.Y = std::min(p1.Y, p2.Y);
+	Max.X = std::max(p1.X, p2.X);
+	Max.Y = std::max(p1.Y, p2.Y);
+}
+
 
 
 
 
 FormControl::FormControl(float min_x, float min_y, float max_x, float max_y) :
-	Min(min_x, min_y), Max(max_x, max_y),
+	Box(min_x, min_y, max_x, max_y),
 	render(NULL)
 {
 
@@ -21,22 +37,21 @@ FormControl::~FormControl()
 
 }
 FormControl::FormControl(const FormControl & other) :
-	Min(other.Min), Max(other.Max), render(other.render)
+	Box(other.Box), render(other.render)
 {
 
 }
 const FormControl & FormControl::operator =(const FormControl & other)
 {
-	Min = other.Min;
-	Max = other.Max;
+	Box = other.Box;
 	render = other.render;
 	return *this;
 }
 
 bool	FormControl::isHover(Point2D Mouse) const
 {
-	return (Min.X < Mouse.X && Mouse.X < Max.X && 
-			Min.Y < Mouse.Y && Mouse.Y < Max.Y
+	return (Box.Min.X < Mouse.X && Mouse.X < Box.Max.X && 
+			Box.Min.Y < Mouse.Y && Mouse.Y < Box.Max.Y
 	);
 }
 void	FormControl::Update(Point2D Mouse)
@@ -52,7 +67,7 @@ void	FormControl::UpdateRender()
 FormControlRenderData	FormControl::getRenderData() const
 {
 	return (FormControlRenderData) {
-		Min, Max,
+		Box,
 		Color(0.5f, 0.5f, 0.5f),
 		0.99f
 	};
@@ -109,7 +124,7 @@ void	FormButton::UpdateRender()
 FormSlot::FormSlot(float min_x, float min_y, float max_x, float max_y) :
 	FormControl(min_x, min_y, max_x, max_y)
 {
-	
+	itemID = -1;
 }
 FormSlot::~FormSlot()
 {
@@ -118,8 +133,8 @@ FormSlot::~FormSlot()
 Point2D	FormSlot::getCenter() const
 {
 	return Point2D(
-		(Min.X + Max.X) / 2,
-		(Min.Y + Max.Y) / 2
+		(Box.Min.X + Box.Max.X) / 2,
+		(Box.Min.Y + Box.Max.Y) / 2
 	);
 }
 void	FormSlot::Update(Point2D Mouse)
@@ -147,6 +162,20 @@ void	FormSlot::UpdateRender()
 	render -> Col.B = 0.75;
 	render -> Depth = 0.5f;
 }
+
+void	FormSlot::SwapItem(int & ID)
+{
+	int temp = ID;
+	ID = itemID;
+	itemID = temp;
+}
+void	FormSlot::DrawItem()
+{
+	if (itemID == -1) { return; }
+	Point2D center = getCenter();
+	ItemVoxel::Draw(center.X, center.Y, itemID);
+}
+
 
 
 

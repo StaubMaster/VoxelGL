@@ -8,12 +8,13 @@ class KeyCheck
 	protected:
 		int	key;
 		int(*check_func)(GLFWwindow *, int);
+		bool	Tabbed;
 
 	public:
-		KeyCheck(int key, bool isMouse);
+		KeyCheck(int key, bool isMouse = false, bool isTabbed = true);
 
 		virtual bool	check() const = 0;
-		virtual void	update(GLFWwindow * win) = 0;
+		virtual void	update(GLFWwindow * win, bool tabbed) = 0;
 };
 
 class KeyHold : public KeyCheck
@@ -22,10 +23,10 @@ class KeyHold : public KeyCheck
 		bool hold;
 
 	public:
-		KeyHold(int key, bool isMouse);
+		KeyHold(int key, bool isMouse = false, bool isTabbed = true);
 
 		bool	check() const;
-		void	update(GLFWwindow * win);
+		void	update(GLFWwindow * win, bool tabbed);
 };
 
 class KeyPress : public KeyCheck
@@ -35,10 +36,10 @@ class KeyPress : public KeyCheck
 		bool hold;
 
 	public:
-		KeyPress(int key, bool isMouse);
+		KeyPress(int key, bool isMouse = false, bool isTabbed = true);
 
 		bool	check() const;
-		void	update(GLFWwindow * win);
+		void	update(GLFWwindow * win, bool tabbed);
 };
 
 #endif

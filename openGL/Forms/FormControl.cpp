@@ -25,7 +25,12 @@ Box2D::Box2D(Point2D p1, Point2D p2)
 
 
 
+FormControl::FormControl() :
+	Box(),
+	render(NULL)
+{
 
+}
 FormControl::FormControl(float min_x, float min_y, float max_x, float max_y) :
 	Box(min_x, min_y, max_x, max_y),
 	render(NULL)
@@ -121,6 +126,11 @@ void	FormButton::UpdateRender()
 
 
 
+FormSlot::FormSlot() :
+	FormControl()
+{
+	itemID = -1;
+}
 FormSlot::FormSlot(float min_x, float min_y, float max_x, float max_y) :
 	FormControl(min_x, min_y, max_x, max_y)
 {

@@ -50,6 +50,7 @@ class FormControl
 		FormControlRenderData * render;
 
 	public:
+		FormControl();
 		FormControl(float min_x, float min_y, float max_x, float max_y);
 		virtual ~FormControl();
 
@@ -81,6 +82,7 @@ class FormSlot : public FormControl
 		int	itemID;
 
 	public:
+		FormSlot();
 		FormSlot(float min_x, float min_y, float max_x, float max_y);
 		~FormSlot();
 

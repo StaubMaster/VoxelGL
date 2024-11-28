@@ -97,12 +97,9 @@ void Window::Update()
 		tabbed_pressed = false;
 	}
 
-	//if (tabbed)
+	for (size_t i = 0; i < keys.size(); i++)
 	{
-		for (size_t i = 0; i < keys.size(); i++)
-		{
-			keys[i] -> update(win);
-		}
+		keys[i] -> update(win, tabbed);
 	}
 }
 Point Window::GetKeyMovement(float speed) const

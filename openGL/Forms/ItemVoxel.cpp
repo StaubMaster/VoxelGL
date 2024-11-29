@@ -74,9 +74,9 @@ void ItemVoxel::Create()
 	};
 	for (unsigned int i = 0; i < Data_Count * 5; i += 5)
 	{
-		Render_Data[i + 0] *= 0.05f;
-		Render_Data[i + 1] *= 0.05f;
-		Render_Data[i + 2] *= 0.05f;
+		Render_Data[i + 0] *= 0.025f;
+		Render_Data[i + 1] *= 0.025f;
+		Render_Data[i + 2] *= 0.025f;
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Main);

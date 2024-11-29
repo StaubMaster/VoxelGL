@@ -25,51 +25,57 @@ Box2D::Box2D(Point2D p1, Point2D p2)
 
 
 
-FormControl::FormControl() :
+Control::Control() :
 	Box(),
 	render(NULL)
 {
 
 }
-FormControl::FormControl(float min_x, float min_y, float max_x, float max_y) :
+Control::Control(float min_x, float min_y, float max_x, float max_y) :
 	Box(min_x, min_y, max_x, max_y),
 	render(NULL)
 {
 
 }
-FormControl::~FormControl()
+Control::Control(Box2D box) :
+	Box(box),
+	render(NULL)
 {
 
 }
-FormControl::FormControl(const FormControl & other) :
+Control::~Control()
+{
+
+}
+Control::Control(const Control & other) :
 	Box(other.Box), render(other.render)
 {
 
 }
-const FormControl & FormControl::operator =(const FormControl & other)
+const Control & Control::operator =(const Control & other)
 {
 	Box = other.Box;
 	render = other.render;
 	return *this;
 }
 
-bool	FormControl::isHover(Point2D Mouse) const
+bool	Control::isHover(Point2D Mouse) const
 {
 	return (Box.Min.X < Mouse.X && Mouse.X < Box.Max.X && 
 			Box.Min.Y < Mouse.Y && Mouse.Y < Box.Max.Y
 	);
 }
-void	FormControl::Update(Point2D Mouse)
+void	Control::Update(Point2D Mouse)
 {
 	(void)Mouse;
 }
 
-void	FormControl::UpdateRender()
+void	Control::UpdateRender()
 {
 	if (render == NULL)
 		return;
 }
-FormControlRenderData	FormControl::getRenderData() const
+FormControlRenderData	Control::getRenderData() const
 {
 	return (FormControlRenderData) {
 		Box,
@@ -77,7 +83,7 @@ FormControlRenderData	FormControl::getRenderData() const
 		0.99f
 	};
 }
-void	FormControl::setRenderData(FormControlRenderData * ptr)
+void	Control::setRenderData(FormControlRenderData * ptr)
 {
 	render = ptr;
 }
@@ -87,7 +93,7 @@ void	FormControl::setRenderData(FormControlRenderData * ptr)
 
 
 FormButton::FormButton(float min_x, float min_y, float max_x, float max_y) :
-	FormControl(min_x, min_y, max_x, max_y)
+	Control(min_x, min_y, max_x, max_y)
 {
 	
 }
@@ -127,12 +133,12 @@ void	FormButton::UpdateRender()
 
 
 FormSlot::FormSlot() :
-	FormControl()
+	Control()
 {
 	itemID = -1;
 }
 FormSlot::FormSlot(float min_x, float min_y, float max_x, float max_y) :
-	FormControl(min_x, min_y, max_x, max_y)
+	Control(min_x, min_y, max_x, max_y)
 {
 	itemID = -1;
 }
@@ -190,29 +196,22 @@ void	FormSlot::DrawItem()
 
 
 
-FormControlList::FormControlList()
+Form::Form(Box2D box) :
+	Main(box)
 {
-	shader = new Shader(
-		"shaders/GUI.vert",
-		"shaders/GUI.geom",
-		"shaders/GUI.frag"
-	);
+	CreateDraw();
 
-	glGenVertexArrays(1, &Buffer_Array);
-	glBindVertexArray(Buffer_Array);
-	glGenBuffers(1, &Buffer_Data);
-	Data_Count = 0;
+	controls.push_back(&Main);
+	renders.push_back(Main.getRenderData());
+	Main.setRenderData(&renders[0]);
+	Main.UpdateRender();
 }
-FormControlList::~FormControlList()
+Form::~Form()
 {
-	delete shader;
-
-	glBindVertexArray(Buffer_Array);
-	glDeleteBuffers(1, &Buffer_Data);
-	glDeleteVertexArrays(1, &Buffer_Array);
+	DeleteDraw();
 }
 
-void	FormControlList::Update(Window * win)
+void	Form::Update(Window * win)
 {
 	double	mouse_x_dbl;
 	double	mouse_y_dbl;
@@ -229,7 +228,7 @@ void	FormControlList::Update(Window * win)
 	UpdateBuffer();
 }
 
-void	FormControlList::Insert(FormControl & control)
+void	Form::Insert(Control & control)
 {
 	controls.push_back(&control);
 	renders.push_back(control.getRenderData());
@@ -241,7 +240,28 @@ void	FormControlList::Insert(FormControl & control)
 	}
 }
 
-void	FormControlList::UpdateBuffer()
+void	Form::CreateDraw()
+{
+	shader = new Shader(
+		"shaders/GUI.vert",
+		"shaders/GUI.geom",
+		"shaders/GUI.frag"
+	);
+
+	glGenVertexArrays(1, &Buffer_Array);
+	glBindVertexArray(Buffer_Array);
+	glGenBuffers(1, &Buffer_Data);
+	Data_Count = 0;
+}
+void	Form::DeleteDraw()
+{
+	delete shader;
+
+	glBindVertexArray(Buffer_Array);
+	glDeleteBuffers(1, &Buffer_Data);
+	glDeleteVertexArrays(1, &Buffer_Array);
+}
+void	Form::UpdateBuffer()
 {
 	Data_Count = renders.size();
 
@@ -261,7 +281,7 @@ void	FormControlList::UpdateBuffer()
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, false, sizeof(FormControlRenderData), (void *)(sizeof(float) * 7));
 }
-void	FormControlList::Draw() const
+void	Form::Draw() const
 {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(Buffer_Array);

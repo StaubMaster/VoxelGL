@@ -1,6 +1,6 @@
 
-#ifndef FORMCONTROL_HPP
-# define FORMCONTROL_HPP
+#ifndef CONTROL_HPP
+# define CONTROL_HPP
 # include <vector>
 # include "../openGL.h"
 # include "../Shader.hpp"
@@ -35,6 +35,8 @@ struct	Box2D
 	Box2D(Point2D p1, Point2D p2);
 };
 
+
+
 struct FormControlRenderData
 {
 	Box2D	Box;
@@ -42,7 +44,9 @@ struct FormControlRenderData
 	float	Depth;
 };
 
-class FormControl
+
+
+class Control
 {
 	protected:
 		Box2D	Box;
@@ -50,12 +54,13 @@ class FormControl
 		FormControlRenderData * render;
 
 	public:
-		FormControl();
-		FormControl(float min_x, float min_y, float max_x, float max_y);
-		virtual ~FormControl();
+		Control();
+		Control(float min_x, float min_y, float max_x, float max_y);
+		Control(Box2D box);
+		virtual ~Control();
 
-		FormControl(const FormControl & other);
-		const FormControl & operator =(const FormControl & other);
+		Control(const Control & other);
+		const Control & operator =(const Control & other);
 
 		bool			isHover(Point2D Mouse) const;
 		virtual void	Update(Point2D Mouse);
@@ -65,7 +70,7 @@ class FormControl
 		void					setRenderData(FormControlRenderData * ptr);
 };
 
-class FormButton : public FormControl
+class FormButton : public Control
 {
 	public:
 		FormButton(float min_x, float min_y, float max_x, float max_y);
@@ -76,7 +81,7 @@ class FormButton : public FormControl
 		void	UpdateRender();
 };
 
-class FormSlot : public FormControl
+class FormSlot : public Control
 {
 	private:
 		int	itemID;
@@ -95,7 +100,7 @@ class FormSlot : public FormControl
 		void	DrawItem();
 };
 
-class FormControlList
+class Form
 {
 	private:
 		Shader	* shader;
@@ -103,17 +108,25 @@ class FormControlList
 		unsigned int Buffer_Data;
 		unsigned int Data_Count;
 
-		std::vector<FormControl *> controls;
+		Control	Main;
+
+		std::vector<Control *> controls;
 		std::vector<FormControlRenderData> renders;
 
 	public:
-		FormControlList();
-		~FormControlList();
+		bool	Visible;
+
+		Form(Box2D box);
+		~Form();
 
 		void	Update(Window * win);
 
-		void	Insert(FormControl & control);
+		void	Insert(Control & control);
 
+	private:
+		void	CreateDraw();
+		void	DeleteDraw();
+	public:
 		void	UpdateBuffer();
 		void	Draw() const;
 };

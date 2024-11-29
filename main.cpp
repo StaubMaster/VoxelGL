@@ -132,37 +132,63 @@ int main(int argc, char **argv)
 	KeyPress form_click(GLFW_MOUSE_BUTTON_1, true, false);
 	win -> keys.push_back(&form_click);
 
-	FormControlList formList;
-	FormControl form1(-0.65f, -0.25f, +0.65f, +0.35f);
 
-	FormSlot slots[2 * 6];
 
 	Point2D min, max;
-	int slots_count = 0;
-	for (int yi = 0; yi < 2; yi++)
+
+
+	Form InvForm(Box2D(
+		-5 * 0.12f - 0.01f,
+		-2 * 0.12f - 0.01f,
+		+5 * 0.12f + 0.01f,
+		+2 * 0.12f + 0.01f
+	));
+	FormSlot InvSlots[4 * 10];
+	int InvSlotsCount = 0;
+	for (int yi = -2; yi < +2; yi++)
 	{
-		for (int xi = 0; xi < 6; xi++)
+		for (int xi = -5; xi < +5; xi++)
 		{
-			min.X = ((xi - 3) * 0.21f);
-			min.Y = 0.13f - (yi * 0.21f);
-			max.X = min.X + 0.2f;
-			max.Y = min.Y + 0.2f;
-			slots[slots_count] = FormSlot(min.X, min.Y, max.X, max.Y);
-			slots_count++;
+			min.X = (xi * 0.12f) + 0.01f;
+			min.Y = (yi * 0.12f) + 0.01f;
+			max.X = min.X + 0.1f;
+			max.Y = min.Y + 0.1f;
+			InvSlots[InvSlotsCount] = FormSlot(min.X, min.Y, max.X, max.Y);
+			InvSlotsCount++;
 		}
 	}
+	for (int i = 0; i < InvSlotsCount; i++)
+		InvForm.Insert(InvSlots[i]);
+	InvForm.UpdateBuffer();
 
-	formList.Insert(form1);
-	for (int i = 0; i < slots_count; i++)
-		formList.Insert(slots[i]);
-	formList.UpdateBuffer();
 
-	int	mouse_itemID = 0;
-	mouse_itemID = 0; slots[0].SwapItem(mouse_itemID);
-	mouse_itemID = 1; slots[1].SwapItem(mouse_itemID);
-	mouse_itemID = 2; slots[2].SwapItem(mouse_itemID);
-	mouse_itemID = 3; slots[3].SwapItem(mouse_itemID);
-	mouse_itemID = 5; slots[4].SwapItem(mouse_itemID);
+	Form formHotbar(Box2D(
+		-5 * 0.12f - 0.01f,
+		-8 * 0.12f - 0.01f,
+		+5 * 0.12f + 0.01f,
+		-7 * 0.12f + 0.01f
+	));
+	FormSlot HotSlot[10];
+	for (int xi = -5; xi < +5; xi++)
+	{
+		min.X = (xi * 0.12f) + 0.01f;
+		min.Y = (-8 * 0.12f) + 0.01f;
+		max.X = min.X + 0.1f;
+		max.Y = min.Y + 0.1f;
+		HotSlot[xi + 5] = FormSlot(min.X, min.Y, max.X, max.Y);
+	}
+	for (int xi = 0; xi < 10; xi++)
+		formHotbar.Insert(HotSlot[xi]);
+	formHotbar.UpdateBuffer();
+
+
+	for (unsigned int i = 0; i < table.Length(); i++)
+	{
+		int temp = i;
+		InvSlots[i].SwapItem(temp);
+	}
+	int	mouse_itemID = -1;
+
 
 
 	double	FrameTimeLast = glfwGetTime();
@@ -297,28 +323,43 @@ int main(int argc, char **argv)
 
 		if (form_click.check())
 		{
-			for (int i = 0; i < slots_count; i++)
+			for (int i = 0; i < InvSlotsCount; i++)
 			{
-				if (slots[i].isHover(mouse))
+				if (InvSlots[i].isHover(mouse))
 				{
-					slots[i].SwapItem(mouse_itemID);
+					InvSlots[i].SwapItem(mouse_itemID);
 					break;
 				}
 			}
 		}
 
+		for (int i = 0; i < 10; i++)
+		{
+			int temp1 = -1;
+			int temp2 = -1;
+			InvSlots[i].SwapItem(temp1);
+			temp2 = temp1;
+			InvSlots[i].SwapItem(temp1);
+			HotSlot[i].SwapItem(temp2);
+		}
+
+		ItemVoxel::Update(FrameTimeDelta);
+		glActiveTexture(GL_TEXTURE_2D_ARRAY);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
+
+		formHotbar.Draw();
+		for (int i = 0; i < 10; i++)
+			HotSlot[i].DrawItem();
+
 		if (!win -> tabbed)
 		{
-			formList.Update(win);
-			formList.Draw();
+			InvForm.Update(win);
+			InvForm.Draw();
 
-			glActiveTexture(GL_TEXTURE_2D_ARRAY);
-			glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
-			ItemVoxel::Update(FrameTimeDelta);
 			if (mouse_itemID != -1)
 				ItemVoxel::Draw(mouse.X, mouse.Y, mouse_itemID);
-			for (int i = 0; i < slots_count; i++)
-				slots[i].DrawItem();
+			for (int i = 0; i < InvSlotsCount; i++)
+				InvSlots[i].DrawItem();
 		}
 
 

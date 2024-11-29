@@ -134,32 +134,10 @@ int main(int argc, char **argv)
 
 
 
+	Form::CreateDraw();
 	Point2D min, max;
 
-
-	Form InvForm(Box2D(
-		-5 * 0.12f - 0.01f,
-		-2 * 0.12f - 0.01f,
-		+5 * 0.12f + 0.01f,
-		+2 * 0.12f + 0.01f
-	));
-	FormSlot InvSlots[4 * 10];
-	int InvSlotsCount = 0;
-	for (int yi = -2; yi < +2; yi++)
-	{
-		for (int xi = -5; xi < +5; xi++)
-		{
-			min.X = (xi * 0.12f) + 0.01f;
-			min.Y = (yi * 0.12f) + 0.01f;
-			max.X = min.X + 0.1f;
-			max.Y = min.Y + 0.1f;
-			InvSlots[InvSlotsCount] = FormSlot(min.X, min.Y, max.X, max.Y);
-			InvSlotsCount++;
-		}
-	}
-	for (int i = 0; i < InvSlotsCount; i++)
-		InvForm.Insert(InvSlots[i]);
-	InvForm.UpdateBuffer();
+	InventoryForm Inv(10, 4);
 
 
 	Form formHotbar(Box2D(
@@ -183,10 +161,7 @@ int main(int argc, char **argv)
 
 
 	for (unsigned int i = 0; i < table.Length(); i++)
-	{
-		int temp = i;
-		InvSlots[i].SwapItem(temp);
-	}
+		Inv.setSlot(i, i);
 	int	mouse_itemID = -1;
 
 
@@ -323,24 +298,13 @@ int main(int argc, char **argv)
 
 		if (form_click.check())
 		{
-			for (int i = 0; i < InvSlotsCount; i++)
-			{
-				if (InvSlots[i].isHover(mouse))
-				{
-					InvSlots[i].SwapItem(mouse_itemID);
-					break;
-				}
-			}
+			Inv.Click(mouse_itemID);
 		}
 
 		for (int i = 0; i < 10; i++)
 		{
-			int temp1 = -1;
-			int temp2 = -1;
-			InvSlots[i].SwapItem(temp1);
-			temp2 = temp1;
-			InvSlots[i].SwapItem(temp1);
-			HotSlot[i].SwapItem(temp2);
+			int temp = Inv.getSlot(i);
+			HotSlot[i].SwapItem(temp);
 		}
 
 		ItemVoxel::Update(FrameTimeDelta);
@@ -348,18 +312,14 @@ int main(int argc, char **argv)
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 
 		formHotbar.Draw();
-		for (int i = 0; i < 10; i++)
-			HotSlot[i].DrawItem();
 
 		if (!win -> tabbed)
 		{
-			InvForm.Update(win);
-			InvForm.Draw();
+			Inv.Update(mouse);
+			Inv.Draw();
 
 			if (mouse_itemID != -1)
 				ItemVoxel::Draw(mouse.X, mouse.Y, mouse_itemID);
-			for (int i = 0; i < InvSlotsCount; i++)
-				InvSlots[i].DrawItem();
 		}
 
 
@@ -368,6 +328,7 @@ int main(int argc, char **argv)
 		glfwPollEvents();
 	}
 
+	Form::DeleteDraw();
 	main_free();
 
 	glDeleteTextures(1, &texture_arr);

@@ -21,7 +21,12 @@ Box2D::Box2D(Point2D p1, Point2D p2)
 	Max.X = std::max(p1.X, p2.X);
 	Max.Y = std::max(p1.Y, p2.Y);
 }
-
+bool	Box2D::check(Point2D p)
+{
+	return (Min.X < p.X && p.X < Max.X && 
+			Min.Y < p.Y && p.Y < Max.Y
+	);
+}
 
 
 
@@ -33,13 +38,15 @@ Control::Control() :
 }
 Control::Control(float min_x, float min_y, float max_x, float max_y) :
 	Box(min_x, min_y, max_x, max_y),
-	render(NULL)
+	render(NULL),
+	isHover(false)
 {
 
 }
 Control::Control(Box2D box) :
 	Box(box),
-	render(NULL)
+	render(NULL),
+	isHover(false)
 {
 
 }
@@ -48,7 +55,9 @@ Control::~Control()
 
 }
 Control::Control(const Control & other) :
-	Box(other.Box), render(other.render)
+	Box(other.Box),
+	render(other.render),
+	isHover(other.isHover)
 {
 
 }
@@ -56,18 +65,22 @@ const Control & Control::operator =(const Control & other)
 {
 	Box = other.Box;
 	render = other.render;
+	isHover = other.isHover;
 	return *this;
 }
 
-bool	Control::isHover(Point2D Mouse) const
+void	Control::ChangeBox(Box2D box)
 {
-	return (Box.Min.X < Mouse.X && Mouse.X < Box.Max.X && 
-			Box.Min.Y < Mouse.Y && Mouse.Y < Box.Max.Y
-	);
+	Box = box;
+	if (render != NULL)
+	{
+		render -> Box = Box;
+	}
 }
+
 void	Control::Update(Point2D Mouse)
 {
-	(void)Mouse;
+	isHover = Box.check(Mouse);
 }
 
 void	Control::UpdateRender()
@@ -87,6 +100,10 @@ void	Control::setRenderData(FormControlRenderData * ptr)
 {
 	render = ptr;
 }
+void	Control::DrawExtra() const
+{
+	
+}
 
 
 
@@ -104,7 +121,9 @@ FormButton::~FormButton()
 
 void	FormButton::Update(Point2D Mouse)
 {
-	if (isHover(Mouse))
+	Control::Update(Mouse);
+
+	if (isHover)
 	{
 		render -> Col.R = 0.25;
 		render -> Col.G = 0.75;
@@ -155,7 +174,9 @@ Point2D	FormSlot::getCenter() const
 }
 void	FormSlot::Update(Point2D Mouse)
 {
-	if (isHover(Mouse))
+	Control::Update(Mouse);
+
+	if (isHover)
 	{
 		render -> Col.R = 0.85;
 		render -> Col.G = 0.85;
@@ -178,6 +199,12 @@ void	FormSlot::UpdateRender()
 	render -> Col.B = 0.75;
 	render -> Depth = 0.5f;
 }
+void	FormSlot::DrawExtra() const
+{
+	if (itemID == -1) { return; }
+	Point2D center = getCenter();
+	ItemVoxel::Draw(center.X, center.Y, itemID);
+}
 
 void	FormSlot::SwapItem(int & ID)
 {
@@ -185,21 +212,47 @@ void	FormSlot::SwapItem(int & ID)
 	ID = itemID;
 	itemID = temp;
 }
-void	FormSlot::DrawItem()
+
+
+
+
+
+static Shader * shader;
+void	Form::CreateDraw()
 {
-	if (itemID == -1) { return; }
-	Point2D center = getCenter();
-	ItemVoxel::Draw(center.X, center.Y, itemID);
+	shader = new Shader(
+		"shaders/GUI.vert",
+		"shaders/GUI.geom",
+		"shaders/GUI.frag"
+	);
+}
+void	Form::DeleteDraw()
+{
+	delete shader;
 }
 
+Form::Form()
+{
+	glGenVertexArrays(1, &Buffer_Array);
+	glBindVertexArray(Buffer_Array);
+	glGenBuffers(1, &Buffer_Data);
+	Data_Count = 0;
 
+	std::cout << "++++ Form " << Buffer_Array << "\n";
 
-
-
+	controls.push_back(&Main);
+	renders.push_back(Main.getRenderData());
+	Main.setRenderData(&renders[0]);
+}
 Form::Form(Box2D box) :
 	Main(box)
 {
-	CreateDraw();
+	glGenVertexArrays(1, &Buffer_Array);
+	glBindVertexArray(Buffer_Array);
+	glGenBuffers(1, &Buffer_Data);
+	Data_Count = 0;
+
+	std::cout << "++++ Form " << Buffer_Array << "\n";
 
 	controls.push_back(&Main);
 	renders.push_back(Main.getRenderData());
@@ -208,19 +261,20 @@ Form::Form(Box2D box) :
 }
 Form::~Form()
 {
-	DeleteDraw();
+	std::cout << "---- Form " << Buffer_Array << "\n";
+
+	glBindVertexArray(Buffer_Array);
+	glDeleteBuffers(1, &Buffer_Data);
+	glDeleteVertexArrays(1, &Buffer_Array);
 }
 
-void	Form::Update(Window * win)
+void	Form::ChangeMainSize(Box2D box)
 {
-	double	mouse_x_dbl;
-	double	mouse_y_dbl;
-	Point2D	mouse;
+	Main.ChangeBox(box);
+}
 
-	glfwGetCursorPos(win -> win, &mouse_x_dbl, &mouse_y_dbl);
-	mouse.X = (mouse_x_dbl / 500) - 1;
-	mouse.Y = 1 - (mouse_y_dbl / 500);
-
+void	Form::Update(Point2D mouse)
+{
 	for (size_t i = 0; i < controls.size(); i++)
 	{
 		controls[i] -> Update(mouse);
@@ -240,27 +294,6 @@ void	Form::Insert(Control & control)
 	}
 }
 
-void	Form::CreateDraw()
-{
-	shader = new Shader(
-		"shaders/GUI.vert",
-		"shaders/GUI.geom",
-		"shaders/GUI.frag"
-	);
-
-	glGenVertexArrays(1, &Buffer_Array);
-	glBindVertexArray(Buffer_Array);
-	glGenBuffers(1, &Buffer_Data);
-	Data_Count = 0;
-}
-void	Form::DeleteDraw()
-{
-	delete shader;
-
-	glBindVertexArray(Buffer_Array);
-	glDeleteBuffers(1, &Buffer_Data);
-	glDeleteVertexArrays(1, &Buffer_Array);
-}
 void	Form::UpdateBuffer()
 {
 	Data_Count = renders.size();
@@ -287,4 +320,85 @@ void	Form::Draw() const
 	glBindVertexArray(Buffer_Array);
 	shader -> Use();
 	glDrawArrays(GL_POINTS, 0, Data_Count);
+
+	for (size_t i = 1; i < controls.size(); i++)
+	{
+		controls[i] -> DrawExtra();
+	}
+}
+
+
+
+
+
+InventoryForm::InventoryForm(int x, int y)
+{
+	int	x_half = x / 2;
+	int	y_half = y / 2;
+
+	float	scale = 0.12f;
+	float	offset = 0.01f;
+
+	form.ChangeMainSize(Box2D(
+		-x_half * scale - offset,
+		-y_half * scale - offset,
+		+x_half * scale + offset,
+		+y_half * scale + offset
+	));
+
+	slots = new FormSlot[x * y];
+	slots_count = 0;
+	for (int yi = -y_half; yi < +y_half; yi++)
+	{
+		for (int xi = -x_half; xi < +x_half; xi++)
+		{
+			slots[slots_count] = FormSlot(
+				(xi * scale) + offset,
+				(yi * scale) + offset,
+				(xi * scale) + (scale - offset),
+				(yi * scale) + (scale - offset)
+			);
+			form.Insert(slots[slots_count]);
+			slots_count++;
+		}
+	}
+	form.UpdateBuffer();
+}
+InventoryForm::~InventoryForm()
+{
+	delete [] slots;
+}
+
+void	InventoryForm::Update(Point2D mouse)
+{
+	form.Update(mouse);
+}
+void	InventoryForm::Click(int & ID)
+{
+	for (int i = 0; i < slots_count; i++)
+	{
+		if (slots[i].isHover)
+		{
+			slots[i].SwapItem(ID);
+			break;
+		}
+	}
+}
+
+void	InventoryForm::Draw() const
+{
+	form.Draw();
+}
+
+int		InventoryForm::getSlot(int idx) const
+{
+	int	temp1;
+	slots[idx].SwapItem(temp1);
+	int	temp2 = temp1;
+	slots[idx].SwapItem(temp1);
+	return temp2;
+}
+void	InventoryForm::setSlot(int idx, int ID)
+{
+	slots[idx].SwapItem(ID);
 }

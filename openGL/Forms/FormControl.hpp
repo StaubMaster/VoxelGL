@@ -33,6 +33,8 @@ struct	Box2D
 	Box2D();
 	Box2D(float x1, float y1, float x2, float y2);
 	Box2D(Point2D p1, Point2D p2);
+
+	bool	check(Point2D p);
 };
 
 
@@ -50,8 +52,10 @@ class Control
 {
 	protected:
 		Box2D	Box;
-
 		FormControlRenderData * render;
+
+	public:
+		bool	isHover;
 
 	public:
 		Control();
@@ -62,12 +66,14 @@ class Control
 		Control(const Control & other);
 		const Control & operator =(const Control & other);
 
-		bool			isHover(Point2D Mouse) const;
+		void			ChangeBox(Box2D box);
+
 		virtual void	Update(Point2D Mouse);
 
 		virtual void			UpdateRender();
 		FormControlRenderData	getRenderData() const;
 		void					setRenderData(FormControlRenderData * ptr);
+		virtual void			DrawExtra() const;
 };
 
 class FormButton : public Control
@@ -95,15 +101,18 @@ class FormSlot : public Control
 		void	Update(Point2D Mouse);
 
 		void	UpdateRender();
+		void	DrawExtra() const;
 
 		void	SwapItem(int & ID);
-		void	DrawItem();
 };
 
 class Form
 {
+	public:
+		static void CreateDraw();
+		static void DeleteDraw();
+
 	private:
-		Shader	* shader;
 		unsigned int Buffer_Array;
 		unsigned int Buffer_Data;
 		unsigned int Data_Count;
@@ -116,19 +125,43 @@ class Form
 	public:
 		bool	Visible;
 
+		Form();
 		Form(Box2D box);
 		~Form();
+	private:
+		Form(const Form & other);
+		const Form & operator =(const Form & other);
 
-		void	Update(Window * win);
+	public:
+		void	ChangeMainSize(Box2D box);
+
+		void	Update(Point2D mouse);
 
 		void	Insert(Control & control);
 
-	private:
-		void	CreateDraw();
-		void	DeleteDraw();
 	public:
 		void	UpdateBuffer();
 		void	Draw() const;
+};
+
+class	InventoryForm
+{
+	private:
+		Form		form;
+		FormSlot *	slots;
+		int			slots_count;
+
+	public:
+		InventoryForm(int x, int y);
+		~InventoryForm();
+
+		void	Update(Point2D mouse);
+		void	Click(int & ID);
+
+		void	Draw() const;
+
+		int		getSlot(int idx) const;
+		void	setSlot(int idx, int ID);
 };
 
 #endif

@@ -11,9 +11,11 @@
 #include "openGL/openGL.h"
 #include "openGL/textureLoadSave.h"
 #include "openGL/Abstract/Angle.hpp"
+
 #include "openGL/Forms/Window.hpp"
-#include "openGL/Forms/FormControl.hpp"
-#include "openGL/Forms/ItemVoxel.hpp"
+#include "openGL/Forms/Inventory.hpp"
+#include "openGL/Forms/HotBar.hpp"
+
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
 
@@ -117,12 +119,6 @@ int main(int argc, char **argv)
 	win -> keys.push_back(&voxel_add_key);
 	win -> keys.push_back(&voxel_sub_key);
 
-	char	placeID = 0;
-	KeyPress place_add_key(GLFW_MOUSE_BUTTON_4, true);
-	KeyPress place_sub_key(GLFW_MOUSE_BUTTON_5, true);
-	win -> keys.push_back(&place_add_key);
-	win -> keys.push_back(&place_sub_key);
-
 
 	Point move;
 	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
@@ -132,33 +128,14 @@ int main(int argc, char **argv)
 	KeyPress form_click(GLFW_MOUSE_BUTTON_1, true, false);
 	win -> keys.push_back(&form_click);
 
-
+	KeyPress HotIncKey(GLFW_MOUSE_BUTTON_4, true);
+	KeyPress HotDecKey(GLFW_MOUSE_BUTTON_5, true);
+	win -> keys.push_back(&HotIncKey);
+	win -> keys.push_back(&HotDecKey);
 
 	Form::CreateDraw();
-	Point2D min, max;
-
 	InventoryForm Inv(10, 4);
-
-
-	Form formHotbar(Box2D(
-		-5 * 0.12f - 0.01f,
-		-8 * 0.12f - 0.01f,
-		+5 * 0.12f + 0.01f,
-		-7 * 0.12f + 0.01f
-	));
-	FormSlot HotSlot[10];
-	for (int xi = -5; xi < +5; xi++)
-	{
-		min.X = (xi * 0.12f) + 0.01f;
-		min.Y = (-8 * 0.12f) + 0.01f;
-		max.X = min.X + 0.1f;
-		max.Y = min.Y + 0.1f;
-		HotSlot[xi + 5] = FormSlot(min.X, min.Y, max.X, max.Y);
-	}
-	for (int xi = 0; xi < 10; xi++)
-		formHotbar.Insert(HotSlot[xi]);
-	formHotbar.UpdateBuffer();
-
+	HotbarForm Hot(10);
 
 	for (unsigned int i = 0; i < table.Length(); i++)
 		Inv.setSlot(i, i);
@@ -237,16 +214,11 @@ int main(int argc, char **argv)
 
 
 
-		if (place_add_key.check())
-		{
-			placeID++;
-			if (placeID >= (int)table.Length()) { placeID = 0; }
-		}
-		if (place_sub_key.check())
-		{
-			placeID--;
-			if (placeID < 0) { placeID = table.Length() - 1; }
-		}
+		if (HotIncKey.check())
+			Hot.Inc();
+		if (HotDecKey.check())
+			Hot.Dec();
+
 
 
 		Index3D chunk_current;
@@ -259,15 +231,16 @@ int main(int argc, char **argv)
 
 		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		if (voxel_add_key.check() && hover.isValid)
-			space.tryAdd(hover, placeID);
-		if (voxel_sub_key.check() && hover.isValid)
-			space.trySub(hover, placeID);
+		if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+			space.tryAdd(hover, Hot.SelectedItem());
+		if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+			space.trySub(hover, Hot.SelectedItem());
 
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.5f, 0.5f, 0.5f, 1);
+
 
 
 		voxelShader -> Use();
@@ -301,17 +274,14 @@ int main(int argc, char **argv)
 			Inv.Click(mouse_itemID);
 		}
 
-		for (int i = 0; i < 10; i++)
-		{
-			int temp = Inv.getSlot(i);
-			HotSlot[i].SwapItem(temp);
-		}
+		Hot.Syncronize(Inv);
+
 
 		ItemVoxel::Update(FrameTimeDelta);
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 
-		formHotbar.Draw();
+		Hot.Draw();
 
 		if (!win -> tabbed)
 		{

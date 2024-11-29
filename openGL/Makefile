@@ -6,15 +6,25 @@ FLAGS = -Wall -Wextra -Werror
 FILES_CPP = stringHelp.cpp \
 	Shader.cpp \
 	View.cpp \
+\
 	Forms/Window.cpp \
 	Forms/KeyCheck.cpp \
-	Forms/FormControl.cpp \
 	Forms/ItemVoxel.cpp \
+\
+	Forms/Controls/Help.cpp \
+	Forms/Controls/Control.cpp \
+	Forms/Controls/Button.cpp \
+	Forms/Controls/Slot.cpp \
+	Forms/Controls/Form.cpp \
+	Forms/Inventory.cpp \
+	Forms/HotBar.cpp \
+\
 	Abstract/math3D.cpp \
 	Abstract/Point.cpp \
 	Abstract/Angle.cpp \
 	Abstract/Index3D.cpp \
 	Abstract/Undex3D.cpp \
+\
 	textureLoadSave.cpp
 FILES_O = glad.o $(FILES_CPP:.cpp=.o)
 

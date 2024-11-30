@@ -21,6 +21,7 @@ InventoryForm::InventoryForm(Size2D winSize, int slots_x, int slots_y) : Form()
 	Main.ChangeBox(winSize, Box2D(
 		200, 200, 800, 800
 	));
+	Main.AnchorBits = 0;
 	//Main.AnchorBits = ANCHOR_BIT_L | ANCHOR_BIT_T;
 	//Main.AnchorBits = ANCHOR_BIT_L | ANCHOR_BIT_T | ANCHOR_BIT_R | ANCHOR_BIT_B;
 

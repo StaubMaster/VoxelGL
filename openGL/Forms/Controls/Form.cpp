@@ -90,8 +90,8 @@ void	Form::UpdateAnchor(Size2D winSize)
 {
 	Main.UpdateAnchor(winSize);
 
-	std::cout << "Min: " << Main.Box.Min.X << " : " << Main.Box.Min.Y << "\n";
-	std::cout << "Max: " << Main.Box.Max.X << " : " << Main.Box.Max.Y << "\n";
+	//std::cout << "Min: " << Main.Box.Min.X << " : " << Main.Box.Min.Y << "\n";
+	//std::cout << "Max: " << Main.Box.Max.X << " : " << Main.Box.Max.Y << "\n";
 
 	UpdateBuffer();
 }

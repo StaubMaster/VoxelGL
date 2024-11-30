@@ -50,6 +50,7 @@ const Control & Control::operator =(const Control & other)
 void	Control::ChangeBox(Size2D formSize, Box2D box)
 {
 	Box = box;
+
 	Size.W = Box.Max.X - Box.Min.X;
 	Size.H = Box.Max.Y - Box.Min.Y;
 
@@ -72,39 +73,49 @@ void	Control::UpdateHover(Point2D Mouse)
 }
 void	Control::UpdateAnchor(Size2D formSize)
 {
-	if (AnchorBits & ANCHOR_BIT_L)
+	if ((AnchorBits & ANCHOR_BIT_L) && (AnchorBits & ANCHOR_BIT_R))
 	{
 		Box.Min.X = Anchor_L;
-		render -> Box.Min.X = Box.Min.X;
+		Box.Max.X = formSize.W - Anchor_R;
 	}
-
-	if (AnchorBits & ANCHOR_BIT_T)
+	else if (AnchorBits & ANCHOR_BIT_L)
 	{
-		Box.Min.Y = Anchor_T;
-		render -> Box.Min.Y = Box.Min.Y;
+		Box.Min.X = Anchor_L;
+		Box.Max.X = Box.Min.X + Size.W;
 	}
-
-	if (AnchorBits & ANCHOR_BIT_R)
+	else if (AnchorBits & ANCHOR_BIT_R)
 	{
 		Box.Max.X = formSize.W - Anchor_R;
-		render -> Box.Max.X = Box.Max.X;
+		Box.Min.X = Box.Max.X - Size.W;
 	}
 	else
 	{
+		Box.Min.X = ((Anchor_L + formSize.W) - (Anchor_R + Size.W)) / 2;
 		Box.Max.X = Box.Min.X + Size.W;
-		render -> Box.Max.X = Box.Max.X;
 	}
 
-	if (AnchorBits & ANCHOR_BIT_B)
+	if ((AnchorBits & ANCHOR_BIT_T) && (AnchorBits & ANCHOR_BIT_B))
+	{
+		Box.Min.Y = Anchor_T;
+		Box.Max.Y = formSize.H - Anchor_B;
+	}
+	else if (AnchorBits & ANCHOR_BIT_T)
+	{
+		Box.Min.Y = Anchor_T;
+		Box.Max.Y = Box.Min.Y + Size.W;
+	}
+	else if (AnchorBits & ANCHOR_BIT_B)
 	{
 		Box.Max.Y = formSize.H - Anchor_B;
-		render -> Box.Max.Y = Box.Max.Y;
+		Box.Min.Y = Box.Max.Y - Size.H;
 	}
 	else
 	{
+		Box.Min.Y = ((Anchor_T + formSize.H) - (Anchor_R + Size.H)) / 2;
 		Box.Max.Y = Box.Min.Y + Size.H;
-		render -> Box.Max.Y = Box.Max.Y;
 	}
+
+	render -> Box = Box;
 
 	(void)formSize;
 }

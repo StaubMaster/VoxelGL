@@ -12,12 +12,15 @@ class Form
 	public:
 		static void CreateDraw();
 		static void DeleteDraw();
+		static int  UniformAspect();
+		static int  UniformSize();
 
 	private:
 		unsigned int Buffer_Array;
 		unsigned int Buffer_Data;
 		unsigned int Data_Count;
 
+	protected:
 		Control	Main;
 
 		std::vector<Control *> controls;
@@ -34,9 +37,8 @@ class Form
 		const Form & operator =(const Form & other);
 
 	public:
-		void	ChangeMainSize(Box2D box);
-
-		void	Update(Point2D mouse);
+		void	UpdateHover(Point2D mouse);
+		void	UpdateAnchor(Size2D winSize);
 
 		void	Insert(Control & control);
 

@@ -14,7 +14,7 @@ static unsigned int Data_Count = 9;
 
 void ItemVoxel::Create()
 {
-	shader = new Shader(
+	shader = new Shader("Item",
 		"shaders/inventory.vert",
 		"shaders/inventory.geom",
 		"shaders/inventory.frag"

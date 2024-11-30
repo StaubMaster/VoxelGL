@@ -2,6 +2,7 @@
 
 uniform vec3[3] viewTrans;
 uniform float[7] depthFactor;
+uniform vec2 aspectRatio;
 uniform ivec3 chunk_pos;
 
 
@@ -49,8 +50,8 @@ vec4 proj(vec3 p_inn)
 	p_inn = ASD(p_inn - viewTrans[0], viewTrans[1], viewTrans[2]);
 
 	vec4 p_out;
-	p_out.x = p_inn.x;
-	p_out.y = p_inn.y;
+	p_out.x = p_inn.x * aspectRatio.x;
+	p_out.y = p_inn.y * aspectRatio.y;
 	p_out.z = p_inn.z * depthFactor[5] - depthFactor[6];
 	p_out.w = p_inn.z;
 	return p_out;

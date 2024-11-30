@@ -4,6 +4,7 @@
 # include "KeyCheck.hpp"
 # include "../openGL.h"
 # include "../Abstract/math3D.hpp"
+# include "Help.hpp"
 # include <iostream>
 # include <vector>
 
@@ -14,8 +15,9 @@ class Window
 		bool			tabbed;
 		bool			tabbed_pressed;
 
-		double	win_middle_x;
-		double	win_middle_y;
+		Point2D	Size;
+		Point2D	Aspect;
+		Point2D	Middle;
 
 		std::vector<KeyCheck *>	keys;
 
@@ -32,7 +34,13 @@ class Window
 		void	Update();
 		Point GetKeyMovement(float speed) const;
 		Angle GetKeyTurning(float speed) const;
-		Angle GetMouseTurning() const;
+		Angle GetMouseTurning();
+
+		Point2D	CursorNormalized() const;
+		Point2D	CursorRasterized() const;
+
+		void	UniformAspect(int uni) const;
+		void	UniformSize(int uni) const;
 
 	private:
 		class GenericWindowException : public std::exception { public: const char * what() const throw(); };

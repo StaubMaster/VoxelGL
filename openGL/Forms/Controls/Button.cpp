@@ -13,9 +13,9 @@ FormButton::~FormButton()
 
 
 
-void	FormButton::Update(Point2D Mouse)
+void	FormButton::UpdateHover(Point2D Mouse)
 {
-	Control::Update(Mouse);
+	Control::UpdateHover(Mouse);
 
 	if (isHover)
 	{

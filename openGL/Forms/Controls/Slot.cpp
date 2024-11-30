@@ -25,9 +25,9 @@ Point2D	FormSlot::getCenter() const
 		(Box.Min.Y + Box.Max.Y) / 2
 	);
 }
-void	FormSlot::Update(Point2D Mouse)
+void	FormSlot::UpdateHover(Point2D Mouse)
 {
-	Control::Update(Mouse);
+	Control::UpdateHover(Mouse);
 	UpdateRender();
 }
 

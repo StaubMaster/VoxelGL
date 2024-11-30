@@ -8,12 +8,13 @@
 class Shader
 {
 	public:
+		std::string	Name;
 		int	Program_ID;
 
 	public:
-		Shader();
-		Shader(const std::string vert, const std::string frag);
-		Shader(const std::string vert, const std::string geom, const std::string frag);
+		Shader(const std::string name);
+		Shader(const std::string name, const std::string vert, const std::string frag);
+		Shader(const std::string name, const std::string vert, const std::string geom, const std::string frag);
 		~Shader();
 
 	private:
@@ -26,7 +27,6 @@ class Shader
 	private:
 		class CompileErrorException : public std::exception { public: const char * what() const throw(); };
 
-	private:
 		static int	Load_Shader_File(std::string file, GLenum type);
 };
 

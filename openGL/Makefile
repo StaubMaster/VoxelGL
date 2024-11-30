@@ -11,7 +11,7 @@ FILES_CPP = stringHelp.cpp \
 	Forms/KeyCheck.cpp \
 	Forms/ItemVoxel.cpp \
 \
-	Forms/Controls/Help.cpp \
+	Forms/Help.cpp \
 	Forms/Controls/Control.cpp \
 	Forms/Controls/Button.cpp \
 	Forms/Controls/Slot.cpp \

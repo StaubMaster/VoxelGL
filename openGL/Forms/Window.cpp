@@ -17,7 +17,7 @@ Window::Window(int w, int h, const char * name, bool resize)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
-	glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
 	glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -42,23 +42,24 @@ Window::Window(int w, int h, const char * name, bool resize)
 	}
 	std::cout << "glad done\n";
 
-	int ww, hh;
-	glfwGetFramebufferSize(win, &ww, &hh);
-	std::cout << w << ":" << h << "\n";
-	std::cout << ww << ":" << hh << "\n";
-	glViewport(0, 0, ww, hh);
-//#ifdef _WIN64
-//	glViewport(0, 0, w, h);			//Windows
-//#elif __APPLE__
-//	glViewport(0, 0, w * 2, h * 2);	//	Mac
-//#endif
+	glfwGetFramebufferSize(win, &w, &h);
+	glViewport(0, 0, w, h);
 	std::cout << "gl viewport done\n";
 
 	tabbed = false;
 	tabbed_pressed = false;
 
-	win_middle_x = w * 0.5;
-	win_middle_y = h * 0.5;
+	Size.X = w;
+	Size.Y = h;
+
+	float	aspect_size;
+	aspect_size = std::min(w, h);
+
+	Aspect.X = aspect_size / w;
+	Aspect.Y = aspect_size / h;
+
+	Middle.X = w * 0.5;
+	Middle.Y = h * 0.5;
 }
 Window::~Window()
 {
@@ -101,6 +102,25 @@ void Window::Update()
 	{
 		keys[i] -> update(win, tabbed);
 	}
+
+	int new_w, new_h;
+	glfwGetFramebufferSize(win, &new_w, &new_h);
+
+	if (new_w != Size.X || new_h != Size.Y)
+	{
+		glViewport(0, 0, new_w, new_h);
+		Size.X = new_w;
+		Size.Y = new_h;
+
+		float	aspect_size;
+		aspect_size = std::min(new_w, new_h);
+
+		Aspect.X = aspect_size / new_w;
+		Aspect.Y = aspect_size / new_h;
+
+		Middle.X = (int)(Size.X * 0.5);
+		Middle.Y = (int)(Size.Y * 0.5);
+	}
 }
 Point Window::GetKeyMovement(float speed) const
 {
@@ -122,7 +142,7 @@ Angle Window::GetKeyTurning(float speed) const
 	if (glfwGetKey(win, GLFW_KEY_RIGHT))	{ rel.y -= speed; }
 	return (rel);
 }
-Angle Window::GetMouseTurning() const
+Angle Window::GetMouseTurning()
 {
 	if (!tabbed)
 		return Angle();
@@ -131,17 +151,54 @@ Angle Window::GetMouseTurning() const
 	glfwGetCursorPos(win, &x, &y);
 
 	double diff_x, diff_y;
-	diff_x = win_middle_x - x;
-	diff_y = win_middle_y - y;
+	diff_x = Middle.X - x;
+	diff_y = Middle.Y - y;
 
 	Angle ang;
 	ang.x -= diff_x * 0.005;
 	ang.y += diff_y * 0.005;
 	ang.UpdateSinCos();
-	glfwSetCursorPos(win, win_middle_x, win_middle_y);
+	glfwSetCursorPos(win, Middle.X, Middle.Y);
 
 	return (ang);
 }
+
+
+
+Point2D	Window::CursorNormalized() const
+{
+	double	mouse_x_dbl;
+	double	mouse_y_dbl;
+	glfwGetCursorPos(win, &mouse_x_dbl, &mouse_y_dbl);
+
+	return Point2D(
+		2 * (mouse_x_dbl / Size.X) - 1,
+		1 - (mouse_y_dbl / Size.Y) * 2
+	);
+}
+Point2D	Window::CursorRasterized() const
+{
+	double	mouse_x_dbl;
+	double	mouse_y_dbl;
+	glfwGetCursorPos(win, &mouse_x_dbl, &mouse_y_dbl);
+
+	return Point2D(
+		mouse_x_dbl,
+		mouse_y_dbl
+	);
+}
+
+
+
+void	Window::UniformAspect(int uni) const
+{
+	glUniform2f(uni, Aspect.X, Aspect.Y);
+}
+void	Window::UniformSize(int uni) const
+{
+	glUniform2f(uni, Size.X, Size.Y);
+}
+
 
 
 const char * Window::GenericWindowException::what() const throw() { return "Error from Window"; }

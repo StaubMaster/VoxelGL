@@ -2,18 +2,36 @@
 #include "Form.hpp"
 
 static Shader * shader;
+static int Uni_Form_Aspect;
+static int Uni_Form_Size;
+
 void	Form::CreateDraw()
 {
-	shader = new Shader(
+	shader = new Shader("Form",
 		"shaders/GUI.vert",
 		"shaders/GUI.geom",
 		"shaders/GUI.frag"
 	);
+
+	Uni_Form_Aspect = shader -> FindUniform("aspectRatio");
+	Uni_Form_Size = shader -> FindUniform("windowSize");
 }
 void	Form::DeleteDraw()
 {
 	delete shader;
 }
+int	Form::UniformAspect()
+{
+	shader -> Use();
+	return Uni_Form_Aspect;
+}
+int	Form::UniformSize()
+{
+	shader -> Use();
+	return Uni_Form_Size;
+}
+
+
 
 
 
@@ -29,6 +47,8 @@ Form::Form()
 	controls.push_back(&Main);
 	renders.push_back(Main.getRenderData());
 	Main.setRenderData(&renders[0]);
+
+	Visible = false;
 }
 Form::Form(Box2D box) :
 	Main(box)
@@ -44,6 +64,8 @@ Form::Form(Box2D box) :
 	renders.push_back(Main.getRenderData());
 	Main.setRenderData(&renders[0]);
 	Main.UpdateRender();
+
+	Visible = false;
 }
 Form::~Form()
 {
@@ -56,19 +78,21 @@ Form::~Form()
 
 
 
-void	Form::ChangeMainSize(Box2D box)
-{
-	Main.ChangeBox(box);
-}
-
-
-
-void	Form::Update(Point2D mouse)
+void	Form::UpdateHover(Point2D mouse)
 {
 	for (size_t i = 0; i < controls.size(); i++)
 	{
-		controls[i] -> Update(mouse);
+		controls[i] -> UpdateHover(mouse);
 	}
+	UpdateBuffer();
+}
+void	Form::UpdateAnchor(Size2D winSize)
+{
+	Main.UpdateAnchor(winSize);
+
+	std::cout << "Min: " << Main.Box.Min.X << " : " << Main.Box.Min.Y << "\n";
+	std::cout << "Max: " << Main.Box.Max.X << " : " << Main.Box.Max.Y << "\n";
+
 	UpdateBuffer();
 }
 
@@ -110,6 +134,8 @@ void	Form::UpdateBuffer()
 }
 void	Form::Draw() const
 {
+	if (!Visible) { return; }
+
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glBindVertexArray(Buffer_Array);
 	shader -> Use();

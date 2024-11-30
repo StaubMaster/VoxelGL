@@ -4,6 +4,9 @@
 Point2D::Point2D() : X(0), Y(0) { }
 Point2D::Point2D(float x, float y) : X(x), Y(y) { }
 
+Size2D::Size2D() : W(0), H(0) { }
+Size2D::Size2D(float w, float h) : W(w), H(h) { }
+
 Color::Color(float r, float g, float b) : R(r), G(g), B(b) { }
 
 Box2D::Box2D() : Min(), Max() { }
@@ -20,6 +23,13 @@ Box2D::Box2D(Point2D p1, Point2D p2)
 	Min.Y = std::min(p1.Y, p2.Y);
 	Max.X = std::max(p1.X, p2.X);
 	Max.Y = std::max(p1.Y, p2.Y);
+}
+Box2D::Box2D(Point2D p, Size2D s)
+{
+	Min.X = p.X;
+	Min.Y = p.Y;
+	Max.X = p.X + s.W;
+	Max.Y = p.Y + s.H;
 }
 bool	Box2D::check(Point2D p)
 {

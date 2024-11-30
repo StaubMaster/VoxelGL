@@ -32,50 +32,47 @@ Window * win = NULL;
 Shader * voxelShader = NULL;
 int Uni_Voxel_View;
 int Uni_Voxel_Depth;
+int Uni_Voxel_Aspect;
 int Uni_Voxel_ChunkPos;
 
 Shader * boxShader = NULL;
 int Uni_Box_View;
 int Uni_Box_Depth;
+int Uni_Box_Aspect;
 int Uni_Box_Cycle;
 
 
 static void	main_init()
 {
-	std::cout << "window ...\n";
-	win = new Window(1000, 1000, "Voxel", false);
-	std::cout << "window done\n";
+	win = new Window(1000, 1000, "Voxel", true);
 
-
-
-	std::cout << "shaders ...\n";
-
-	voxelShader = new Shader(
+	voxelShader = new Shader("Voxel",
 		"shaders/voxel_project_tex.vert",
 		"shaders/voxel_normal_tex.geom",
 		"shaders/voxel_depth_tex.frag"
 	);
 	Uni_Voxel_View = voxelShader -> FindUniform("viewTrans");
 	Uni_Voxel_Depth = voxelShader -> FindUniform("depthFactor");
+	Uni_Voxel_Aspect = voxelShader -> FindUniform("aspectRatio");
 	Uni_Voxel_ChunkPos = voxelShader -> FindUniform("chunk_pos");
 
-	boxShader = new Shader(
+	boxShader = new Shader("Box",
 		"shaders/Box.vert",
 		"shaders/Box.geom",
 		"shaders/Cycle.frag"
 	);
 	Uni_Box_View = boxShader -> FindUniform("viewTrans");
 	Uni_Box_Depth = boxShader -> FindUniform("depthFactor");
+	Uni_Box_Aspect = boxShader -> FindUniform("aspectRatio");
 	Uni_Box_Cycle = boxShader -> FindUniform("cycle");
 
-	std::cout << "shaders done\n";
-
-
 	ItemVoxel::Create();
+	Form::CreateDraw();
 }
 static void	main_free()
 {
 	ItemVoxel::Delete();
+	Form::DeleteDraw();
 
 	delete voxelShader;
 	delete boxShader;
@@ -89,6 +86,7 @@ int main(int argc, char **argv)
 {
 	main_init();
 
+{
 	std::cout << "table ...\n";
 	VoxelDataTable table;
 	table.Set(VoxelData("images/TextureAlign.png",     false, false, false, true , false));
@@ -133,13 +131,13 @@ int main(int argc, char **argv)
 	win -> keys.push_back(&HotIncKey);
 	win -> keys.push_back(&HotDecKey);
 
-	Form::CreateDraw();
-	InventoryForm Inv(10, 4);
-	HotbarForm Hot(10);
+	InventoryForm Inv(Size2D(win -> Size.X, win -> Size.Y), 10, 4);
+	//HotbarForm Hot(10);
+	//Hot.Visible = true;
 
-	for (unsigned int i = 0; i < table.Length(); i++)
-		Inv.setSlot(i, i);
-	int	mouse_itemID = -1;
+	//for (unsigned int i = 0; i < table.Length(); i++)
+	//	Inv.setSlot(i, i);
+	int	cursorItemID = -1;
 
 
 
@@ -155,9 +153,9 @@ int main(int argc, char **argv)
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	std::cout << "loop\n";
-	for (int i = 0; i < 20; i++)
-		std::cout << "\n";
+	std::cout << ">>>> loop\n";
+	//for (int i = 0; i < 20; i++)
+	//	std::cout << "\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
 		/*{
@@ -214,10 +212,10 @@ int main(int argc, char **argv)
 
 
 
-		if (HotIncKey.check())
-			Hot.Inc();
-		if (HotDecKey.check())
-			Hot.Dec();
+		//if (HotIncKey.check())
+		//	Hot.Inc();
+		//if (HotDecKey.check())
+		//	Hot.Dec();
 
 
 
@@ -231,10 +229,10 @@ int main(int argc, char **argv)
 
 		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-			space.tryAdd(hover, Hot.SelectedItem());
-		if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-			space.trySub(hover, Hot.SelectedItem());
+		//if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+		//	space.tryAdd(hover, Hot.SelectedItem());
+		//if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+		//	space.trySub(hover, Hot.SelectedItem());
 
 
 
@@ -246,6 +244,7 @@ int main(int argc, char **argv)
 		voxelShader -> Use();
 		view.uniform(Uni_Voxel_View);
 		view.uniform_depth(Uni_Voxel_Depth);
+		win -> UniformAspect(Uni_Voxel_Aspect);
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 		space.Draw(Uni_Voxel_ChunkPos);
@@ -254,54 +253,43 @@ int main(int argc, char **argv)
 		glUniform1f(Uni_Box_Cycle, FrameTimeCurr * 16);
 		view.uniform(Uni_Box_View);
 		view.uniform_depth(Uni_Box_Depth);
+		win -> UniformAspect(Uni_Box_Aspect);
 		space.DrawHover(hover);
 
 		entity.DrawBox();
 
 
 
-		Point2D mouse;
-		{
-			double	mouse_x_dbl;
-			double	mouse_y_dbl;
-			glfwGetCursorPos(win -> win, &mouse_x_dbl, &mouse_y_dbl);
-			mouse.X = (mouse_x_dbl / 500) - 1;
-			mouse.Y = 1 - (mouse_y_dbl / 500);
-		}
+		Point2D cursorNorm = win -> CursorNormalized();
 
-		if (form_click.check())
-		{
-			Inv.Click(mouse_itemID);
-		}
+		if (form_click.check()) { Inv.Click(cursorItemID); }
+		Inv.Visible = !(win -> tabbed);
 
-		Hot.Syncronize(Inv);
-
+		//Hot.Syncronize(Inv);
+		Inv.UpdateHover(cursorNorm);
+		Inv.UpdateAnchor(Size2D(win -> Size.X, win -> Size.Y));
 
 		ItemVoxel::Update(FrameTimeDelta);
+		win -> UniformAspect(Form::UniformAspect());
+		win -> UniformSize(Form::UniformSize());
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 
-		Hot.Draw();
-
-		if (!win -> tabbed)
-		{
-			Inv.Update(mouse);
-			Inv.Draw();
-
-			if (mouse_itemID != -1)
-				ItemVoxel::Draw(mouse.X, mouse.Y, mouse_itemID);
-		}
+		//Hot.Draw();
+		Inv.Draw();
+		if (cursorItemID != -1) { ItemVoxel::Draw(cursorNorm.X, cursorNorm.Y, cursorItemID); }
 
 
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
-
-	Form::DeleteDraw();
-	main_free();
+	std::cout << "<<<< loop\n";
 
 	glDeleteTextures(1, &texture_arr);
+}
+
+	main_free();
 
 	return (0);
 	(void)argc;

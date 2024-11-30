@@ -11,6 +11,15 @@ struct	Point2D
 	Point2D(float x, float y);
 };
 
+struct	Size2D
+{
+	float	W;
+	float	H;
+
+	Size2D();
+	Size2D(float w, float h);
+};
+
 struct	Color
 {
 	float	R;
@@ -28,6 +37,7 @@ struct	Box2D
 	Box2D();
 	Box2D(float x1, float y1, float x2, float y2);
 	Box2D(Point2D p1, Point2D p2);
+	Box2D(Point2D p, Size2D s);
 
 	bool	check(Point2D p);
 };

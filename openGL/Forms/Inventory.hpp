@@ -4,21 +4,17 @@
 #include "Controls/Form.hpp"
 #include "Controls/Slot.hpp"
 
-class	InventoryForm
+class	InventoryForm : public Form
 {
 	private:
-		Form		form;
 		FormSlot *	slots;
 		int			slots_count;
 
 	public:
-		InventoryForm(int x, int y);
+		InventoryForm(Size2D winSize, int slots_x, int slots_y);
 		~InventoryForm();
 
-		void	Update(Point2D mouse);
 		void	Click(int & ID);
-
-		void	Draw() const;
 
 		int		getSlot(int idx) const;
 		void	setSlot(int idx, int ID);

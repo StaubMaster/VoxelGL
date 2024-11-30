@@ -16,7 +16,7 @@ class FormSlot : public Control
 		~FormSlot();
 
 		Point2D	getCenter() const;
-		void	Update(Point2D Mouse);
+		void	UpdateHover(Point2D Mouse);
 
 		void	UpdateRender();
 		void	DrawExtra() const;

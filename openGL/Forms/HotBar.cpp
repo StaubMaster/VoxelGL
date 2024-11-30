@@ -8,7 +8,7 @@ HotbarForm::HotbarForm(int x)
 	float	scale = 0.12f;
 	float	offset = 0.01f;
 
-	form.ChangeMainSize(Box2D(
+	Main.ChangeBox(Size2D(), Box2D(
 		-x_half * scale - offset,
 		-8 * scale - offset,
 		+x_half * scale + offset,
@@ -26,7 +26,7 @@ HotbarForm::HotbarForm(int x)
 			(xi * scale) + (scale - offset),
 			(yi * scale) + (scale - offset)
 		);
-		form.Insert(slots[slots_count]);
+		Insert(slots[slots_count]);
 		slots_count++;
 	}
 
@@ -34,7 +34,7 @@ HotbarForm::HotbarForm(int x)
 	slots[selected].isHover = true;
 	slots[selected].UpdateRender();
 
-	form.UpdateBuffer();
+	UpdateBuffer();
 }
 HotbarForm::~HotbarForm()
 {
@@ -52,7 +52,7 @@ void	HotbarForm::Inc()
 	slots[selected].isHover = true;
 	slots[selected].UpdateRender();
 
-	form.UpdateBuffer();
+	UpdateBuffer();
 }
 void	HotbarForm::Dec()
 {
@@ -65,12 +65,7 @@ void	HotbarForm::Dec()
 	slots[selected].isHover = true;
 	slots[selected].UpdateRender();
 
-	form.UpdateBuffer();
-}
-
-void	HotbarForm::Draw() const
-{
-	form.Draw();
+	UpdateBuffer();
 }
 
 int		HotbarForm::SelectedItem()
@@ -84,5 +79,5 @@ void	HotbarForm::Syncronize(InventoryForm & inv)
 		slots[i].setItem(inv.getSlot(i));
 		slots[i].UpdateRender();
 	}
-	form.UpdateBuffer();
+	UpdateBuffer();
 }

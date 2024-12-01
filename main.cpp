@@ -131,12 +131,12 @@ int main(int argc, char **argv)
 	win -> keys.push_back(&HotIncKey);
 	win -> keys.push_back(&HotDecKey);
 
-	InventoryForm Inv(Size2D(win -> Size.X, win -> Size.Y), 10, 4);
-	//HotbarForm Hot(10);
-	//Hot.Visible = true;
+	InventoryForm Inv(win -> Size, 12, 8);
+	HotbarForm Hot(win -> Size, 12);
+	Hot.Visible = true;
 
-	//for (unsigned int i = 0; i < table.Length(); i++)
-	//	Inv.setSlot(i, i);
+	for (unsigned int i = 0; i < table.Length(); i++)
+		Inv.setSlot(i, i);
 	int	cursorItemID = -1;
 
 
@@ -212,10 +212,10 @@ int main(int argc, char **argv)
 
 
 
-		//if (HotIncKey.check())
-		//	Hot.Inc();
-		//if (HotDecKey.check())
-		//	Hot.Dec();
+		if (HotIncKey.check())
+			Hot.Inc();
+		if (HotDecKey.check())
+			Hot.Dec();
 
 
 
@@ -229,10 +229,10 @@ int main(int argc, char **argv)
 
 		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
-		//if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-		//	space.tryAdd(hover, Hot.SelectedItem());
-		//if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-		//	space.trySub(hover, Hot.SelectedItem());
+		if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+			space.tryAdd(hover, Hot.SelectedItem());
+		if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
+			space.trySub(hover, Hot.SelectedItem());
 
 
 
@@ -260,24 +260,28 @@ int main(int argc, char **argv)
 
 
 
-		Point2D cursorNorm = win -> CursorNormalized();
+		Point2D cursorPos = win -> CursorRasterized();
 
 		if (form_click.check()) { Inv.Click(cursorItemID); }
 		Inv.Visible = !(win -> tabbed);
 
-		//Hot.Syncronize(Inv);
-		Inv.UpdateHover(cursorNorm);
-		Inv.UpdateAnchor(Size2D(win -> Size.X, win -> Size.Y));
+		Inv.UpdateAnchor(win -> Size);
+		Hot.UpdateAnchor(win -> Size);
+
+		Hot.Syncronize(Inv);
+		Inv.UpdateHover(cursorPos);
 
 		ItemVoxel::Update(FrameTimeDelta);
+		win -> UniformAspect(ItemVoxel::UniformAspect());
+		win -> UniformSize(ItemVoxel::UniformSize());
 		win -> UniformAspect(Form::UniformAspect());
 		win -> UniformSize(Form::UniformSize());
 		glActiveTexture(GL_TEXTURE_2D_ARRAY);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_arr);
 
-		//Hot.Draw();
+		Hot.Draw();
 		Inv.Draw();
-		if (cursorItemID != -1) { ItemVoxel::Draw(cursorNorm.X, cursorNorm.Y, cursorItemID); }
+		if (cursorItemID != -1) { ItemVoxel::Draw(cursorPos.X, cursorPos.Y, cursorItemID); }
 
 
 

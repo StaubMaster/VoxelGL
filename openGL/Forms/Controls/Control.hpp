@@ -42,8 +42,8 @@ class Control
 		float	Anchor_B;
 
 		Box2D	Box;
-	protected:
 		Size2D	Size;
+	protected:
 		FormControlRenderData * render;
 
 	public:
@@ -58,10 +58,11 @@ class Control
 		Control(const Control & other);
 		const Control & operator =(const Control & other);
 
-		void			ChangeBox(Size2D formSize, Box2D box);
+		void			ChangeAnchor(Size2D formSize, Point2D formPos);
+		void			ChangeBox(Box2D box);
 
 		virtual void	UpdateHover(Point2D Mouse);
-		void			UpdateAnchor(Size2D formSize);
+		void			UpdateAnchor(Size2D formSize, Point2D formPos);
 
 		virtual void			UpdateRender();
 		FormControlRenderData	getRenderData() const;

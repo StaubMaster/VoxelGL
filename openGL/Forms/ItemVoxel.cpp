@@ -7,6 +7,8 @@ static Shader *	shader = NULL;
 static int Uni_Spin;
 static int Uni_Pos;
 static int Uni_TexIdx;
+static int Uni_Aspect;
+static int Uni_Size;
 
 static unsigned int	Buffer_Array = 9;
 static unsigned int	Buffer_Main = 9;
@@ -22,6 +24,8 @@ void ItemVoxel::Create()
 	Uni_Pos = shader -> FindUniform("UPos");
 	Uni_Spin = shader -> FindUniform("USpin");
 	Uni_TexIdx = shader -> FindUniform("UTex_Idx");
+	Uni_Aspect = shader -> FindUniform("UAspect");
+	Uni_Size = shader -> FindUniform("UWin_Size");
 
 	glGenVertexArrays(1, &Buffer_Array);
 	glBindVertexArray(Buffer_Array);
@@ -96,6 +100,18 @@ void ItemVoxel::Delete()
 	glDeleteVertexArrays(1, &Buffer_Array);
 }
 
+
+
+int	ItemVoxel::UniformAspect()
+{
+	shader -> Use();
+	return Uni_Aspect;
+}
+int	ItemVoxel::UniformSize()
+{
+	shader -> Use();
+	return Uni_Size;
+}
 
 
 void ItemVoxel::Update(float time)

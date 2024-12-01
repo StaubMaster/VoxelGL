@@ -2,8 +2,8 @@
 #include "Form.hpp"
 
 static Shader * shader;
-static int Uni_Form_Aspect;
-static int Uni_Form_Size;
+static int Uni_Aspect;
+static int Uni_Size;
 
 void	Form::CreateDraw()
 {
@@ -13,8 +13,8 @@ void	Form::CreateDraw()
 		"shaders/GUI.frag"
 	);
 
-	Uni_Form_Aspect = shader -> FindUniform("aspectRatio");
-	Uni_Form_Size = shader -> FindUniform("windowSize");
+	Uni_Aspect = shader -> FindUniform("aspectRatio");
+	Uni_Size = shader -> FindUniform("windowSize");
 }
 void	Form::DeleteDraw()
 {
@@ -23,12 +23,12 @@ void	Form::DeleteDraw()
 int	Form::UniformAspect()
 {
 	shader -> Use();
-	return Uni_Form_Aspect;
+	return Uni_Aspect;
 }
 int	Form::UniformSize()
 {
 	shader -> Use();
-	return Uni_Form_Size;
+	return Uni_Size;
 }
 
 
@@ -80,18 +80,21 @@ Form::~Form()
 
 void	Form::UpdateHover(Point2D mouse)
 {
-	for (size_t i = 0; i < controls.size(); i++)
+	for (size_t i = 1; i < controls.size(); i++)
 	{
 		controls[i] -> UpdateHover(mouse);
 	}
+
 	UpdateBuffer();
 }
 void	Form::UpdateAnchor(Size2D winSize)
 {
-	Main.UpdateAnchor(winSize);
+	Main.UpdateAnchor(winSize, Point2D());
 
-	//std::cout << "Min: " << Main.Box.Min.X << " : " << Main.Box.Min.Y << "\n";
-	//std::cout << "Max: " << Main.Box.Max.X << " : " << Main.Box.Max.Y << "\n";
+	for (size_t i = 1; i < controls.size(); i++)
+	{
+		controls[i] -> UpdateAnchor(Main.Size, Main.Box.Min);
+	}
 
 	UpdateBuffer();
 }

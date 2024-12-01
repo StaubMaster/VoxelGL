@@ -14,7 +14,7 @@ class	HotbarForm : public Form
 		int			selected;
 
 	public:
-		HotbarForm(int x);
+		HotbarForm(Size2D winSize, int slots_x);
 		~HotbarForm();
 
 		void	Inc();

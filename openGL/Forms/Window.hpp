@@ -14,9 +14,10 @@ class Window
 		GLFWwindow *	win;
 		bool			tabbed;
 		bool			tabbed_pressed;
+		bool			sizeChanged;
 
-		Point2D	Size;
-		Point2D	Aspect;
+		Size2D	Size;
+		Size2D	Aspect;
 		Point2D	Middle;
 
 		std::vector<KeyCheck *>	keys;

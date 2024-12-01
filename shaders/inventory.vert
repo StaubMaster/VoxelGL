@@ -3,7 +3,8 @@
 uniform vec2 UPos;
 uniform vec3[2] USpin;
 uniform uint UTex_Idx;
-
+uniform vec2 UAspect;
+uniform vec2 UWin_Size;
 
 layout(location = 0) in vec3 VPos;
 layout(location = 1) in vec2 VTex_pos;
@@ -46,8 +47,13 @@ void main()
 {
 	vs_out.Tex_pos = vec3(VTex_pos, UTex_Idx);
 	vs_out.Absolut = DSA(VPos, USpin[0], USpin[1]);
+	vs_out.Absolut.xy *= UAspect;
 
-	vs_out.Absolut.xy += UPos;
+	vec2	pos;
+	pos.x = 2 * (UPos.x / UWin_Size.x) - 1;
+	pos.y = 1 - (UPos.y / UWin_Size.y) * 2;
+
+	vs_out.Absolut.xy += pos;
 	vs_out.Absolut.z *= 0.01;
 	gl_Position = vec4(vs_out.Absolut, 1);
 }

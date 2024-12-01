@@ -1,31 +1,34 @@
 
 #include "Hotbar.hpp"
 
-HotbarForm::HotbarForm(int x)
+HotbarForm::HotbarForm(Size2D winSize, int slots_x)
 {
-	int	x_half = x / 2;
+	int	x_half = slots_x / 2;
 
-	float	scale = 0.12f;
-	float	offset = 0.01f;
+	float	scale = 50;
+	float	offset = 5;
 
-	Main.ChangeBox(Size2D(), Box2D(
-		-x_half * scale - offset,
-		-8 * scale - offset,
-		+x_half * scale + offset,
-		-7 * scale + offset
+	Main.ChangeBox(Box2D(
+		winSize.W / 2 - x_half * scale + offset / 2,
+		winSize.H - offset - scale + offset / 2,
+		winSize.W / 2 + x_half * scale + offset / 2,
+		winSize.H - offset + offset / 2
 	));
+	Main.AnchorBits = ANCHOR_BIT_B;
+	Main.ChangeAnchor(winSize, Point2D());
 
-	slots = new FormSlot[x];
+	slots = new FormSlot[slots_x];
 	slots_count = 0;
-	int yi = -8;
-	for (int xi = -x_half; xi < +x_half; xi++)
+	for (int xi = 0; xi < slots_x; xi++)
 	{
 		slots[slots_count] = FormSlot(
-			(xi * scale) + offset,
-			(yi * scale) + offset,
-			(xi * scale) + (scale - offset),
-			(yi * scale) + (scale - offset)
+			Main.Box.Min.X + xi * scale + (offset),
+			Main.Box.Min.Y + (offset),
+			Main.Box.Min.X + xi * scale + (scale - offset),
+			Main.Box.Min.Y + (scale - offset)
 		);
+		slots[slots_count].AnchorBits = 0;
+		slots[slots_count].ChangeAnchor(Main.Size, Main.Box.Min);
 		Insert(slots[slots_count]);
 		slots_count++;
 	}
@@ -76,7 +79,7 @@ void	HotbarForm::Syncronize(InventoryForm & inv)
 {
 	for (int i = 0; i < slots_count; i++)
 	{
-		slots[i].setItem(inv.getSlot(i));
+		slots[i].setItem(inv.getHot(i));
 		slots[i].UpdateRender();
 	}
 	UpdateBuffer();

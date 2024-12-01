@@ -44,6 +44,11 @@ struct	Box2D
 
 
 
+std::ostream & operator <<(std::ostream & o, const Point2D & p);
+std::ostream & operator <<(std::ostream & o, const Size2D & s);
+std::ostream & operator <<(std::ostream & o, const Color & c);
+std::ostream & operator <<(std::ostream & o, const Box2D & b);
+
 
 
 struct FormControlRenderData

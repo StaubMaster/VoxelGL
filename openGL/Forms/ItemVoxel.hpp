@@ -11,6 +11,9 @@ class ItemVoxel
 		static void	Create();
 		static void	Delete();
 
+		static int	UniformAspect();
+		static int	UniformSize();
+
 		static void	Update(float time);
 
 		static void	Draw(float x, float y, int idx);

@@ -49,17 +49,19 @@ Window::Window(int w, int h, const char * name, bool resize)
 	tabbed = false;
 	tabbed_pressed = false;
 
-	Size.X = w;
-	Size.Y = h;
+	Size.W = w;
+	Size.H = h;
 
 	float	aspect_size;
 	aspect_size = std::min(w, h);
 
-	Aspect.X = aspect_size / w;
-	Aspect.Y = aspect_size / h;
+	Aspect.W = aspect_size / w;
+	Aspect.H = aspect_size / h;
 
 	Middle.X = w * 0.5;
 	Middle.Y = h * 0.5;
+
+	sizeChanged = true;
 }
 Window::~Window()
 {
@@ -80,6 +82,8 @@ void Window::operator =(const Window & other)
 
 void Window::Update()
 {
+	sizeChanged = false;
+
 	if (glfwGetKey(win, GLFW_KEY_ESCAPE))
 	{
 		glfwSetWindowShouldClose(win, 1);
@@ -106,20 +110,22 @@ void Window::Update()
 	int new_w, new_h;
 	glfwGetFramebufferSize(win, &new_w, &new_h);
 
-	if (new_w != Size.X || new_h != Size.Y)
+	if (new_w != Size.W || new_h != Size.H)
 	{
 		glViewport(0, 0, new_w, new_h);
-		Size.X = new_w;
-		Size.Y = new_h;
+		Size.W = new_w;
+		Size.H = new_h;
 
 		float	aspect_size;
 		aspect_size = std::min(new_w, new_h);
 
-		Aspect.X = aspect_size / new_w;
-		Aspect.Y = aspect_size / new_h;
+		Aspect.W = aspect_size / new_w;
+		Aspect.H = aspect_size / new_h;
 
-		Middle.X = (int)(Size.X * 0.5);
-		Middle.Y = (int)(Size.Y * 0.5);
+		Middle.X = (int)(Size.W * 0.5);
+		Middle.Y = (int)(Size.H * 0.5);
+
+		sizeChanged = true;
 	}
 }
 Point Window::GetKeyMovement(float speed) const
@@ -172,8 +178,8 @@ Point2D	Window::CursorNormalized() const
 	glfwGetCursorPos(win, &mouse_x_dbl, &mouse_y_dbl);
 
 	return Point2D(
-		2 * (mouse_x_dbl / Size.X) - 1,
-		1 - (mouse_y_dbl / Size.Y) * 2
+		2 * (mouse_x_dbl / Size.W) - 1,
+		1 - (mouse_y_dbl / Size.H) * 2
 	);
 }
 Point2D	Window::CursorRasterized() const
@@ -192,11 +198,11 @@ Point2D	Window::CursorRasterized() const
 
 void	Window::UniformAspect(int uni) const
 {
-	glUniform2f(uni, Aspect.X, Aspect.Y);
+	glUniform2f(uni, Aspect.W, Aspect.H);
 }
 void	Window::UniformSize(int uni) const
 {
-	glUniform2f(uni, Size.X, Size.Y);
+	glUniform2f(uni, Size.W, Size.H);
 }
 
 

@@ -4,10 +4,16 @@
 Point2D::Point2D() : X(0), Y(0) { }
 Point2D::Point2D(float x, float y) : X(x), Y(y) { }
 
+
+
 Size2D::Size2D() : W(0), H(0) { }
 Size2D::Size2D(float w, float h) : W(w), H(h) { }
 
+
+
 Color::Color(float r, float g, float b) : R(r), G(g), B(b) { }
+
+
 
 Box2D::Box2D() : Min(), Max() { }
 Box2D::Box2D(float x1, float y1, float x2, float y2)
@@ -36,4 +42,27 @@ bool	Box2D::check(Point2D p)
 	return (Min.X < p.X && p.X < Max.X && 
 			Min.Y < p.Y && p.Y < Max.Y
 	);
+}
+
+
+
+std::ostream & operator <<(std::ostream & o, const Point2D & p)
+{
+	o << "(" << p.X << " , " << p.Y << ")";
+	return o;
+}
+std::ostream & operator <<(std::ostream & o, const Size2D & s)
+{
+	o << "[" << s.W << " , " << s.H << "]";
+	return o;
+}
+std::ostream & operator <<(std::ostream & o, const Color & c)
+{
+	o << c.R << ":" << c.G << ":" << c.B;
+	return o;
+}
+std::ostream & operator <<(std::ostream & o, const Box2D & b)
+{
+	o << b.Min << " | " << b.Max;
+	return o;
 }

@@ -28,8 +28,13 @@ out Geom_GUI
 
 void main()
 {
-	vec2	min_screen = 2 * (gs_in[0].Min / windowSize) - 1;
-	vec2	max_screen = 2 * (gs_in[0].Max / windowSize) - 1;
+	vec2	min_screen;
+	min_screen.x = 2 * (gs_in[0].Min.x / windowSize.x) - 1;
+	min_screen.y = 1 - (gs_in[0].Min.y / windowSize.y) * 2;
+
+	vec2	max_screen;
+	max_screen.x = 2 * (gs_in[0].Max.x / windowSize.x) - 1;
+	max_screen.y = 1 - (gs_in[0].Max.y / windowSize.y) * 2;
 
 	gs_out.Min = gs_in[0].Min;
 	gs_out.Max = gs_in[0].Max;
@@ -38,11 +43,11 @@ void main()
 	gs_out.Pos = vec2(gs_in[0].Min.x, gs_in[0].Min.y);
 	gl_Position = vec4(min_screen.x, min_screen.y, gs_in[0].Depth, 1); EmitVertex();
 
-	gs_out.Pos = vec2(gs_in[0].Min.x, gs_in[0].Max.y);
-	gl_Position = vec4(min_screen.x, max_screen.y, gs_in[0].Depth, 1); EmitVertex();
-
 	gs_out.Pos = vec2(gs_in[0].Max.x, gs_in[0].Min.y);
 	gl_Position = vec4(max_screen.x, min_screen.y, gs_in[0].Depth, 1); EmitVertex();
+
+	gs_out.Pos = vec2(gs_in[0].Min.x, gs_in[0].Max.y);
+	gl_Position = vec4(min_screen.x, max_screen.y, gs_in[0].Depth, 1); EmitVertex();
 
 	gs_out.Pos = vec2(gs_in[0].Max.x, gs_in[0].Max.y);
 	gl_Position = vec4(max_screen.x, max_screen.y, gs_in[0].Depth, 1); EmitVertex();

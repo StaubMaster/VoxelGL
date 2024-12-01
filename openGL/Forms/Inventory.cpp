@@ -3,50 +3,63 @@
 
 InventoryForm::InventoryForm(Size2D winSize, int slots_x, int slots_y) : Form()
 {
-	//int	x_half = x / 2;
-	//int	y_half = y / 2;
+	int	x_half = slots_x / 2;
+	int	y_half = slots_y / 2;
 
-	//float	scale = 0.12f;
-	//float	offset = 0.01f;
+	float	scale = 50;
+	float	offset = 5;
 
-	(void)slots_x;
-	(void)slots_y;
-
-	/*Main.ChangeBox(Box2D(
-		-x_half * scale - offset,
-		-y_half * scale - offset,
-		+x_half * scale + offset,
-		+y_half * scale + offset
-	));*/
-	Main.ChangeBox(winSize, Box2D(
-		200, 200, 800, 800
+	Main.ChangeBox(Box2D(
+		winSize.W / 2 - x_half * scale + offset / 2,
+		winSize.H / 2 - y_half * scale + offset / 2,
+		winSize.W / 2 + x_half * scale + offset / 2,
+		winSize.H / 2 + y_half * scale + offset / 2 +
+		scale + 10
 	));
 	Main.AnchorBits = 0;
-	//Main.AnchorBits = ANCHOR_BIT_L | ANCHOR_BIT_T;
-	//Main.AnchorBits = ANCHOR_BIT_L | ANCHOR_BIT_T | ANCHOR_BIT_R | ANCHOR_BIT_B;
+	Main.ChangeAnchor(winSize, Point2D());
 
 	slots_count = 0;
-	/*slots = new FormSlot[x * y];
-	for (int yi = -y_half; yi < +y_half; yi++)
+	slots = new FormSlot[slots_x * slots_y];
+	for (int yi = 0; yi < slots_y; yi++)
 	{
-		for (int xi = -x_half; xi < +x_half; xi++)
+		for (int xi = 0; xi < slots_x; xi++)
 		{
 			slots[slots_count] = FormSlot(
-				(xi * scale) + offset,
-				(yi * scale) + offset,
-				(xi * scale) + (scale - offset),
-				(yi * scale) + (scale - offset)
+				Main.Box.Min.X + xi * scale + (offset),
+				Main.Box.Min.Y + yi * scale + (offset),
+				Main.Box.Min.X + xi * scale + (scale - offset),
+				Main.Box.Min.Y + yi * scale + (scale - offset)
 			);
+			slots[slots_count].AnchorBits = 0;
+			slots[slots_count].ChangeAnchor(Main.Size, Main.Box.Min);
 			Insert(slots[slots_count]);
 			slots_count++;
 		}
-	}*/
+	}
+
+	hots_count = 0;
+	hots = new FormSlot[slots_x];
+	for (int xi = 0; xi < slots_x; xi++)
+	{
+		hots[hots_count] = FormSlot(
+			Main.Box.Min.X + xi * scale + (offset),
+			Main.Box.Min.Y + slots_y * scale + (offset) + 10,
+			Main.Box.Min.X + xi * scale + (scale - offset),
+			Main.Box.Min.Y + slots_y * scale + (scale - offset) + 10
+		);
+		hots[hots_count].AnchorBits = 0;
+		hots[hots_count].ChangeAnchor(Main.Size, Main.Box.Min);
+		Insert(hots[hots_count]);
+		hots_count++;
+	}
 
 	UpdateBuffer();
 }
 InventoryForm::~InventoryForm()
 {
-	//delete [] slots;
+	delete [] hots;
+	delete [] slots;
 }
 
 void	InventoryForm::Click(int & ID)
@@ -59,6 +72,15 @@ void	InventoryForm::Click(int & ID)
 			break;
 		}
 	}
+ 
+	for (int i = 0; i < hots_count; i++)
+	{
+		if (hots[i].isHover)
+		{
+			hots[i].SwapItem(ID);
+			break;
+		}
+	}
 }
 
 int		InventoryForm::getSlot(int idx) const
@@ -68,4 +90,13 @@ int		InventoryForm::getSlot(int idx) const
 void	InventoryForm::setSlot(int idx, int ID)
 {
 	slots[idx].setItem(ID);
+}
+
+int		InventoryForm::getHot(int idx) const
+{
+	return hots[idx].getItem();
+}
+void	InventoryForm::setHot(int idx, int ID)
+{
+	hots[idx].setItem(ID);
 }

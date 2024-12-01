@@ -65,10 +65,11 @@ void	VoxelSpace::AddChunk(Index3D idx)
 	VoxelChunk * ch = new VoxelChunk(idx);
 	Chunks.push_back(ch);
 
-	//ch -> GenerateVoxelRotationTest(table);
-	//ch -> GenerateFuzzyCenterCube(table, 16);
-	//ch -> GenerateChunkLimit(table, 2);
 	ch -> GeneratePlane(Table);
+	//ch -> GenerateVoxelRotationTest(Table);
+	//ch -> GenerateFuzzyCenterCube(Table, 16);
+	//ch -> GenerateChunkLimit(Table, 1);
+
 	UpdateBufferNeighbours(idx);
 }
 void	VoxelSpace::SubChunk(Index3D idx)

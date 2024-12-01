@@ -15,6 +15,7 @@
 #include "openGL/Forms/Window.hpp"
 #include "openGL/Forms/Inventory.hpp"
 #include "openGL/Forms/HotBar.hpp"
+#include "openGL/Forms/Debug.hpp"
 
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
@@ -120,6 +121,8 @@ int main(int argc, char **argv)
 
 	Point move;
 	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
+	entity.pos = Point(0, 10, 0);
+	entity.vel = Point();
 
 
 
@@ -133,7 +136,8 @@ int main(int argc, char **argv)
 
 	InventoryForm Inv(win -> Size, 12, 8);
 	HotbarForm Hot(win -> Size, 12);
-	Hot.Visible = true;
+	DebugForm DBG(win -> Size);
+
 
 	for (unsigned int i = 0; i < table.Length(); i++)
 		Inv.setSlot(i, i);
@@ -224,15 +228,17 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		space.AddChunksRange(chunk_current, 1);
-		space.SubChunksRange(chunk_current, 2);
+		space.AddChunksRange(chunk_current, 3);
+		space.SubChunksRange(chunk_current, 6);
+
+
 
 		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
 			space.tryAdd(hover, Hot.SelectedItem());
-		if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-			space.trySub(hover, Hot.SelectedItem());
+		if (voxel_sub_key.check() && hover.isValid)
+			space.trySub(hover, 0);
 
 
 
@@ -256,20 +262,29 @@ int main(int argc, char **argv)
 		win -> UniformAspect(Uni_Box_Aspect);
 		space.DrawHover(hover);
 
-		entity.DrawBox();
+		//entity.DrawBox();
 
 
 
 		Point2D cursorPos = win -> CursorRasterized();
 
-		if (form_click.check()) { Inv.Click(cursorItemID); }
+		if (form_click.check())
+		{
+			if (!DBG.Click())
+			{
+				Inv.Click(cursorItemID);
+			}
+		}
 		Inv.Visible = !(win -> tabbed);
+		DBG.Visible = !(win -> tabbed);
 
 		Inv.UpdateAnchor(win -> Size);
 		Hot.UpdateAnchor(win -> Size);
+		DBG.UpdateAnchor(win -> Size);
 
 		Hot.Syncronize(Inv);
 		Inv.UpdateHover(cursorPos);
+		DBG.UpdateHover(cursorPos);
 
 		ItemVoxel::Update(FrameTimeDelta);
 		win -> UniformAspect(ItemVoxel::UniformAspect());
@@ -282,6 +297,7 @@ int main(int argc, char **argv)
 		Hot.Draw();
 		Inv.Draw();
 		if (cursorItemID != -1) { ItemVoxel::Draw(cursorPos.X, cursorPos.Y, cursorItemID); }
+		DBG.Draw();
 
 
 

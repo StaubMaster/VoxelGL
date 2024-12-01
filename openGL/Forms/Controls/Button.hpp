@@ -6,7 +6,7 @@
 class FormButton : public Control
 {
 	public:
-		FormButton(float min_x, float min_y, float max_x, float max_y);
+		FormButton(Box2D box);
 		~FormButton();
 
 		void	UpdateHover(Point2D Mouse);

@@ -33,7 +33,7 @@ View::depth_s View::calc_depth(float near, float far)
 View::View()
 {
 //	depth = calc_depth(0.125f, 64.0f);
-	depth = calc_depth(0.125f, 32.0f);
+	depth = calc_depth(0.125f, 128.0f);
 }
 View::~View()
 {

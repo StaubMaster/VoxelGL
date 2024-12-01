@@ -62,25 +62,27 @@ InventoryForm::~InventoryForm()
 	delete [] slots;
 }
 
-void	InventoryForm::Click(int & ID)
+bool	InventoryForm::Click(int & ID)
 {
 	for (int i = 0; i < slots_count; i++)
 	{
 		if (slots[i].isHover)
 		{
 			slots[i].SwapItem(ID);
-			break;
+			return (true);
 		}
 	}
- 
+
 	for (int i = 0; i < hots_count; i++)
 	{
 		if (hots[i].isHover)
 		{
 			hots[i].SwapItem(ID);
-			break;
+			return (true);
 		}
 	}
+
+	return (false);
 }
 
 int		InventoryForm::getSlot(int idx) const

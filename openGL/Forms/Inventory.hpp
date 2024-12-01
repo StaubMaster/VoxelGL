@@ -17,7 +17,7 @@ class	InventoryForm : public Form
 		InventoryForm(Size2D winSize, int slots_x, int slots_y);
 		~InventoryForm();
 
-		void	Click(int & ID);
+		bool	Click(int & ID);
 
 		int		getSlot(int idx) const;
 		void	setSlot(int idx, int ID);

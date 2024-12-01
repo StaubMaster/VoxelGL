@@ -235,6 +235,25 @@ void	VoxelChunk::GenerateVoxelRotationTest(VoxelDataTable & table)
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
 	(void)table;
 }
+void	VoxelChunk::GenerateTree(VoxelDataTable & table, Index3D tree_base)
+{
+	unsigned int i;
+
+	Index3D min;
+	Index3D max;
+
+	min = tree_base;
+	max = tree_base;
+	max.y += 10;
+
+	do
+	{
+		i = tree_base.ToIndex(Voxel_per_Side);
+		//if (Data[i].getID() == table.Get(2))
+		Data[i] = table.Get(2).ToVoxel(2, AXIS_BITS_YN | (std::rand() % 4) << 3);
+	}
+	while (Index3D::loop_inclusive(tree_base, min, max));
+}
 void	VoxelChunk::GeneratePlane(VoxelDataTable & table)
 {
 	Index3D chunk_idx;
@@ -262,6 +281,12 @@ void	VoxelChunk::GeneratePlane(VoxelDataTable & table)
 		Data[i] = Voxel();
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
+
+	if (chunk_idx.y == 0)
+	{
+		Index3D tree_base(std::rand() % Voxel_per_Side, 1, std::rand() % Voxel_per_Side);
+		GenerateTree(table, tree_base);
+	}
 }
 
 

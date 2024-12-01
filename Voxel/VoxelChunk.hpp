@@ -21,6 +21,8 @@
 # define Vertex_per_Side (Voxel_per_Side+1)
 # define Vertex_per_Chunk (Vertex_per_Side*Vertex_per_Side*Vertex_per_Side)
 
+
+
 class VoxelChunk
 {
 	public:
@@ -29,13 +31,13 @@ class VoxelChunk
 		static void	Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch);
 
 	private:
-		Voxel *			Data;
-		const Index3D	Index;
-
 		unsigned int	Buffer_Array;
 		unsigned int	Buffer_Corner;
 		unsigned int	Buffer_Index;
 		unsigned int	Vertex_Count;
+
+		Voxel *			Data;
+		const Index3D	Index;
 
 	public:
 		VoxelChunk(Index3D idx);
@@ -51,11 +53,6 @@ class VoxelChunk
 		bool	isChunkIndex(Index3D idx) const;
 		Index3D	getChunkIndex3D() const;
 		Point	getChunkOffset() const;
-
-		void	GenerateChunkLimit(VoxelDataTable & table, char axis_limit);
-		void	GenerateFuzzyCenterCube(VoxelDataTable & table, int size2);
-		void	GenerateVoxelRotationTest(VoxelDataTable & table);
-		void	GeneratePlane(VoxelDataTable & table);
 
 		int		CheckVoxel(Index3D idx);
 		void	tryAdd(VoxelDataTable & table, VoxelHover hover, char id);
@@ -73,6 +70,15 @@ class VoxelChunk
 
 		unsigned int	GeneralInfoMemData();
 		unsigned int	GeneralInfoMemBuff();
+
+	public:
+		void	GenerateChunkLimit(VoxelDataTable & table, char axis_limit);
+		void	GenerateFuzzyCenterCube(VoxelDataTable & table, int size2);
+		void	GenerateVoxelRotationTest(VoxelDataTable & table);
+
+		void	GeneratePlane(VoxelDataTable & table);
+
+		void	GenerateTree(VoxelDataTable & table, Index3D tree_base);
 };
 
 #endif

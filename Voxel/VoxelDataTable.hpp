@@ -1,6 +1,6 @@
 
-#ifndef VOXELDATATABLE_HPP
-# define VOXELDATATABLE_HPP
+#pragma once
+
 # include <iostream>
 # include <fstream>
 # include <sstream>
@@ -51,5 +51,3 @@ class VoxelDataTable
 
 		class Exception_IndexOutOfRange : public std::exception { public: const char * what() const throw(); };
 };
-
-#endif

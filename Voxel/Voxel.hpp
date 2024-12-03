@@ -1,6 +1,6 @@
 
-#ifndef VOXEL_HPP
-# define VOXEL_HPP
+#pragma once
+
 # include <iostream>
 
 # include "../AxisBox.hpp"
@@ -40,5 +40,3 @@ class Voxel
 		char	getAxis() const;
 		char	getSpin() const;
 };
-
-#endif

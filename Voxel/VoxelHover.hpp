@@ -1,6 +1,6 @@
 
-#ifndef VOXELHOVER_HPP
-# define VOXELHOVER_HPP
+#pragma once
+
 # include "../openGL/Abstract/math3D.hpp"
 
 struct VoxelHover
@@ -14,5 +14,3 @@ struct VoxelHover
 
 	RayCast3D_Hit	hit;
 };
-
-#endif

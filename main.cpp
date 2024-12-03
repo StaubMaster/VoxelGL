@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 		std::cout << "\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
-		{
+		/*{
 			std::stringstream ss;
 			ss << "\e[17A\n";
 			ss << "General Info\n";
@@ -228,7 +228,7 @@ int main(int argc, char **argv)
 				ss << "      +-Chunks Render Avg: NaN\n";
 			}
 			std::cout << ss.str();
-		}
+		}*/
 
 		win -> Update();
 
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 
 		space.AddChunksRange(chunk_current, 3);
 		space.SubChunksRange(chunk_current, 6);
-
+		space.UpdateChunks();
 
 
 		VoxelHover hover;

@@ -1,6 +1,6 @@
 
-#ifndef VOXELCHUNK_HPP
-# define VOXELCHUNK_HPP
+#pragma once
+
 # include <iostream>
 
 # include "../openGL/openGL.h"
@@ -21,8 +21,6 @@
 # define Vertex_per_Side (Voxel_per_Side+1)
 # define Vertex_per_Chunk (Vertex_per_Side*Vertex_per_Side*Vertex_per_Side)
 
-
-
 class VoxelChunk
 {
 	public:
@@ -36,6 +34,17 @@ class VoxelChunk
 		unsigned int	Buffer_Index;
 		unsigned int	Vertex_Count;
 
+	public:
+		bool			NeedsBufferUpdate;
+		bool			NeedsBufferBind;
+
+		bool			NeedsGeneration1;
+		bool			NeedsGeneration2;
+
+	private:
+		VoxelRenderData::DataStream *	BufferStream;
+
+
 		Voxel *			Data;
 		const Index3D	Index;
 
@@ -48,13 +57,12 @@ class VoxelChunk
 
 	public:
 		const Voxel & get(Undex3D idx) const;
-
-	public:
 		bool	isChunkIndex(Index3D idx) const;
 		Index3D	getChunkIndex3D() const;
 		Point	getChunkOffset() const;
 
 		int		CheckVoxel(Index3D idx);
+
 		void	tryAdd(VoxelDataTable & table, VoxelHover hover, char id);
 		char	trySub(VoxelHover hover);
 
@@ -62,10 +70,12 @@ class VoxelChunk
 		char	TouchVoxel(AxisBox & box, float size);
 
 	public:
-		void	UpdateBuffer(
+		void	RequestBufferUpdate();
+		void	BufferUpdate(
 					const VoxelChunk * Xn, const VoxelChunk * Xp,
 					const VoxelChunk * Yn, const VoxelChunk * Yp,
 					const VoxelChunk * Zn, const VoxelChunk * Zp);
+		void	BufferBind();
 		void	Draw(int Uni_Chunk_Pos) const;
 
 		unsigned int	GeneralInfoMemData();
@@ -79,6 +89,7 @@ class VoxelChunk
 		void	GeneratePlane(VoxelDataTable & table);
 
 		void	GenerateTree(VoxelDataTable & table, Index3D tree_base);
-};
 
-#endif
+		static void set(VoxelChunk * * chunks, Undex3D idx, Voxel vox);
+		static void	GenerateFeature(VoxelDataTable & table, VoxelChunk * * chunks);
+};

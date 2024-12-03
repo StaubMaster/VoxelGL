@@ -1,12 +1,11 @@
 
-#ifndef VOXELRENDERDATA_HPP
-# define VOXELRENDERDATA_HPP
+# pragma once
 
 # include "../openGL/openGL.h"
 # include "../openGL/Abstract/Undex3D.hpp"
 
 # include "Voxel.hpp"
-# include "VoxelChunk.hpp"
+//# include "VoxelChunk.hpp"
 
 # define TEXTURE_XM 0b00100
 # define TEXTURE_XP 0b11000
@@ -109,7 +108,3 @@ struct VoxelRenderData
 			void FaceZ(Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
 		};
 };
-
-
-
-#endif

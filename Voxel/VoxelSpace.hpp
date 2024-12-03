@@ -1,6 +1,6 @@
 
-#ifndef VOXELSPACE_HPP
-# define VOXELSPACE_HPP
+#pragma once
+
 # include <iostream>
 # include <vector>
 
@@ -32,6 +32,7 @@ class VoxelSpace
 
 		void	UpdateBuffer(Index3D idx);
 		void	UpdateBufferNeighbours(Index3D idx);
+		void	UpdateChunks();
 
 		char	tryAdd(VoxelHover hover, char id);
 		char	trySub(VoxelHover hover, char id);
@@ -49,5 +50,3 @@ class VoxelSpace
 
 		VoxelHover		Cross(Point pos, Point dir);
 };
-
-#endif

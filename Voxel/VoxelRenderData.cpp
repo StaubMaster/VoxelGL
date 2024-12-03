@@ -1,5 +1,6 @@
 
 #include "VoxelRenderData.hpp"
+#include "VoxelChunk.hpp"
 
 void	VoxelRenderData::TextureCoordFace::getCorner(float & x, float & y, bool Xbool, bool Ybool, bool swap) const
 {

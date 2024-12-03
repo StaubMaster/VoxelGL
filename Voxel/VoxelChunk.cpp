@@ -2,7 +2,7 @@
 #include "VoxelChunk.hpp"
 
 
-
+#pragma region Loop Neighbour
 void	VoxelChunk::Loop_Index(unsigned int & vox, int & ch)
 {
 	if (vox == 0xFFFFFFFF)
@@ -39,9 +39,11 @@ void	VoxelChunk::Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch)
 
 	Loop_Index(vox, ch);
 }
+#pragma endregion
 
 
 
+#pragma region Canonical
 VoxelChunk::VoxelChunk(Index3D idx) :
 	Index(idx)
 {
@@ -55,6 +57,14 @@ VoxelChunk::VoxelChunk(Index3D idx) :
 	glGenVertexArrays(1, &Buffer_Array);
 	glGenBuffers(1, &Buffer_Corner);
 	glGenBuffers(1, &Buffer_Index);
+	Vertex_Count = 0;
+
+	NeedsBufferUpdate = false;
+	NeedsBufferBind = false;
+	BufferStream = NULL;
+
+	NeedsGeneration1 = true;
+	NeedsGeneration2 = false;
 }
 VoxelChunk::~VoxelChunk()
 {
@@ -90,6 +100,11 @@ const VoxelChunk & VoxelChunk::operator =(const VoxelChunk & other)
 	(void)other;
 	return (*this);
 }
+#pragma endregion
+
+
+
+#pragma region Miscellaneous
 const Voxel	& VoxelChunk::get(Undex3D idx) const
 {
 	return (Data[idx.ToIndex(Voxel_per_Side)]);
@@ -111,7 +126,11 @@ Point	VoxelChunk::getChunkOffset() const
 		Index.z * ((int)Voxel_per_Side)
 	);
 }
+#pragma endregion
 
+
+
+#pragma region Generate
 void	VoxelChunk::GenerateChunkLimit(VoxelDataTable & table, char axis_limit)
 {
 	Index3D chunk_idx;
@@ -254,6 +273,83 @@ void	VoxelChunk::GenerateTree(VoxelDataTable & table, Index3D tree_base)
 	}
 	while (Index3D::loop_inclusive(tree_base, min, max));
 }
+void	VoxelChunk::set(VoxelChunk * * chunks, Undex3D udx, Voxel vox)
+{
+	if (udx.x >= Voxel_per_Side)
+	{
+		udx.x -= Voxel_per_Side;
+		if (udx.z >= Voxel_per_Side)
+		{
+			udx.z -= Voxel_per_Side;
+			chunks[3] -> Data[udx.ToIndex(Voxel_per_Side)] = vox;
+		}
+		else
+		{
+			chunks[1] -> Data[udx.ToIndex(Voxel_per_Side)] = vox;
+		}
+	}
+	else
+	{
+		if (udx.z >= Voxel_per_Side)
+		{
+			udx.z -= Voxel_per_Side;
+			chunks[2] -> Data[udx.ToIndex(Voxel_per_Side)] = vox;
+		}
+		else
+		{
+			chunks[0] -> Data[udx.ToIndex(Voxel_per_Side)] = vox;
+		}
+	}
+}
+void	VoxelChunk::GenerateFeature(VoxelDataTable & table, VoxelChunk * * chunks)
+{
+	if (chunks[0] -> Index.y != 0)
+		return;
+	//Voxel stem = table.Get(2).ToVoxel(2, AXIS_BITS_YN | (std::rand() % 4) << 3);
+	//Voxel leave = table.Get(3).ToVoxel(3, AXIS_BITS_YN | (std::rand() % 4) << 3);
+
+	Undex3D udx;
+
+	Undex3D	tree_base(std::rand() % Voxel_per_Side, 2, std::rand() % Voxel_per_Side);
+	tree_base.x += Voxel_per_Side / 2;
+	tree_base.z += Voxel_per_Side / 2;
+
+	Undex3D	tree_crown = tree_base;
+	tree_crown.y += 3 + (std::rand() % 7);
+
+	Undex3D leaves_min;
+	leaves_min.x = tree_crown.x - 2;
+	leaves_min.y = tree_crown.y - 2;
+	leaves_min.z = tree_crown.z - 2;
+	Undex3D leaves_max;
+	leaves_max.x = tree_crown.x + 2;
+	leaves_max.y = tree_crown.y + 2;
+	leaves_max.z = tree_crown.z + 2;
+
+	udx = leaves_min;
+	do
+	{
+		Point diff;
+		diff.x = ((float)udx.x) - ((float)tree_crown.x);
+		diff.y = ((float)udx.y) - ((float)tree_crown.y);
+		diff.z = ((float)udx.z) - ((float)tree_crown.z);
+
+		float dist = diff.length();
+
+		if (dist <= 2)
+		{
+			set(chunks, udx, table.Get(3).ToVoxel(3, AXIS_BITS_YN | (std::rand() % 4) << 3));
+		}
+	}
+	while (Undex3D::loop_inclusive(udx, leaves_min, leaves_max));
+
+	udx = tree_base;
+	do
+	{
+		set(chunks, udx, table.Get(2).ToVoxel(2, AXIS_BITS_YN | (std::rand() % 4) << 3));
+	}
+	while (Undex3D::loop_inclusive(udx, tree_base, tree_crown));
+}
 void	VoxelChunk::GeneratePlane(VoxelDataTable & table)
 {
 	Index3D chunk_idx;
@@ -282,15 +378,17 @@ void	VoxelChunk::GeneratePlane(VoxelDataTable & table)
 	}
 	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side));
 
-	if (chunk_idx.y == 0)
+	/*if (chunk_idx.y == 0)
 	{
 		Index3D tree_base(std::rand() % Voxel_per_Side, 1, std::rand() % Voxel_per_Side);
 		GenerateTree(table, tree_base);
-	}
+	}*/
 }
+#pragma endregion
 
 
 
+#pragma region Hover
 int		VoxelChunk::CheckVoxel(Index3D idx)
 {
 	if ((idx.x < -1) || (idx.x >= (int)(Voxel_per_Side + 1)) ||
@@ -316,6 +414,11 @@ int		VoxelChunk::CheckVoxel(Index3D idx)
 
 	return (0);
 }
+#pragma endregion
+
+
+
+#pragma region Change
 void	VoxelChunk::tryAdd(VoxelDataTable & table, VoxelHover hover, char id)
 {
 	unsigned int i = hover.voxel_idx.ToIndex(Voxel_per_Side);
@@ -334,9 +437,11 @@ char	VoxelChunk::trySub(VoxelHover hover)
 	Data[i] = Voxel(0);
 	return (t);
 }
+#pragma endregion
 
 
 
+#pragma region Collision
 bool	VoxelChunk::IntersektBool(AxisBox & box)
 {
 	Point offset = getChunkOffset();
@@ -420,33 +525,57 @@ char	VoxelChunk::TouchVoxel(AxisBox & box, float size)
 
 	return (bits);
 }
+#pragma endregion
 
 
 
-void	VoxelChunk::UpdateBuffer(
+#pragma region Rendering
+void	VoxelChunk::RequestBufferUpdate()
+{
+	if (!NeedsGeneration1 && !NeedsGeneration2)
+	{
+		NeedsBufferUpdate = true;
+	}
+}
+void	VoxelChunk::BufferUpdate(
 	const VoxelChunk * Xn, const VoxelChunk * Xp,
 	const VoxelChunk * Yn, const VoxelChunk * Yp,
 	const VoxelChunk * Zn, const VoxelChunk * Zp)
 {
-	//std::cout << "UpdateBuffer() " << Index << " ...\n";
-
-	VoxelRenderData::DataStream	data(Vertex_per_Chunk * 6 * 6);
-
-	Undex3D voxel_idx;
-	do
+	if (NeedsBufferUpdate && BufferStream == NULL)
 	{
-		data.FaceX(voxel_idx, this, Xn, Xp);
-		data.FaceY(voxel_idx, this, Yn, Yp);
-		data.FaceZ(voxel_idx, this, Zn, Zp);
+		//std::cout << "BufferUpdate() " << Index << " ...\n";
+		NeedsBufferUpdate = false;
+		BufferStream = new VoxelRenderData::DataStream(Vertex_per_Chunk * 6 * 6);
+
+		Undex3D voxel_idx;
+		do
+		{
+			BufferStream -> FaceX(voxel_idx, this, Xn, Xp);
+			BufferStream -> FaceY(voxel_idx, this, Yn, Yp);
+			BufferStream -> FaceZ(voxel_idx, this, Zn, Zp);
+		}
+		while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side + 1));
+
+		NeedsBufferBind = true;
+		//std::cout << "BufferUpdate() " << Index << " done\n";
 	}
-	while (Undex3D::loop_exclusive(voxel_idx, 0, Voxel_per_Side + 1));
+}
+void	VoxelChunk::BufferBind()
+{
+	if (NeedsBufferBind && BufferStream != NULL)
+	{
+		//std::cout << "BufferBind() " << Index << " ...\n";
+		NeedsBufferBind = false;
 
-	glBindVertexArray(Buffer_Array);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
+		glBindVertexArray(Buffer_Array);
+		glBindBuffer(GL_ARRAY_BUFFER, Buffer_Corner);
+		BufferStream -> ToBuffer(Vertex_Count);
 
-	data.ToBuffer(Vertex_Count);
-
-	//std::cout << "UpdateBuffer() " << Index << " done\n";
+		delete BufferStream;
+		BufferStream = NULL;
+		//std::cout << "BufferBind() " << Index << " done\n";
+	}
 }
 void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 {
@@ -456,8 +585,11 @@ void	VoxelChunk::Draw(int Uni_Chunk_Pos) const
 	glBindVertexArray(Buffer_Array);
 	glDrawArrays(GL_TRIANGLES, 0, Vertex_Count);
 }
+#pragma endregion
 
 
+
+#pragma region Info
 unsigned int	VoxelChunk::GeneralInfoMemData()
 {
 	return (Voxel_per_Chunk * sizeof(Voxel));
@@ -466,3 +598,4 @@ unsigned int	VoxelChunk::GeneralInfoMemBuff()
 {
 	return (Vertex_Count * sizeof(VoxelRenderData));
 }
+#pragma endregion

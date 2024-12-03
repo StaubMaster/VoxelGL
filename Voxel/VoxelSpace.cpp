@@ -65,12 +65,12 @@ void	VoxelSpace::AddChunk(Index3D idx)
 	VoxelChunk * ch = new VoxelChunk(idx);
 	Chunks.push_back(ch);
 
-	ch -> GeneratePlane(Table);
+	//ch -> GeneratePlane(Table);
 	//ch -> GenerateVoxelRotationTest(Table);
 	//ch -> GenerateFuzzyCenterCube(Table, 16);
 	//ch -> GenerateChunkLimit(Table, 1);
 
-	UpdateBufferNeighbours(idx);
+	//UpdateBufferNeighbours(idx);
 }
 void	VoxelSpace::SubChunk(Index3D idx)
 {
@@ -140,11 +140,7 @@ void	VoxelSpace::UpdateBuffer(Index3D idx)
 
 	if (ch != NULL)
 	{
-		ch -> UpdateBuffer(
-			FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
-			FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
-			FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
-		);
+		ch -> RequestBufferUpdate();
 	}
 }
 void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
@@ -156,6 +152,80 @@ void	VoxelSpace::UpdateBufferNeighbours(Index3D idx)
 	UpdateBuffer(idx.Yp());
 	UpdateBuffer(idx.Zn());
 	UpdateBuffer(idx.Zp());
+}
+void	VoxelSpace::UpdateChunks()
+{
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		if (Chunks[i] -> NeedsGeneration1)
+		{
+			Chunks[i] -> GeneratePlane(Table);
+
+			Chunks[i] -> NeedsGeneration1 = false;
+			Chunks[i] -> NeedsGeneration2 = true;
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		if (Chunks[i] -> NeedsGeneration2)
+		{
+			Index3D idx = Chunks[i] -> getChunkIndex3D();
+			VoxelChunk * chunks[4] = {
+				Chunks[i],
+				FindChunkPtr(idx.Xp()),
+				FindChunkPtr(idx.Zp()),
+				FindChunkPtr(idx.Xp().Zp())
+			};
+
+			bool allAvailable = true;
+			for (int c = 0; c < 4; c++)
+			{
+				if (chunks[c] == NULL)
+				{
+					allAvailable = false;
+					break;
+				}
+				if (chunks[c] -> NeedsGeneration1)
+				{
+					allAvailable = false;
+					break;
+				}
+			}
+
+			if (allAvailable)
+			{
+				VoxelChunk::GenerateFeature(Table, chunks);
+				Chunks[i] -> NeedsGeneration2 = false;
+				Chunks[i] -> NeedsBufferUpdate = true;
+				break;
+			}
+		}
+	}
+
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		if (Chunks[i] -> NeedsBufferUpdate)
+		{
+			Index3D idx = Chunks[i] -> getChunkIndex3D();
+			Chunks[i] -> BufferUpdate(
+				FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
+				FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
+				FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
+			);
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < Chunks.size(); i++)
+	{
+		if (Chunks[i] -> NeedsBufferBind)
+		{
+			Chunks[i] -> BufferBind();
+			break;
+		}
+	}
 }
 
 

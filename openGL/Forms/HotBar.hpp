@@ -8,7 +8,7 @@
 class	HotbarForm : public Form
 {
 	private:
-		FormSlot *	slots;
+		SlotControl *	slots;
 		int			slots_count;
 
 		int			selected;

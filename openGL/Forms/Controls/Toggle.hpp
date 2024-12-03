@@ -3,15 +3,15 @@
 
 #include "Control.hpp"
 
-class FormToggle : public Control
+class ToggleControl : public Control
 {
 	private:
 		bool toggled;
 
 	public:
-		FormToggle();
-		FormToggle(Box2D box);
-		~FormToggle();
+		ToggleControl();
+		ToggleControl(Box2D box);
+		~ToggleControl();
 
 		void	UpdateHover(Point2D Mouse);
 

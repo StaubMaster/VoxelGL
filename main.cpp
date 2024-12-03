@@ -16,6 +16,7 @@
 #include "openGL/Forms/Inventory.hpp"
 #include "openGL/Forms/HotBar.hpp"
 #include "openGL/Forms/Debug.hpp"
+#include "openGL/Forms/Controls/Text.hpp"
 
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
@@ -42,6 +43,8 @@ int Uni_Box_Depth;
 int Uni_Box_Aspect;
 int Uni_Box_Cycle;
 
+Shader * textShader = NULL;
+int Uni_Text_Size;
 
 static void	main_init()
 {
@@ -67,6 +70,13 @@ static void	main_init()
 	Uni_Box_Aspect = boxShader -> FindUniform("aspectRatio");
 	Uni_Box_Cycle = boxShader -> FindUniform("cycle");
 
+	textShader = new Shader("Text",
+		"shaders/Text.vert",
+		"shaders/Text.frag"
+	);
+	Uni_Text_Size = textShader -> FindUniform("windowSize");
+	std::cout << "UUUUUUUUUUUUUUUU: " << Uni_Text_Size << "\n";
+
 	ItemVoxel::Create();
 	Form::CreateDraw();
 }
@@ -77,6 +87,7 @@ static void	main_free()
 
 	delete voxelShader;
 	delete boxShader;
+	delete textShader;
 
 	delete win;
 }
@@ -100,6 +111,30 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/RedPlank.png",         false, false, false, true , true ));
 	table.Set(VoxelData("images/WoodPlank.png",        false, false, false, true , true ));
 	std::cout << "table done\n";
+
+	std::cout << "text ...\n";
+	unsigned int text_texture;
+	{
+		glGenTextures(1, &text_texture);
+		glBindTexture(GL_TEXTURE_2D, text_texture);
+
+		//PNG_Image * text_img = PNG_Image::Load("images/fancy_Text15_16.png");
+		PNG_Image * text_img = PNG_Image::Load("images/fancy_Text15_16_Thick.png");
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, text_img -> w, text_img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, text_img -> data);
+		delete text_img;
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	BufferString text_Buff;
+	text_Buff.Append(10, 10, 25.0f, "TestT\nline2");
+	text_Buff.UpdateBuffer();
+	std::cout << "text done\n";
 
 	std::cout << "textures ...\n";
 	unsigned int texture_arr = table.InitTextures();
@@ -158,13 +193,13 @@ int main(int argc, char **argv)
 	glFrontFace(GL_CCW);
 
 	std::cout << ">>>> loop\n";
-	//for (int i = 0; i < 20; i++)
-	//	std::cout << "\n";
+	for (int i = 0; i < 20; i++)
+		std::cout << "\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
-		/*{
+		{
 			std::stringstream ss;
-			ss << "\e[18A\n";
+			ss << "\e[17A\n";
 			ss << "General Info\n";
 			ss << "+-Memory:\n";
 			ss << "  +-Static:\n";
@@ -193,7 +228,7 @@ int main(int argc, char **argv)
 				ss << "      +-Chunks Render Avg: NaN\n";
 			}
 			std::cout << ss.str();
-		}*/
+		}
 
 		win -> Update();
 
@@ -300,12 +335,25 @@ int main(int argc, char **argv)
 		DBG.Draw();
 
 
+		{
+			textShader -> Use();
+			win -> UniformSize(Uni_Text_Size);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glActiveTexture(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, text_texture);
+
+			DBG.DrawText();
+			text_Buff.Draw();
+		}
+
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();
 	}
 	std::cout << "<<<< loop\n";
 
+	glDeleteTextures(1, &text_texture);
 	glDeleteTextures(1, &texture_arr);
 }
 

@@ -1,24 +1,24 @@
 
 #include "Toggle.hpp"
 
-FormToggle::FormToggle() :
+ToggleControl::ToggleControl() :
 	Control()
 {
 
 }
-FormToggle::FormToggle(Box2D box) :
+ToggleControl::ToggleControl(Box2D box) :
 	Control(box)
 {
 	toggled = false;
 }
-FormToggle::~FormToggle()
+ToggleControl::~ToggleControl()
 {
 
 }
 
 
 
-void	FormToggle::UpdateHover(Point2D Mouse)
+void	ToggleControl::UpdateHover(Point2D Mouse)
 {
 	Control::UpdateHover(Mouse);
 	UpdateRender();
@@ -26,7 +26,7 @@ void	FormToggle::UpdateHover(Point2D Mouse)
 
 
 
-void	FormToggle::UpdateRender()
+void	ToggleControl::UpdateRender()
 {
 	if (render == NULL)
 		return;
@@ -64,10 +64,14 @@ void	FormToggle::UpdateRender()
 
 
 
-bool	FormToggle::Click()
+bool	ToggleControl::Click()
 {
 	if (!isHover) { return false; }
 	toggled = !toggled;
 	UpdateRender();
 	return true;
+}
+bool	ToggleControl::Check()
+{
+	return toggled;
 }

@@ -24,7 +24,7 @@ void main()
 
 	float l;
 	l = dot(normalize(fs_in.Normal), light);
-	l = max(l, 0.25);
+	l = max(l, 0.1);
 	l = 1;
 
 	vec4 back = vec4(0.5, 0.5, 0.5, 1);

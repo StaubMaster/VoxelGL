@@ -17,11 +17,11 @@ HotbarForm::HotbarForm(Size2D winSize, int slots_x)
 	Main.AnchorBits = ANCHOR_BIT_B;
 	Main.ChangeAnchor(winSize, Point2D());
 
-	slots = new FormSlot[slots_x];
+	slots = new SlotControl[slots_x];
 	slots_count = 0;
 	for (int xi = 0; xi < slots_x; xi++)
 	{
-		slots[slots_count] = FormSlot(
+		slots[slots_count] = SlotControl(
 			Main.Box.Min.X + xi * scale + (offset),
 			Main.Box.Min.Y + (offset),
 			Main.Box.Min.X + xi * scale + (scale - offset),

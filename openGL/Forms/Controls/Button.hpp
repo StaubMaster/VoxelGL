@@ -3,11 +3,11 @@
 
 #include "Control.hpp"
 
-class FormButton : public Control
+class ButtonControl : public Control
 {
 	public:
-		FormButton(Box2D box);
-		~FormButton();
+		ButtonControl(Box2D box);
+		~ButtonControl();
 
 		void	UpdateHover(Point2D Mouse);
 

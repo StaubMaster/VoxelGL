@@ -16,6 +16,7 @@ FILES_CPP = stringHelp.cpp \
 	Forms/Controls/Button.cpp \
 	Forms/Controls/Slot.cpp \
 	Forms/Controls/Toggle.cpp \
+	Forms/Controls/Text.cpp \
 	Forms/Controls/Form.cpp \
 \
 	Forms/Inventory.cpp \

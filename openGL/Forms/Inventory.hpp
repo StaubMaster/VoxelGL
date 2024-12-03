@@ -7,10 +7,10 @@
 class	InventoryForm : public Form
 {
 	private:
-		FormSlot *	slots;
+		SlotControl *	slots;
 		int			slots_count;
 
-		FormSlot *	hots;
+		SlotControl *	hots;
 		int			hots_count;
 
 	public:

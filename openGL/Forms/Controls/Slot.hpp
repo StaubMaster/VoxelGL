@@ -5,15 +5,15 @@
 
 #include "../ItemVoxel.hpp"
 
-class FormSlot : public Control
+class SlotControl : public Control
 {
 	private:
 		int	itemID;
 
 	public:
-		FormSlot();
-		FormSlot(float min_x, float min_y, float max_x, float max_y);
-		~FormSlot();
+		SlotControl();
+		SlotControl(float min_x, float min_y, float max_x, float max_y);
+		~SlotControl();
 
 		Point2D	getCenter() const;
 		void	UpdateHover(Point2D Mouse);

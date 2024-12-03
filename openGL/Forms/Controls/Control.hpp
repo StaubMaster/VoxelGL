@@ -58,6 +58,11 @@ class Control
 		Control(const Control & other);
 		const Control & operator =(const Control & other);
 
+		float	L() const;
+		float	T() const;
+		float	R() const;
+		float	B() const;
+
 		void			ChangeAnchor(Size2D formSize, Point2D formPos);
 		void			ChangeBox(Box2D box);
 

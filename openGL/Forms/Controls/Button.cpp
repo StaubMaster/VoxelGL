@@ -1,18 +1,18 @@
 
 #include "Button.hpp"
 
-FormButton::FormButton(Box2D box) :
+ButtonControl::ButtonControl(Box2D box) :
 	Control(box)
 {
 }
-FormButton::~FormButton()
+ButtonControl::~ButtonControl()
 {
 
 }
 
 
 
-void	FormButton::UpdateHover(Point2D Mouse)
+void	ButtonControl::UpdateHover(Point2D Mouse)
 {
 	Control::UpdateHover(Mouse);
 	UpdateRender();
@@ -20,7 +20,7 @@ void	FormButton::UpdateHover(Point2D Mouse)
 
 
 
-void	FormButton::UpdateRender()
+void	ButtonControl::UpdateRender()
 {
 	if (render == NULL)
 		return;

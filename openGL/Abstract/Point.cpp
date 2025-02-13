@@ -27,6 +27,15 @@ const Point & Point::operator =(const Point & other)
 
 
 
+Point Point::operator -() const
+{
+	return Point(
+		-x,
+		-y,
+		-z
+	);
+}
+
 Point Point::operator +(const Point & other) const
 {
 	return Point(
@@ -60,6 +69,22 @@ Point Point::operator /(const Point & other) const
 	);
 }
 
+Point Point::operator +(const float & flt) const
+{
+	return Point(
+		x + flt,
+		y + flt,
+		z + flt
+	);
+}
+Point Point::operator -(const float & flt) const
+{
+	return Point(
+		x - flt,
+		y - flt,
+		z - flt
+	);
+}
 Point Point::operator *(const float & flt) const
 {
 	return Point(

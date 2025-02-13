@@ -3,6 +3,7 @@
 # define AXISBOX_HPP
 # include "openGL/openGL.h"
 # include "openGL/Abstract/math3D.hpp"
+# include "openGL/Abstract/Index3D.hpp"
 # include <iostream>
 # include <math.h>
 
@@ -32,6 +33,9 @@ class AxisBox
 		AxisBox(const AxisBox & other);
 	private:
 		const AxisBox & operator =(const AxisBox & other);
+
+	public:
+		static AxisBox	UnitBox(Index3D idx);
 
 		AxisBox	Move(Point rel) const;
 

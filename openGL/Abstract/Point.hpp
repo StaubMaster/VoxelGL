@@ -18,11 +18,15 @@ class Point
 		Point(const Point & other);
 		const Point & operator =(const Point & other);
 
+		Point operator -() const;
+
 		Point operator +(const Point & other) const;
 		Point operator -(const Point & other) const;
 		Point operator *(const Point & other) const;
 		Point operator /(const Point & other) const;
 
+		Point operator +(const float & flt) const;
+		Point operator -(const float & flt) const;
 		Point operator *(const float & flt) const;
 		Point operator /(const float & flt) const;
 

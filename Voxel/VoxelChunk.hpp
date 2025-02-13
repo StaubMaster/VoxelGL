@@ -11,6 +11,7 @@
 # include "VoxelDataTable.hpp"
 # include "VoxelRenderData.hpp"
 # include "VoxelHover.hpp"
+# include "Structure.hpp"
 
 # include "../AxisBox.hpp"
 # include "../MemorySize.hpp"
@@ -21,6 +22,33 @@
 # define Vertex_per_Side (Voxel_per_Side+1)
 # define Vertex_per_Chunk (Vertex_per_Side*Vertex_per_Side*Vertex_per_Side)
 
+/*
+allocate
+request Base
+	generate Base
+request Features (tree)
+	give Requests to neighbouring chunks to generate
+once Requests from self and all neighbours recieved
+	generate Features
+done
+*/
+
+/*
+Feature Generation Request
+simple
+	: spheare {
+		global box
+	}
+	: spheare {
+		global location
+		radius
+	}
+
+	Structure {
+		Data of the Structure
+	}
+*/
+
 class VoxelChunk
 {
 	public:
@@ -29,22 +57,43 @@ class VoxelChunk
 		static void	Voxel_Neighbour(char cardinal, Undex3D & vox, Index3D & ch);
 
 	private:
-		unsigned int	Buffer_Array;
-		unsigned int	Buffer_Corner;
-		unsigned int	Buffer_Index;
-		unsigned int	Vertex_Count;
+		struct RenderData
+		{
+			unsigned int	Buffer_Array;
+			unsigned int	Buffer_Corner;
+			unsigned int	Buffer_Index;
+			unsigned int	Vertex_Count;
+
+			bool							NeedsUpdate;
+			bool							NeedsBind;
+			VoxelRenderData::DataStream *	BufferStream;
+
+			RenderData();
+			~RenderData();
+			RenderData(const RenderData & other) = delete;
+			const RenderData & operator =(const RenderData & other) = delete;
+
+			void	RequestUpdate();
+			void	Update(const VoxelChunk * here,
+						const VoxelChunk * Xn, const VoxelChunk * Xp,
+						const VoxelChunk * Yn, const VoxelChunk * Yp,
+						const VoxelChunk * Zn, const VoxelChunk * Zp);
+			void	Bind();
+			void	Draw() const;
+		};
 
 	public:
-		bool			NeedsBufferUpdate;
-		bool			NeedsBufferBind;
+		RenderData		Render;
+
+		bool			NeedsBase;
+		bool			NeedsToRequest;
+		bool			allRequestsGotten() const;
+		bool			NeedsToGenRequest;
 
 		bool			NeedsGeneration1;
 		bool			NeedsGeneration2;
 
 	private:
-		VoxelRenderData::DataStream *	BufferStream;
-
-
 		Voxel *			Data;
 		const Index3D	Index;
 
@@ -57,8 +106,10 @@ class VoxelChunk
 
 	public:
 		const Voxel & get(Undex3D idx) const;
+
 		bool	isChunkIndex(Index3D idx) const;
 		Index3D	getChunkIndex3D() const;
+		Index3D	getChunkVoxelIndex3D() const;
 		Point	getChunkOffset() const;
 
 		int		CheckVoxel(Index3D idx);
@@ -71,11 +122,6 @@ class VoxelChunk
 
 	public:
 		void	RequestBufferUpdate();
-		void	BufferUpdate(
-					const VoxelChunk * Xn, const VoxelChunk * Xp,
-					const VoxelChunk * Yn, const VoxelChunk * Yp,
-					const VoxelChunk * Zn, const VoxelChunk * Zp);
-		void	BufferBind();
 		void	Draw(int Uni_Chunk_Pos) const;
 
 		unsigned int	GeneralInfoMemData();

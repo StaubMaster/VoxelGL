@@ -2,6 +2,8 @@
 #ifndef UNDEX3D_HPP
 # define UNDEX3D_HPP
 
+# include <iostream>
+
 class Undex3D
 {
 	public:
@@ -41,5 +43,7 @@ class Undex3D
 		static bool	loop_inclusive(Undex3D & idx, unsigned int min, unsigned int max);
 		static bool	loop_exclusive(Undex3D & idx, unsigned int min, unsigned int max);
 };
+
+std::ostream & operator <<(std::ostream & o, const Undex3D & idx);
 
 #endif

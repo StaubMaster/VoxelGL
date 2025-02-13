@@ -45,6 +45,13 @@ const AxisBox & AxisBox::operator =(const AxisBox & other)
 
 
 
+AxisBox	AxisBox::UnitBox(Index3D idx)
+{
+	return AxisBox(
+		Point(idx.x + 0, idx.y + 0, idx.z + 0),
+		Point(idx.x + 1, idx.y + 1, idx.z + 1)
+	);
+}
 
 AxisBox	AxisBox::Move(Point rel) const
 {

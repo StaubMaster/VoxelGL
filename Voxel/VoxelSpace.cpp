@@ -198,7 +198,7 @@ void	VoxelSpace::UpdateChunks()
 			{
 				VoxelChunk::GenerateFeature(Table, chunks);
 				Chunks[i] -> NeedsGeneration2 = false;
-				Chunks[i] -> NeedsBufferUpdate = true;
+				Chunks[i] -> RequestBufferUpdate();
 				break;
 			}
 		}
@@ -206,10 +206,10 @@ void	VoxelSpace::UpdateChunks()
 
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		if (Chunks[i] -> NeedsBufferUpdate)
+		if (Chunks[i] -> Render.NeedsUpdate)
 		{
 			Index3D idx = Chunks[i] -> getChunkIndex3D();
-			Chunks[i] -> BufferUpdate(
+			Chunks[i] -> Render.Update(FindChunkPtr(idx),
 				FindChunkPtr(idx.Xn()), FindChunkPtr(idx.Xp()),
 				FindChunkPtr(idx.Yn()), FindChunkPtr(idx.Yp()),
 				FindChunkPtr(idx.Zn()), FindChunkPtr(idx.Zp())
@@ -220,9 +220,9 @@ void	VoxelSpace::UpdateChunks()
 
 	for (size_t i = 0; i < Chunks.size(); i++)
 	{
-		if (Chunks[i] -> NeedsBufferBind)
+		if (Chunks[i] -> Render.NeedsBind)
 		{
-			Chunks[i] -> BufferBind();
+			Chunks[i] -> Render.Bind();
 			break;
 		}
 	}

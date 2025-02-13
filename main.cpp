@@ -75,7 +75,6 @@ static void	main_init()
 		"shaders/Text.frag"
 	);
 	Uni_Text_Size = textShader -> FindUniform("windowSize");
-	std::cout << "UUUUUUUUUUUUUUUU: " << Uni_Text_Size << "\n";
 
 	ItemVoxel::Create();
 	Form::CreateDraw();

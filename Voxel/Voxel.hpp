@@ -13,18 +13,32 @@
 # define VOXEL_AXIS_BITS 0b00111
 # define VOXEL_SPIN_BITS 0b11000
 
-class Voxel
+struct	VoxelOrientation
+{
+	char	Data;
+
+	VoxelOrientation(char axis, char spin);
+
+	void	SetAxis(char axis);
+	char	GetAxis() const;
+
+	void	SetSpin(char spin);
+	char	GetSpin() const;
+
+	VoxelOrientation	ToNonRandom() const;
+};
+
+class	Voxel
 {
 	protected:
 		char	ID;
-
 		char	Category;
-		char	Orientation;
+		VoxelOrientation	Orientation;
 
 	public:
 		Voxel();
 		Voxel(char id);
-		Voxel(char idx, char category, char orientation);
+		Voxel(char idx, char category, VoxelOrientation ori);
 		~Voxel();
 
 		Voxel(const Voxel & other);

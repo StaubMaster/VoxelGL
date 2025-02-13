@@ -23,10 +23,10 @@ when Placing a Voxel the Top Axis will try to face away up from the face it was 
 ### Except when it dosen't
 some Voxels will Orient (Log) some won't (Grass)
 TODO: Have Spin determines by the way the View is facing from the Axis. The Problem is that this would probably need to be hard code which axis to care about, but the Texture Orientation is already hardcoded so it would probybly be fitting.
-### Chunk Surrounding
+## Chunk Surrounding
 Chunks can be generated at a certain distance and removed at a different distance<br/>
 TODO: Save/Load
-### Chunk Stage Generation
+## Chunk Stage Generation
 currently unstructured<br/>
 When a Chunk is generated it is generated in Stages.
 - Allocate

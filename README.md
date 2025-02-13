@@ -7,7 +7,7 @@ on my local machine I specify the direct path because env-paths don't want to wo
 on 42 machine I use the '-lglfw' flag<br/>
 
 # Controls
-Esc : Closes Program
+Esc : Closes Program<br/>
 W A S D Space ShiftL : Move<br/>
 Tab : Inventory/Selection<br/>
 Mouse1 (L) : Place<br/>
@@ -27,7 +27,7 @@ TODO: Have Spin determines by the way the View is facing from the Axis. The Prob
 Chunks can be generated at a certain distance and removed at a different distance<br/>
 TODO: Save/Load
 ## Chunk Stage Generation
-currently unstructured<br/>
+(currently unstructured)<br/>
 When a Chunk is generated it is generated in Stages.
 - Allocate
 - Fill Basic Voxels

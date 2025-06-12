@@ -1,5 +1,5 @@
 
-#include "Hotbar.hpp"
+#include "HotBar.hpp"
 
 HotbarForm::HotbarForm(Size2D winSize, int slots_x)
 {

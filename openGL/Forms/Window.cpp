@@ -58,8 +58,10 @@ Window::Window(int w, int h, const char * name, bool resize)
 	Aspect.W = aspect_size / w;
 	Aspect.H = aspect_size / h;
 
-	Middle.X = w * 0.5;
-	Middle.Y = h * 0.5;
+	//Middle.X = w * 0.5;
+	//Middle.Y = h * 0.5;
+	Middle.X = w * 0.25;
+	Middle.Y = h * 0.25;
 
 	sizeChanged = true;
 }
@@ -189,8 +191,14 @@ Point2D	Window::CursorRasterized() const
 	glfwGetCursorPos(win, &mouse_x_dbl, &mouse_y_dbl);
 
 	return Point2D(
+	#ifdef __WIN32__
 		mouse_x_dbl,
 		mouse_y_dbl
+	#endif
+	#ifdef __APPLE__
+		mouse_x_dbl * 2,
+		mouse_y_dbl * 2
+	#endif
 	);
 }
 

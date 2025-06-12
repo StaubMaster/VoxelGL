@@ -261,6 +261,7 @@ int main(int argc, char **argv)
 
 
 		Point2D cursorPos = win -> CursorRasterized();
+		std::cout << cursorPos << "\n";
 
 		if (form_click.check()) { Inv.Click(cursorItemID); }
 		Inv.Visible = !(win -> tabbed);

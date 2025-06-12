@@ -15,6 +15,8 @@
 #include "openGL/Forms/Window.hpp"
 #include "openGL/Forms/Inventory.hpp"
 #include "openGL/Forms/HotBar.hpp"
+#include "openGL/Forms/Debug.hpp"
+#include "openGL/Forms/Controls/Text.hpp"
 
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
@@ -41,6 +43,8 @@ int Uni_Box_Depth;
 int Uni_Box_Aspect;
 int Uni_Box_Cycle;
 
+Shader * textShader = NULL;
+int Uni_Text_Size;
 
 static void	main_init()
 {
@@ -66,6 +70,12 @@ static void	main_init()
 	Uni_Box_Aspect = boxShader -> FindUniform("aspectRatio");
 	Uni_Box_Cycle = boxShader -> FindUniform("cycle");
 
+	textShader = new Shader("Text",
+		"shaders/Text.vert",
+		"shaders/Text.frag"
+	);
+	Uni_Text_Size = textShader -> FindUniform("windowSize");
+
 	ItemVoxel::Create();
 	Form::CreateDraw();
 }
@@ -76,6 +86,7 @@ static void	main_free()
 
 	delete voxelShader;
 	delete boxShader;
+	delete textShader;
 
 	delete win;
 }
@@ -100,6 +111,30 @@ int main(int argc, char **argv)
 	table.Set(VoxelData("images/WoodPlank.png",        false, false, false, true , true ));
 	std::cout << "table done\n";
 
+	std::cout << "text ...\n";
+	unsigned int text_texture;
+	{
+		glGenTextures(1, &text_texture);
+		glBindTexture(GL_TEXTURE_2D, text_texture);
+
+		//PNG_Image * text_img = PNG_Image::Load("images/fancy_Text15_16.png");
+		PNG_Image * text_img = PNG_Image::Load("images/fancy_Text15_16_Thick.png");
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, text_img -> w, text_img -> h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, text_img -> data);
+		delete text_img;
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+
+	BufferString text_Buff;
+	text_Buff.Append(10, 10, 25.0f, "TestT\nline2");
+	text_Buff.UpdateBuffer();
+	std::cout << "text done\n";
+
 	std::cout << "textures ...\n";
 	unsigned int texture_arr = table.InitTextures();
 	std::cout << "textures done\n";
@@ -120,6 +155,8 @@ int main(int argc, char **argv)
 
 	Point move;
 	EntityBox entity(AxisBox(Point(-0.6, -3.2, -0.6), Point(+0.6, +0.2, +0.6)));
+	entity.pos = Point(0, 10, 0);
+	entity.vel = Point();
 
 
 
@@ -133,7 +170,8 @@ int main(int argc, char **argv)
 
 	InventoryForm Inv(win -> Size, 12, 8);
 	HotbarForm Hot(win -> Size, 12);
-	Hot.Visible = true;
+	DebugForm DBG(win -> Size);
+
 
 	for (unsigned int i = 0; i < table.Length(); i++)
 		Inv.setSlot(i, i);
@@ -154,13 +192,13 @@ int main(int argc, char **argv)
 	glFrontFace(GL_CCW);
 
 	std::cout << ">>>> loop\n";
-	//for (int i = 0; i < 20; i++)
-	//	std::cout << "\n";
+	for (int i = 0; i < 20; i++)
+		std::cout << "\n";
 	while (!glfwWindowShouldClose(win -> win))
 	{
 		/*{
 			std::stringstream ss;
-			ss << "\e[18A\n";
+			ss << "\e[17A\n";
 			ss << "General Info\n";
 			ss << "+-Memory:\n";
 			ss << "  +-Static:\n";
@@ -224,15 +262,17 @@ int main(int argc, char **argv)
 		chunk_current.y = floorf(view.pos.y / Voxel_per_Side);
 		chunk_current.z = floorf(view.pos.z / Voxel_per_Side);
 
-		space.AddChunksRange(chunk_current, 1);
-		space.SubChunksRange(chunk_current, 2);
+		space.AddChunksRange(chunk_current, 3);
+		space.SubChunksRange(chunk_current, 6);
+		space.UpdateChunks();
+
 
 		VoxelHover hover;
 		hover = space.Cross(view.pos, view.ang.rotate_back(Point(0, 0, 1)));
 		if (voxel_add_key.check() && hover.isValid && Hot.SelectedItem() != -1)
 			space.tryAdd(hover, Hot.SelectedItem());
-		if (voxel_sub_key.check() && hover.isValid && Hot.SelectedItem() != -1)
-			space.trySub(hover, Hot.SelectedItem());
+		if (voxel_sub_key.check() && hover.isValid)
+			space.trySub(hover, 0);
 
 
 
@@ -256,21 +296,30 @@ int main(int argc, char **argv)
 		win -> UniformAspect(Uni_Box_Aspect);
 		space.DrawHover(hover);
 
-		entity.DrawBox();
+		//entity.DrawBox();
 
 
 
 		Point2D cursorPos = win -> CursorRasterized();
 		std::cout << cursorPos << "\n";
 
-		if (form_click.check()) { Inv.Click(cursorItemID); }
+		if (form_click.check())
+		{
+			if (!DBG.Click())
+			{
+				Inv.Click(cursorItemID);
+			}
+		}
 		Inv.Visible = !(win -> tabbed);
+		DBG.Visible = !(win -> tabbed);
 
 		Inv.UpdateAnchor(win -> Size);
 		Hot.UpdateAnchor(win -> Size);
+		DBG.UpdateAnchor(win -> Size);
 
 		Hot.Syncronize(Inv);
 		Inv.UpdateHover(cursorPos);
+		DBG.UpdateHover(cursorPos);
 
 		ItemVoxel::Update(FrameTimeDelta);
 		win -> UniformAspect(ItemVoxel::UniformAspect());
@@ -283,7 +332,20 @@ int main(int argc, char **argv)
 		Hot.Draw();
 		Inv.Draw();
 		if (cursorItemID != -1) { ItemVoxel::Draw(cursorPos.X, cursorPos.Y, cursorItemID); }
+		DBG.Draw();
 
+
+		{
+			textShader -> Use();
+			win -> UniformSize(Uni_Text_Size);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glActiveTexture(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, text_texture);
+
+			DBG.DrawText();
+			text_Buff.Draw();
+		}
 
 
 		glfwSwapBuffers(win -> win);
@@ -291,6 +353,7 @@ int main(int argc, char **argv)
 	}
 	std::cout << "<<<< loop\n";
 
+	glDeleteTextures(1, &text_texture);
 	glDeleteTextures(1, &texture_arr);
 }
 

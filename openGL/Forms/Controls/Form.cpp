@@ -48,7 +48,7 @@ Form::Form()
 	renders.push_back(Main.getRenderData());
 	Main.setRenderData(&renders[0]);
 
-	Visible = false;
+	Visible = true;
 }
 Form::Form(Box2D box) :
 	Main(box)
@@ -65,7 +65,7 @@ Form::Form(Box2D box) :
 	Main.setRenderData(&renders[0]);
 	Main.UpdateRender();
 
-	Visible = false;
+	Visible = true;
 }
 Form::~Form()
 {

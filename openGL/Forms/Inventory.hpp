@@ -7,17 +7,17 @@
 class	InventoryForm : public Form
 {
 	private:
-		FormSlot *	slots;
+		SlotControl *	slots;
 		int			slots_count;
 
-		FormSlot *	hots;
+		SlotControl *	hots;
 		int			hots_count;
 
 	public:
 		InventoryForm(Size2D winSize, int slots_x, int slots_y);
 		~InventoryForm();
 
-		void	Click(int & ID);
+		bool	Click(int & ID);
 
 		int		getSlot(int idx) const;
 		void	setSlot(int idx, int ID);

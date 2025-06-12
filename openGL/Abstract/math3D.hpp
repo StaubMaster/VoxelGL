@@ -8,12 +8,14 @@
 # include "Index3D.hpp"
 # include "Undex3D.hpp"
 
+# define AXIS_BITS_NONE 0b000
 # define AXIS_BITS_XN 0b001
 # define AXIS_BITS_XP 0b110
 # define AXIS_BITS_YN 0b010
 # define AXIS_BITS_YP 0b101
 # define AXIS_BITS_ZN 0b100
 # define AXIS_BITS_ZP 0b011
+# define AXIS_BITS_RAND 0b111
 
 struct	RayCast3D_Data
 {

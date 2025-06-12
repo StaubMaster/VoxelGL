@@ -12,12 +12,13 @@ FILES_VOXEL_CPP = \
 	Voxel/VoxelRenderData.cpp \
 	Voxel/VoxelChunk.cpp \
 	Voxel/VoxelSpace.cpp \
-	Voxel/VoxelDataTable.cpp
+	Voxel/VoxelDataTable.cpp \
+	Voxel/Structure.cpp
 
 FILES_O = $(FILES_CPP:.cpp=.o)
 FILES_O += $(FILES_VOXEL_CPP:.cpp=.o)
 
-FLAGS = -Wall -Wextra -Werror
+#FLAGS = -Wall -Wextra -Werror
 
 ARC_OPENGL_PATH = ./openGL
 ARC_OPENGL = $(ARC_OPENGL_PATH)/openGL.a

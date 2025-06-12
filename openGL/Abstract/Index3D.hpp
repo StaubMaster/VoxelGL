@@ -4,6 +4,8 @@
 
 # include <iostream>
 
+# include "Point.hpp"
+
 class Index3D
 {
 	public:
@@ -41,6 +43,9 @@ class Index3D
 		static bool	loop_exclusive(Index3D & idx, int min, int max);
 
 		void	Clamp(int min, int max);
+
+		static Index3D	Floor(Point p);
+		static Index3D	Ceil(Point p);
 };
 
 std::ostream & operator <<(std::ostream & o, const Index3D & idx);

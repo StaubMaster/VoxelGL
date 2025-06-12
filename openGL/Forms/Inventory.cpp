@@ -20,12 +20,12 @@ InventoryForm::InventoryForm(Size2D winSize, int slots_x, int slots_y) : Form()
 	Main.ChangeAnchor(winSize, Point2D());
 
 	slots_count = 0;
-	slots = new FormSlot[slots_x * slots_y];
+	slots = new SlotControl[slots_x * slots_y];
 	for (int yi = 0; yi < slots_y; yi++)
 	{
 		for (int xi = 0; xi < slots_x; xi++)
 		{
-			slots[slots_count] = FormSlot(
+			slots[slots_count] = SlotControl(
 				Main.Box.Min.X + xi * scale + (offset),
 				Main.Box.Min.Y + yi * scale + (offset),
 				Main.Box.Min.X + xi * scale + (scale - offset),
@@ -39,10 +39,10 @@ InventoryForm::InventoryForm(Size2D winSize, int slots_x, int slots_y) : Form()
 	}
 
 	hots_count = 0;
-	hots = new FormSlot[slots_x];
+	hots = new SlotControl[slots_x];
 	for (int xi = 0; xi < slots_x; xi++)
 	{
-		hots[hots_count] = FormSlot(
+		hots[hots_count] = SlotControl(
 			Main.Box.Min.X + xi * scale + (offset),
 			Main.Box.Min.Y + slots_y * scale + (offset) + 10,
 			Main.Box.Min.X + xi * scale + (scale - offset),
@@ -62,25 +62,27 @@ InventoryForm::~InventoryForm()
 	delete [] slots;
 }
 
-void	InventoryForm::Click(int & ID)
+bool	InventoryForm::Click(int & ID)
 {
 	for (int i = 0; i < slots_count; i++)
 	{
 		if (slots[i].isHover)
 		{
 			slots[i].SwapItem(ID);
-			break;
+			return (true);
 		}
 	}
- 
+
 	for (int i = 0; i < hots_count; i++)
 	{
 		if (hots[i].isHover)
 		{
 			hots[i].SwapItem(ID);
-			break;
+			return (true);
 		}
 	}
+
+	return (false);
 }
 
 int		InventoryForm::getSlot(int idx) const

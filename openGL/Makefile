@@ -15,9 +15,13 @@ FILES_CPP = stringHelp.cpp \
 	Forms/Controls/Control.cpp \
 	Forms/Controls/Button.cpp \
 	Forms/Controls/Slot.cpp \
+	Forms/Controls/Toggle.cpp \
+	Forms/Controls/Text.cpp \
 	Forms/Controls/Form.cpp \
+\
 	Forms/Inventory.cpp \
 	Forms/HotBar.cpp \
+	Forms/Debug.cpp \
 \
 	Abstract/math3D.cpp \
 	Abstract/Point.cpp \

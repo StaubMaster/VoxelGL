@@ -45,7 +45,22 @@ const Control & Control::operator =(const Control & other)
 	return *this;
 }
 
-
+float	Control::L() const
+{
+	return Box.Min.X;
+}
+float	Control::T() const
+{
+	return Box.Min.Y;
+}
+float	Control::R() const
+{
+	return Box.Max.X;
+}
+float	Control::B() const
+{
+	return Box.Max.Y;
+}
 
 void	Control::ChangeAnchor(Size2D formSize, Point2D formPos)
 {

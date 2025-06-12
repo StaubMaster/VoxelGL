@@ -1,31 +1,31 @@
 
 #include "Slot.hpp"
 
-FormSlot::FormSlot() :
+SlotControl::SlotControl() :
 	Control()
 {
 	itemID = -1;
 }
-FormSlot::FormSlot(float min_x, float min_y, float max_x, float max_y) :
+SlotControl::SlotControl(float min_x, float min_y, float max_x, float max_y) :
 	Control(min_x, min_y, max_x, max_y)
 {
 	itemID = -1;
 }
-FormSlot::~FormSlot()
+SlotControl::~SlotControl()
 {
 
 }
 
 
 
-Point2D	FormSlot::getCenter() const
+Point2D	SlotControl::getCenter() const
 {
 	return Point2D(
 		(Box.Min.X + Box.Max.X) / 2,
 		(Box.Min.Y + Box.Max.Y) / 2
 	);
 }
-void	FormSlot::UpdateHover(Point2D Mouse)
+void	SlotControl::UpdateHover(Point2D Mouse)
 {
 	Control::UpdateHover(Mouse);
 	UpdateRender();
@@ -33,7 +33,7 @@ void	FormSlot::UpdateHover(Point2D Mouse)
 
 
 
-void	FormSlot::UpdateRender()
+void	SlotControl::UpdateRender()
 {
 	if (render == NULL)
 		return;
@@ -53,7 +53,7 @@ void	FormSlot::UpdateRender()
 
 	render -> Depth = 0.5f;
 }
-void	FormSlot::DrawExtra() const
+void	SlotControl::DrawExtra() const
 {
 	if (itemID == -1) { return; }
 	Point2D center = getCenter();
@@ -62,17 +62,17 @@ void	FormSlot::DrawExtra() const
 
 
 
-void	FormSlot::SwapItem(int & ID)
+void	SlotControl::SwapItem(int & ID)
 {
 	int temp = ID;
 	ID = itemID;
 	itemID = temp;
 }
-void	FormSlot::setItem(int ID)
+void	SlotControl::setItem(int ID)
 {
 	itemID = ID;
 }
-int	FormSlot::getItem()
+int	SlotControl::getItem()
 {
 	return (itemID);
 }

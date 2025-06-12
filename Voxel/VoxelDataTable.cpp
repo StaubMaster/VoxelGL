@@ -31,7 +31,8 @@ Voxel	VoxelData::ToVoxel(char idx, char ori) const
 	char spin;
 	if (isFixedSpin) { spin = ori & VOXEL_SPIN_BITS; } else { spin = (std::rand() % 4) << 3; }
 
-	return Voxel(idx, category, axis | spin);
+	//return Voxel(idx, category, axis | spin);
+	return Voxel(idx, category, VoxelOrientation(axis, spin));
 }
 Voxel	VoxelData::ToVoxelForce(char idx, char ori) const
 {
@@ -45,7 +46,8 @@ Voxel	VoxelData::ToVoxelForce(char idx, char ori) const
 	char spin;
 	spin = ori & VOXEL_SPIN_BITS;
 
-	return Voxel(idx, category, axis | spin);
+	//return Voxel(idx, category, axis | spin);
+	return Voxel(idx, category, VoxelOrientation(axis, spin));
 }
 Voxel	VoxelData::ToVoxel(char idx, VoxelHover hover) const
 {
@@ -60,7 +62,8 @@ Voxel	VoxelData::ToVoxel(char idx, VoxelHover hover) const
 	//if (isFixedSpin) { spin = (hover.hit.dir2 << 3) & VOXEL_SPIN_BITS; } else { spin = (std::rand() % 4) << 3; }
 	spin = 0;
 
-	return Voxel(idx, category, axis | spin);
+	//return Voxel(idx, category, axis | spin);
+	return Voxel(idx, category, VoxelOrientation(axis, spin));
 }
 
 

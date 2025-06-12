@@ -198,10 +198,27 @@ void	Index3D::Clamp(int min, int max)
 
 
 
+Index3D	Index3D::Floor(Point p)
+{
+	return Index3D(
+		floorf(p.x),
+		floorf(p.y),
+		floorf(p.z)
+	);
+}
+Index3D	Index3D::Ceil(Point p)
+{
+	return Index3D(
+		ceilf(p.x),
+		ceilf(p.y),
+		ceilf(p.z)
+	);
+}
+
 
 
 std::ostream & operator <<(std::ostream & o, const Index3D & idx)
 {
-	o << idx.x << ":" << idx.y << ":" << idx.z;
+	o << "[" << idx.x << ":" << idx.y << ":" << idx.z << "]";
 	return o;
 }

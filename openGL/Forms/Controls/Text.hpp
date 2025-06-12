@@ -51,8 +51,8 @@ struct BufferString
 class TextControl : public Control
 {
 	private:
-		const char *	str;
-		float			str_size;
+		//const char *	str;
+		//float			str_size;
 
 	public:
 		TextControl();

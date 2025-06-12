@@ -93,6 +93,17 @@ static void	main_free()
 
 
 
+double scrollX;
+double scrollY;
+void ScrollCallback(GLFWwindow *win, double x, double y)
+{
+	(void)win;
+	scrollX = x;
+	scrollY = y;
+}
+
+
+
 int main(int argc, char **argv)
 {
 	main_init();
@@ -163,15 +174,16 @@ int main(int argc, char **argv)
 	KeyPress form_click(GLFW_MOUSE_BUTTON_1, true, false);
 	win -> keys.push_back(&form_click);
 
-	KeyPress HotIncKey(GLFW_MOUSE_BUTTON_4, true);
-	KeyPress HotDecKey(GLFW_MOUSE_BUTTON_5, true);
-	win -> keys.push_back(&HotIncKey);
-	win -> keys.push_back(&HotDecKey);
+	//KeyPress HotIncKey(GLFW_MOUSE_BUTTON_4, true);
+	//KeyPress HotDecKey(GLFW_MOUSE_BUTTON_5, true);
+	//win -> keys.push_back(&HotIncKey);
+	//win -> keys.push_back(&HotDecKey);
 
 	InventoryForm Inv(win -> Size, 12, 8);
 	HotbarForm Hot(win -> Size, 12);
 	DebugForm DBG(win -> Size);
 
+	glfwSetScrollCallback(win -> win, ScrollCallback);
 
 	for (unsigned int i = 0; i < table.Length(); i++)
 		Inv.setSlot(i, i);
@@ -250,10 +262,12 @@ int main(int argc, char **argv)
 
 
 
-		if (HotIncKey.check())
-			Hot.Inc();
-		if (HotDecKey.check())
-			Hot.Dec();
+		//if (HotIncKey.check())
+		//	Hot.Inc();
+		//if (HotDecKey.check())
+		//	Hot.Dec();
+		if (scrollY < 0) { Hot.Inc(); }
+		if (scrollY > 0) { Hot.Dec(); }
 
 
 
@@ -301,7 +315,7 @@ int main(int argc, char **argv)
 
 
 		Point2D cursorPos = win -> CursorRasterized();
-		std::cout << cursorPos << "\n";
+		//std::cout << cursorPos << "\n";
 
 		if (form_click.check())
 		{
@@ -347,6 +361,8 @@ int main(int argc, char **argv)
 			text_Buff.Draw();
 		}
 
+		scrollX = 0;
+		scrollY = 0;
 
 		glfwSwapBuffers(win -> win);
 		glfwPollEvents();

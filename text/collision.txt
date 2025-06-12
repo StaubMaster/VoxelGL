@@ -1,0 +1,157 @@
+
+collision get suck because
+
+─│┌┐└┘├┤┬┴┼╴╵╶╷╭╮╯╰▲▶▼◀
+
+
+
+looks like touching
+        ┌───────┐
+        │   2   │
+┌───────┤       │
+│   1   ├───────┘
+│       │
+└───────┘
+
+but they are colliding slightly in the X direction
+        │
+        │
+────────┼┐
+        ││
+        ││
+        ││
+        ││
+        └┼──────
+         │
+         │
+the only way to get out is by moving back in the X direction
+since any other direction would still be intersekting
+
+
+
+puch boxes apart ?
+find the smallest overlap
+push box:es in that direction apart from eachother
+Problem:
+this usually gets bouncy
+also if too much overlap is happaning then the box:es might get launched
+this is the desired outcome with moving vs moving collision
+but maybe not with moving vs static ?
+because minecraft dosent do that
+but in garrys mod everything leans more toward bouncy
+
+also how would one figure out if touching anything ?
+
+
+
+
+
+player is a pawn (like from a board game)
+the cone part can deform
+but the sphere shouldn't
+
+so just check that the shere dosent intersect with anything
+and make sure that the center stays a certain distance off the ground ?
+
+
+
+sphere vs Box collision
+
+if the center of the sphere is in a corner area
+then that corner is the closest,
+just check the distance from the coner (point)
+to the sphere
+
+not shown:
+if the center of the sphere is in an edge area
+then that edge is the closest,
+just check the distance from that edge (line)
+to the sphere
+
+if center of sphere is in a side area
+then that side is the closest,
+just check the distance from the side (plane)
+to the  sphere
+
+─│┌┐└┘├┤┬┴┼╴╵╶╷╭╮╯╰▲▶▼◀
+
+get area of a point
+┌──────────┐ ╶─────
+│          │  check point axis value
+│          │  against min and max of the box axis
+│          │  this will give one of (01 10 11)
+│          │  with (00) indicating an error (such as NaN)
+└──────────┘ ╶─────
+doing this for each axis will give 1 of 27 (3^3) areas
+[3] have 1 bit & [0] have 2 bits : corner (8 cases)
+[2] have 1 bit & [1] have 2 bits : edge (12 cases)
+[1] have 1 bit & [2] have 2 bits : side (6 cases)
+[0] have 1 bit & [3] have 2 bits : inside (1 case)
+
+all cases
+01 01 01 : corn
+10 01 01 : corn
+01 10 01 : corn
+10 10 01 : corn
+01 01 10 : corn
+10 01 10 : corn
+01 10 10 : corn
+10 10 10 : corn
+
+11 01 01 : edge
+11 10 01 : edge
+11 01 10 : edge
+11 10 10 : edge
+01 11 01 : edge
+10 11 01 : edge
+01 11 10 : edge
+10 11 10 : edge
+01 01 11 : edge
+10 01 11 : edge
+01 10 11 : edge
+10 10 11 : edge
+
+01 11 11 : side
+10 11 11 : side
+11 01 11 : side
+11 10 11 : side
+11 11 01 : side
+11 11 10 : side
+
+11 11 11 : inside
+
+
+
+in order:
+01 01 01 : corn
+10 01 01 : corn
+11 01 01 : edge
+01 10 01 : corn
+10 10 01 : corn
+11 10 01 : edge
+01 11 01 : edge
+10 11 01 : edge
+11 11 01 : side
+01 01 10 : corn
+10 01 10 : corn
+11 01 10 : edge
+01 10 10 : corn
+10 10 10 : corn
+11 10 10 : edge
+01 11 10 : edge
+10 11 10 : edge
+11 11 10 : side
+01 01 11 : edge
+10 01 11 : edge
+11 01 11 : side
+01 10 11 : edge
+10 10 11 : edge
+11 10 11 : side
+01 11 11 : side
+10 11 11 : side
+11 11 11 : inside
+
+
+
+
+

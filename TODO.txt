@@ -1,0 +1,13 @@
+
+make code cleaner
+organize things better
+
+fix chunk leading Issue
+fix form scaling
+make dubugging form do something
+fix collision making you sicky
+fix movement being so floaty
+
+but the mouse scroll here is fucked so working here is kind of difficult
+
+

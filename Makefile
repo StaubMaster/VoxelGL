@@ -18,7 +18,7 @@ FILES_VOXEL_CPP = \
 FILES_O = $(FILES_CPP:.cpp=.o)
 FILES_O += $(FILES_VOXEL_CPP:.cpp=.o)
 
-#FLAGS = -Wall -Wextra -Werror
+FLAGS = -std=c++11 -Wall -Wextra -Werror
 
 ARC_OPENGL_PATH = ./openGL
 ARC_OPENGL = $(ARC_OPENGL_PATH)/openGL.a

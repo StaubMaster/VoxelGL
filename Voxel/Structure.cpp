@@ -11,9 +11,9 @@ Structure::Structure(StructureData & data, Index3D global) :
 bool	Structure::relativeBool(Index3D global)
 {
 	Index3D rel_pos = global - globalPos;
-	if (rel_pos.x < 0 || rel_pos.x >= structureData.Size.x ||
-		rel_pos.y < 0 || rel_pos.y >= structureData.Size.y ||
-		rel_pos.z < 0 || rel_pos.z >= structureData.Size.z)
+	if (rel_pos.x < 0 || rel_pos.x >= (int)structureData.Size.x ||
+		rel_pos.y < 0 || rel_pos.y >= (int)structureData.Size.y ||
+		rel_pos.z < 0 || rel_pos.z >= (int)structureData.Size.z)
 	{
 		return false;
 	}
@@ -23,9 +23,9 @@ bool	Structure::relativeBool(Index3D global)
 Voxel	Structure::relative(Index3D global)
 {
 	Index3D rel_pos = global - globalPos;
-	if (rel_pos.x < 0 || rel_pos.x >= structureData.Size.x ||
-		rel_pos.y < 0 || rel_pos.y >= structureData.Size.y ||
-		rel_pos.z < 0 || rel_pos.z >= structureData.Size.z)
+	if (rel_pos.x < 0 || rel_pos.x >= (int)structureData.Size.x ||
+		rel_pos.y < 0 || rel_pos.y >= (int)structureData.Size.y ||
+		rel_pos.z < 0 || rel_pos.z >= (int)structureData.Size.z)
 	{
 		return structureData.Default;
 	}

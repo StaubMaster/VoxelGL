@@ -28,6 +28,7 @@ char	VoxelOrientation::GetAxis() const
 }
 void	VoxelOrientation::SetSpin(char spin)
 {
+	(void)spin;
 	/*if (spin == 0b100)
 	{
 		Data = (Data & 0b11100111) | ((std::rand() % 4) << 3);

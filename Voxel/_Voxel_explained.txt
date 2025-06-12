@@ -1,0 +1,49 @@
+─│┌┐└┘├┤┬┴┼╴╵╶╷╭╮╯╰▲▶▼◀
+
+
+
+VoxelDataTable
+  VoxelData
+
+Voxel
+  VoxelOrientation
+
+VoxelRenderData
+  TextureCoordCube
+    TextureCoordFace
+  DataStream
+
+VoxelChunk
+  []Voxel
+
+VoxelSpace
+  []VoxelChunk
+
+VoxelHover
+
+
+
+what does everything do:
+	Check Data
+		Hover
+		Collision
+	Update Data
+		Add/Sub Voxel
+		Generate
+	Render Data
+		Data changed
+		Neighbour changed
+		Info
+	Static Stuff
+
+
+
+I feel like with some of there parts
+it would be easier to start over
+instead of trying to change the already esisting stuff
+
+but right now I dont really feel motivated to do that
+especially since I am doing the other project right now
+although I am not sure what to do in the other project right now
+
+

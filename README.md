@@ -1,6 +1,8 @@
 # VoxelGL
 gonna try and make a voxel thing with openGL
 
+2025.06.12: dosent currentky work, [not motivated / dont have time to] reorganze everything to fix problems and add new stuff
+
 # Requirements
 lglfw is needen<br/>
 on my local machine I specify the direct path because env-paths don't want to work<br/>

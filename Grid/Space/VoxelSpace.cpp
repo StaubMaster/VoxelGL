@@ -1,5 +1,6 @@
-
 #include "VoxelSpace.hpp"
+
+
 
 VoxelSpace::VoxelSpace(VoxelDataTable & table) :
 	Table(table)

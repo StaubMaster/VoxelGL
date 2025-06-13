@@ -74,10 +74,15 @@ class VoxelChunk
 			const RenderData & operator =(const RenderData & other) = delete;
 
 			void	RequestUpdate();
+
+			void	UpdateFaceX(VoxelRenderData::DataStream * BitStream, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
+			void	UpdateFaceY(VoxelRenderData::DataStream * BitStream, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
+			void	UpdateFaceZ(VoxelRenderData::DataStream * BitStream, Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
 			void	Update(const VoxelChunk * here,
 						const VoxelChunk * Xn, const VoxelChunk * Xp,
 						const VoxelChunk * Yn, const VoxelChunk * Yp,
 						const VoxelChunk * Zn, const VoxelChunk * Zp);
+
 			void	Bind();
 			void	Draw() const;
 		};
@@ -85,10 +90,10 @@ class VoxelChunk
 	public:
 		RenderData		Render;
 
-		bool			NeedsBase;
-		bool			NeedsToRequest;
-		bool			allRequestsGotten() const;
-		bool			NeedsToGenRequest;
+		//bool			NeedsBase;
+		//bool			NeedsToRequest;
+		//bool			allRequestsGotten() const;
+		//bool			NeedsToGenRequest;
 
 		bool			NeedsGeneration1;
 		bool			NeedsGeneration2;

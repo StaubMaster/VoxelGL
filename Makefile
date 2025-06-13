@@ -9,6 +9,7 @@ FILES_CPP = \
 
 FILES_VOXEL_CPP = \
 	Grid/Voxel/Voxel.cpp \
+	Grid/Voxel/Voxel_VoxelOrientation.cpp \
 	Grid/Voxel/VoxelRenderData.cpp \
 	Grid/Voxel/VoxelRenderData_TextureCoordFace.cpp \
 	Grid/Voxel/VoxelRenderData_TextureCoordCube.cpp \
@@ -17,6 +18,7 @@ FILES_VOXEL_CPP = \
 	Grid/Chunk/VoxelChunk_Generate.cpp \
 	Grid/Chunk/VoxelChunk_RenderData.cpp \
 	Grid/Space/VoxelSpace.cpp \
+	Grid/Template/VoxelData.cpp \
 	Grid/Template/VoxelDataTable.cpp \
 	Grid/Template/Structure.cpp
 

@@ -1,5 +1,6 @@
-
 #include "Structure.hpp"
+
+
 
 Structure::Structure(StructureData & data, Index3D global) :
 	structureData(data),

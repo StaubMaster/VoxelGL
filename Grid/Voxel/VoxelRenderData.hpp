@@ -5,7 +5,6 @@
 # include "../../openGL/Abstract/Undex3D.hpp"
 
 # include "./Voxel.hpp"
-//# include "../Chunk/VoxelChunk.hpp"
 
 # define TEXTURE_XM 0b00100
 # define TEXTURE_XP 0b11000
@@ -105,9 +104,10 @@ struct VoxelRenderData
 
 			void	ToBuffer(unsigned int & count) const;
 
-		public:
+		private:
 			void FaceN(Undex3D vox_idx, const Voxel & vox, char tex_axis, Undex3D udx[6]);
 			void FaceP(Undex3D vox_idx, const Voxel & vox, char tex_axis, Undex3D udx[6]);
+
 			void FaceXn(Undex3D vox_idx, const Voxel & vox);
 			void FaceXp(Undex3D vox_idx, const Voxel & vox);
 			void FaceYn(Undex3D vox_idx, const Voxel & vox);
@@ -115,12 +115,9 @@ struct VoxelRenderData
 			void FaceZn(Undex3D vox_idx, const Voxel & vox);
 			void FaceZp(Undex3D vox_idx, const Voxel & vox);
 
+		public:
 			void FaceX(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
 			void FaceY(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
 			void FaceZ(Undex3D vox_idx, const Voxel * v_n, const Voxel * v_p);
-
-			void FaceX(Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-			void FaceY(Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
-			void FaceZ(Undex3D vox_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p);
 		};
 };

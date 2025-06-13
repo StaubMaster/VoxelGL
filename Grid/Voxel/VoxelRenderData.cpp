@@ -1,6 +1,5 @@
 
 #include "VoxelRenderData.hpp"
-#include "../Chunk/VoxelChunk.hpp"
 
 
 
@@ -28,21 +27,21 @@ VoxelRenderData::VoxelRenderData(Undex3D vox_pos_idx, char tex_info, const Voxel
 	else if (vox_axis == AXIS_BITS_ZP) { coords = Default::YP; }
 	else                               { coords = Default::Same; }
 
-	if (vox_axis == 0b001 || vox_axis == 0b110)
+	if (vox_axis == AXIS_BITS_XN || vox_axis == AXIS_BITS_XP)
 	{
 		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateXM(); }
 		else if (vox_spin == 2) { coords = coords.SpinAroundX(); }
 		else if (vox_spin == 3) { coords = coords.RotateXP(); }
 	}
-	else if (vox_axis == 0b010 || vox_axis == 0b101)
+	else if (vox_axis == AXIS_BITS_YN || vox_axis == AXIS_BITS_YP)
 	{
 		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateYM(); }
 		else if (vox_spin == 2) { coords = coords.SpinAroundY(); }
 		else if (vox_spin == 3) { coords = coords.RotateYP(); }
 	}
-	else if (vox_axis == 0b100 || vox_axis == 0b011)
+	else if (vox_axis == AXIS_BITS_ZN || vox_axis == AXIS_BITS_ZP)
 	{
 		     if (vox_spin == 0) { ; }
 		else if (vox_spin == 1) { coords = coords.RotateZM(); }
@@ -112,6 +111,9 @@ void VoxelRenderData::DataStream::FaceP(Undex3D vox_pos_idx, const Voxel & vox, 
 	Data[Index + 5] = VoxelRenderData(vox_pos_idx + udx[5], tex_axis | TEXTURE_MAX_MAX, vox);
 	Index += 6;
 }
+
+
+
 void VoxelRenderData::DataStream::FaceXn(Undex3D vox_pos_idx, const Voxel & vox)
 {
 	Undex3D udx[6] = {
@@ -227,90 +229,4 @@ void VoxelRenderData::DataStream::FaceZ(Undex3D vox_pos_idx, const Voxel * v_n, 
 	else if (isDraw == 0b10) { FaceZp(vox_pos_idx, *v_p); }
 }
 
-
-
-void VoxelRenderData::DataStream::FaceX(Undex3D vox_pos_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_pos_idx.y == Voxel_per_Side || vox_pos_idx.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_pos_idx.x == 0)
-	{
-		if (ch_n == NULL) { return; }
-		vn = &ch_n -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
-		vp = &here -> get(vox_pos_idx.set_get_X(0));
-		if (!vp -> isDraw()) { return; }
-	}
-	else if (vox_pos_idx.x == Voxel_per_Side)
-	{
-		if (ch_p == NULL) { return; }
-		vn = &here -> get(vox_pos_idx.set_get_X(Voxel_per_Side - 1));
-		vp = &ch_p -> get(vox_pos_idx.set_get_X(0));
-		if (!vn -> isDraw()) { return; }
-	}
-	else
-	{
-		vn = &here -> get(vox_pos_idx.set_get_X(vox_pos_idx.x - 1));
-		vp = &here -> get(vox_pos_idx.set_get_X(vox_pos_idx.x - 0));
-	}
-	FaceX(vox_pos_idx, vn, vp);
-}
-void VoxelRenderData::DataStream::FaceY(Undex3D vox_pos_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_pos_idx.x == Voxel_per_Side || vox_pos_idx.z == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_pos_idx.y == 0)
-	{
-		if (ch_n == NULL) { return; }
-		vn = &ch_n -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
-		vp = &here -> get(vox_pos_idx.set_get_Y(0));
-		if (!vp -> isDraw()) { return; }
-	}
-	else if (vox_pos_idx.y == Voxel_per_Side)
-	{
-		if (ch_p == NULL) { return; }
-		vn = &here -> get(vox_pos_idx.set_get_Y(Voxel_per_Side - 1));
-		vp = &ch_p -> get(vox_pos_idx.set_get_Y(0));
-		if (!vn -> isDraw()) { return; }
-	}
-	else
-	{
-		vn = &here -> get(vox_pos_idx.set_get_Y(vox_pos_idx.y - 1));
-		vp = &here -> get(vox_pos_idx.set_get_Y(vox_pos_idx.y - 0));
-	}
-	FaceY(vox_pos_idx, vn, vp);
-}
-void VoxelRenderData::DataStream::FaceZ(Undex3D vox_pos_idx, const VoxelChunk * here, const VoxelChunk * ch_n, const VoxelChunk * ch_p)
-{
-	if (vox_pos_idx.x == Voxel_per_Side || vox_pos_idx.y == Voxel_per_Side)
-		return;
-
-	const Voxel * vn = NULL;
-	const Voxel * vp = NULL;
-	if (vox_pos_idx.z == 0)
-	{
-		if (ch_n == NULL) { return; }
-		vn = &ch_n -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
-		vp = &here -> get(vox_pos_idx.set_get_Z(0));
-		if (!vp -> isDraw()) { return; }
-	}
-	else if (vox_pos_idx.z == Voxel_per_Side)
-	{
-		if (ch_p == NULL) { return; }
-		vn = &here -> get(vox_pos_idx.set_get_Z(Voxel_per_Side - 1));
-		vp = &ch_p -> get(vox_pos_idx.set_get_Z(0));
-		if (!vn -> isDraw()) { return; }
-	}
-	else
-	{
-		vn = &here -> get(vox_pos_idx.set_get_Z(vox_pos_idx.z - 1));
-		vp = &here -> get(vox_pos_idx.set_get_Z(vox_pos_idx.z - 0));
-	}
-	FaceZ(vox_pos_idx, vn, vp);
-}
 

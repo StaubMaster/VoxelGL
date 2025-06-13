@@ -8,12 +8,17 @@ FILES_CPP = \
 	MemorySize.cpp
 
 FILES_VOXEL_CPP = \
-	Voxel/Voxel.cpp \
-	Voxel/VoxelRenderData.cpp \
-	Voxel/VoxelChunk.cpp \
-	Voxel/VoxelSpace.cpp \
-	Voxel/VoxelDataTable.cpp \
-	Voxel/Structure.cpp
+	Grid/Voxel/Voxel.cpp \
+	Grid/Voxel/VoxelRenderData.cpp \
+	Grid/Voxel/VoxelRenderData_TextureCoordFace.cpp \
+	Grid/Voxel/VoxelRenderData_TextureCoordCube.cpp \
+	Grid/Voxel/VoxelRenderData_Default.cpp \
+	Grid/Chunk/VoxelChunk.cpp \
+	Grid/Chunk/VoxelChunk_Generate.cpp \
+	Grid/Chunk/VoxelChunk_RenderData.cpp \
+	Grid/Space/VoxelSpace.cpp \
+	Grid/Template/VoxelDataTable.cpp \
+	Grid/Template/Structure.cpp
 
 FILES_O = $(FILES_CPP:.cpp=.o)
 FILES_O += $(FILES_VOXEL_CPP:.cpp=.o)

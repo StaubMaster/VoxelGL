@@ -4,11 +4,11 @@
 # include <iostream>
 # include <vector>
 
-# include "../openGL/openGL.h"
-# include "../openGL/Abstract/math3D.hpp"
+# include "../../openGL/openGL.h"
+# include "../../openGL/Abstract/math3D.hpp"
 
-# include "VoxelChunk.hpp"
-# include "VoxelHover.hpp"
+# include "../Chunk/VoxelChunk.hpp"
+# include "./VoxelHover.hpp"
 
 class VoxelSpace
 {

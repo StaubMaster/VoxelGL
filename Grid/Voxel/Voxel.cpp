@@ -1,6 +1,5 @@
 
 #include "Voxel.hpp"
-#include "../openGL/Abstract/math3D.hpp"
 
 
 

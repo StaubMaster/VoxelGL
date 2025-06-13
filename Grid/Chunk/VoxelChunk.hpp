@@ -3,18 +3,18 @@
 
 # include <iostream>
 
-# include "../openGL/openGL.h"
-# include "../openGL/Abstract/math3D.hpp"
-# include "../openGL/Abstract/Point.hpp"
+# include "../../openGL/openGL.h"
+# include "../../openGL/Abstract/math3D.hpp"
+# include "../../openGL/Abstract/Point.hpp"
 
-# include "Voxel.hpp"
-# include "VoxelDataTable.hpp"
-# include "VoxelRenderData.hpp"
-# include "VoxelHover.hpp"
-# include "Structure.hpp"
+# include "../Voxel/Voxel.hpp"
+# include "../Voxel/VoxelRenderData.hpp"
+# include "../Template/VoxelDataTable.hpp"
+# include "../Space/VoxelHover.hpp"
+# include "../Template/Structure.hpp"
 
-# include "../AxisBox.hpp"
-# include "../MemorySize.hpp"
+# include "../../AxisBox.hpp"
+# include "../../MemorySize.hpp"
 
 //	!!!! when changing chunk size make sure to change it in the shader as well
 # define Voxel_per_Side 16

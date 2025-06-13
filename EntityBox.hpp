@@ -3,11 +3,11 @@
 # define ENTIRYBOX_HPP
 # include <iostream>
 
-# include "openGL/Abstract/Point.hpp"
+# include "./openGL/Abstract/Point.hpp"
 
-# include "Voxel/VoxelSpace.hpp"
+# include "./Grid/Space/VoxelSpace.hpp"
 
-# include "AxisBox.hpp"
+# include "./AxisBox.hpp"
 
 class EntityBox
 {

@@ -1,0 +1,43 @@
+
+
+
+Voxel.hpp
+	# include <iostream>
+	# include "../../AxisBox.hpp"
+	# include "../../openGL/Abstract/Undex3D.hpp"
+	# include "../../openGL/Abstract/math3D.hpp"
+
+
+VoxelRenderData.hpp
+	# include "../../openGL/openGL.h"
+	# include "../../openGL/Abstract/Undex3D.hpp"
+	# include "./Voxel.hpp"
+VoxelRenderData.cpp
+	#include "VoxelRenderData.hpp"
+	#include "../Chunk/VoxelChunk.hpp"
+
+
+VoxelDataTable.hpp
+	# include "../Voxel/Voxel.hpp"
+	# include "../Space/VoxelHover.hpp"
+	# include "../../openGL/openGL.h"
+	# include "../../FileParse/PNG/PNG_Image.hpp"
+
+Structure.hpp
+	# include "../Voxel/Voxel.hpp"
+
+
+VoxelSpace.hpp
+	# include "../Chunk/VoxelChunk.hpp"
+	# include "./VoxelHover.hpp"
+
+
+VoxelChunk
+	# include "../Voxel/Voxel.hpp"
+	# include "../Voxel/VoxelRenderData.hpp"
+	# include "../Template/VoxelDataTable.hpp"
+	# include "../Space/VoxelHover.hpp"
+	# include "../Template/Structure.hpp"
+
+
+

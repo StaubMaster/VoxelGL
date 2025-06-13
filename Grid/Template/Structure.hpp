@@ -1,9 +1,9 @@
 
 #pragma once
 
-# include "../openGL/Abstract/math3D.hpp"
+# include "../../openGL/Abstract/math3D.hpp"
 
-# include "Voxel.hpp"
+# include "../Voxel/Voxel.hpp"
 
 struct StructureData
 {

@@ -159,7 +159,8 @@ void	VoxelSpace::UpdateChunks()
 	{
 		if (Chunks[i] -> NeedsGeneration1)
 		{
-			Chunks[i] -> GeneratePlane(Table);
+			//Chunks[i] -> GeneratePlane(Table);
+			Chunks[i] -> GenerateVoxelRotationTest(Table);
 
 			Chunks[i] -> NeedsGeneration1 = false;
 			Chunks[i] -> NeedsGeneration2 = true;
@@ -196,7 +197,7 @@ void	VoxelSpace::UpdateChunks()
 
 			if (allAvailable)
 			{
-				VoxelChunk::GenerateFeature(Table, chunks);
+				//VoxelChunk::GenerateFeature(Table, chunks);
 				Chunks[i] -> NeedsGeneration2 = false;
 				Chunks[i] -> RequestBufferUpdate();
 				break;

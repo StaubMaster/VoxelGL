@@ -1,11 +1,11 @@
 
 # pragma once
 
-# include "../openGL/openGL.h"
-# include "../openGL/Abstract/Undex3D.hpp"
+# include "../../openGL/openGL.h"
+# include "../../openGL/Abstract/Undex3D.hpp"
 
-# include "Voxel.hpp"
-//# include "VoxelChunk.hpp"
+# include "./Voxel.hpp"
+//# include "../Chunk/VoxelChunk.hpp"
 
 # define TEXTURE_XM 0b00100
 # define TEXTURE_XP 0b11000
@@ -63,6 +63,20 @@ struct VoxelRenderData
 			TextureCoordCube	RotateZP() const;
 		};
 
+	private:
+		struct Default
+		{
+			Default() = delete;
+
+			static VoxelRenderData::TextureCoordCube Same;
+			static VoxelRenderData::TextureCoordCube ZM;
+			static VoxelRenderData::TextureCoordCube XM;
+			static VoxelRenderData::TextureCoordCube YM;
+			static VoxelRenderData::TextureCoordCube ZP;
+			static VoxelRenderData::TextureCoordCube XP;
+			static VoxelRenderData::TextureCoordCube YP;
+		};
+
 	//	======== ======== DATA ======== ========
 	private:
 		unsigned int	compressed_pos;
@@ -92,6 +106,8 @@ struct VoxelRenderData
 			void	ToBuffer(unsigned int & count) const;
 
 		public:
+			void FaceN(Undex3D vox_idx, const Voxel & vox, char tex_axis, Undex3D udx[6]);
+			void FaceP(Undex3D vox_idx, const Voxel & vox, char tex_axis, Undex3D udx[6]);
 			void FaceXn(Undex3D vox_idx, const Voxel & vox);
 			void FaceXp(Undex3D vox_idx, const Voxel & vox);
 			void FaceYn(Undex3D vox_idx, const Voxel & vox);

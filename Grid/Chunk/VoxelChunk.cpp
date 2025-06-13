@@ -2,6 +2,7 @@
 #include "VoxelChunk.hpp"
 
 
+
 #pragma region Loop Neighbour
 void	VoxelChunk::Loop_Index(unsigned int & vox, int & ch)
 {

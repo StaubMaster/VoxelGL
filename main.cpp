@@ -21,8 +21,8 @@
 #include "openGL/Shader.hpp"
 #include "openGL/View.hpp"
 
-#include "Voxel/VoxelChunk.hpp"
-#include "Voxel/VoxelSpace.hpp"
+#include "./Grid/Chunk/VoxelChunk.hpp"
+#include "./Grid/Space/VoxelSpace.hpp"
 
 #include "AxisBox.hpp"
 #include "EntityBox.hpp"

@@ -3,9 +3,10 @@
 
 # include <iostream>
 
-# include "../AxisBox.hpp"
+# include "../../AxisBox.hpp"
 
-# include "../openGL/Abstract/Undex3D.hpp"
+# include "../../openGL/Abstract/Undex3D.hpp"
+# include "../../openGL/Abstract/math3D.hpp"
 
 # define VOXEL_NO_DRAW_BIT     0b001
 # define VOXEL_NOT_SOLID_BIT   0b010

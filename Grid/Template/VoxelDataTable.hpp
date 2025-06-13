@@ -6,11 +6,11 @@
 # include <sstream>
 # include <vector>
 
-# include "Voxel.hpp"
-# include "VoxelHover.hpp"
+# include "../Voxel/Voxel.hpp"
+# include "../Space/VoxelHover.hpp"
 
-# include "../openGL/openGL.h"
-# include "../FileParse/PNG/PNG_Image.hpp"
+# include "../../openGL/openGL.h"
+# include "../../FileParse/PNG/PNG_Image.hpp"
 
 struct VoxelData
 {
